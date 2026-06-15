@@ -22,14 +22,14 @@ function TapeStrip() {
 function ReviewCard({ review }: { review: HomepageReview }) {
   return (
     <article
-      className="relative h-80 w-80 shrink-0 shadow-[0_10px_28px_rgba(0,0,0,0.22)]"
+      className="relative h-72 w-[min(18rem,calc(100vw-3rem))] shrink-0 shadow-[0_10px_28px_rgba(0,0,0,0.22)] sm:h-80 sm:w-80"
       style={{
         backgroundColor: review.backgroundColor,
         transform: `rotate(${review.rotation}deg)`,
       }}
     >
       <TapeStrip />
-      <div className="flex h-full flex-col justify-between p-8 pt-10">
+      <div className="flex h-full flex-col justify-between p-6 pt-9 sm:p-8 sm:pt-10">
         <p className="text-sm font-medium leading-5 text-[#1e2939]">
           {review.quote}
         </p>
@@ -53,12 +53,14 @@ export function HomepageReviews({
 }: HomepageReviewsProps) {
   return (
     <section
-      className={cn("bg-[#3d3d3d] px-4 py-12 md:px-8", className)}
+      className={cn("bg-[#3d3d3d] px-4 py-10 sm:py-12 md:px-8", className)}
     >
       {title ? (
-        <h2 className="mb-8 text-lg font-medium text-gray-300">{title}</h2>
+        <h2 className="mb-6 text-base font-medium text-gray-300 sm:mb-8 sm:text-lg">
+          {title}
+        </h2>
       ) : null}
-      <div className="-mx-2 flex gap-5 overflow-x-auto px-2 py-6 scrollbar-none md:gap-6">
+      <div className="-mx-2 flex gap-4 overflow-x-auto px-2 py-4 scrollbar-none sm:gap-5 sm:py-6 md:gap-6">
         {reviews.map((review) => (
           <ReviewCard key={`${review.name}-${review.city}`} review={review} />
         ))}

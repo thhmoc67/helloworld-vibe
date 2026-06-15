@@ -31,6 +31,11 @@ export const metadata: Metadata = {
   description: "HelloWorld design system and revamp",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

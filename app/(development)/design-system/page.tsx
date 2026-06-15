@@ -1,9 +1,20 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
+import { ShowcaseShell } from "@/components/layout/showcase-shell";
 import { HomepageReviews } from "@/components/marketing/homepage-reviews";
+import { LocalityCardDemo } from "@/components/marketing/locality-card-demo";
+import { SrpCardDemo } from "@/components/marketing/srp-card-demo";
+import { ModalDemo } from "@/components/ui/modal-demo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LocationSearchDemo } from "@/components/search/location-search-demo";
+import { ProgressBarDemo } from "@/components/ui/progress-bar-demo";
+import { PromoCodeInputDemo } from "@/components/ui/promo-code-input-demo";
+import { ProgressRingDemo } from "@/components/ui/progress-ring-demo";
+import { SegmentedControlDemo } from "@/components/ui/segmented-control-demo";
+import { TabNavDemo } from "@/components/ui/tab-nav-demo";
 import { colorPalettes, type ColorPalette } from "@/src/tokens/colors";
+import { gradientStops, gradients, textGradients } from "@/src/tokens/gradients";
 import { fontFamilies, typeScale } from "@/src/tokens/typography";
 
 const buttonHierarchies = [
@@ -18,6 +29,25 @@ const buttonHierarchies = [
 
 const buttonSizes = ["sm", "md", "lg", "xl", "2xl"] as const;
 
+const designSystemNav = [
+  { label: "Assets", href: "/assets" },
+  { label: "Logos", id: "logos" },
+  { label: "Colors", id: "colors" },
+  { label: "Gradients", id: "gradients" },
+  { label: "Typography", id: "typography" },
+  { label: "Reviews", id: "reviews" },
+  { label: "Buttons", id: "buttons" },
+  { label: "Segmented Control", id: "segmented-control" },
+  { label: "Location Search", id: "location-search" },
+  { label: "Progress Ring", id: "progress-ring" },
+  { label: "Progress Bar", id: "progress-bar" },
+  { label: "Tab Nav", id: "tab-nav" },
+  { label: "SRP Card", id: "srp-card" },
+  { label: "Locality Card", id: "locality-card" },
+  { label: "Modal", id: "modal" },
+  { label: "Inputs", id: "inputs" },
+] as const;
+
 function Section({
   id,
   title,
@@ -30,13 +60,15 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-8 border-t border-gray-200 py-16">
-      <div className="mb-10">
-        <h2 className="text-display-sm font-bold tracking-tight text-gray-900">
+    <section id={id} className="scroll-mt-24 border-t border-gray-200 py-10 sm:py-16">
+      <div className="mb-8 sm:mb-10">
+        <h2 className="text-display-xs font-bold tracking-tight text-gray-900 sm:text-display-sm">
           {title}
         </h2>
         {description ? (
-          <p className="mt-2 max-w-3xl text-lg text-gray-600">{description}</p>
+          <p className="mt-2 max-w-3xl text-base text-gray-600 sm:text-lg">
+            {description}
+          </p>
         ) : null}
       </div>
       {children}
@@ -85,38 +117,9 @@ const localityRatingCategories = [
   { emoji: "🏥", label: "Health" },
 ] as const;
 
-const bentoGradients = [
-  {
-    variant: "bento" as const,
-    name: "Transit",
-    className: "bg-bento-transit",
-    stops: ["#D2F0FE", "#E8FFC7"],
-    rating: "4.8",
-  },
-  {
-    variant: "bento" as const,
-    name: "Night Life",
-    className: "bg-bento-night-life",
-    stops: ["#D2F0FE", "#E9D7FE"],
-    rating: "4.9",
-  },
-  {
-    variant: "ratings-bar" as const,
-    name: "Locality Ratings",
-    className: "bg-bento-locality-ratings",
-    stops: ["#D2F0FE", "#E9D7FE"],
-  },
-  {
-    variant: "banner" as const,
-    name: "Vibe Match",
-    className: "bg-vibe-match",
-    stops: ["#B694FE", "#B9E6FE"],
-  },
-] as const;
-
-function GradientSwatch(gradient: (typeof bentoGradients)[number]) {
+function GradientSwatch({ gradient }: { gradient: (typeof gradients)[number] }) {
   const { variant, name, className, stops } = gradient;
-  const rating = "rating" in gradient ? gradient.rating : undefined;
+  const rating = gradient.rating;
   return (
     <div className="flex flex-col gap-4">
       {variant === "banner" ? (
@@ -134,23 +137,23 @@ function GradientSwatch(gradient: (typeof bentoGradients)[number]) {
         </div>
       ) : variant === "ratings-bar" ? (
         <div
-          className={`grid w-full max-w-md grid-cols-4 gap-2 rounded-3xl px-4 py-5 ${className}`}
+          className={`grid w-full max-w-md grid-cols-2 gap-3 rounded-3xl px-3 py-4 sm:grid-cols-4 sm:gap-2 sm:px-4 sm:py-5 ${className}`}
         >
           {localityRatingCategories.map((category) => (
-            <div key={category.label} className="text-center">
-              <p className="text-lg font-bold text-gray-900">
+            <div key={category.label} className="min-w-0 text-center">
+              <p className="text-base font-bold text-gray-900 sm:text-lg">
                 4.8 <span className="text-yelloworld-700">★</span>
               </p>
-              <p className="mt-1 text-xs text-gray-600">
+              <p className="mt-1 text-[11px] text-gray-600 sm:text-xs">
                 <span aria-hidden>{category.emoji} </span>
                 {category.label}
               </p>
             </div>
           ))}
         </div>
-      ) : (
+      ) : variant === "tile" ? (
         <div
-          className={`flex h-52 w-full max-w-xs flex-col justify-between rounded-3xl p-6 ${className}`}
+          className={`flex h-44 w-full max-w-xs flex-col justify-between rounded-3xl p-5 sm:h-52 sm:p-6 ${className}`}
         >
           <div>
             <p className="text-lg font-bold text-gray-900">
@@ -159,7 +162,26 @@ function GradientSwatch(gradient: (typeof bentoGradients)[number]) {
             <p className="mt-1 text-2xl font-bold text-gray-900">{name}</p>
           </div>
         </div>
-      )}
+      ) : variant === "card" ? (
+        <div
+          className={`w-full max-w-xs rounded-3xl p-6 shadow-md ${className}`}
+        >
+          <p className="text-center text-lg font-bold text-gray-900">
+            Let us help you!
+          </p>
+          <div className="mt-6 space-y-3">
+            <div className="h-10 rounded-lg border border-gray-200 bg-white" />
+            <div className="h-10 rounded-lg border border-gray-200 bg-white" />
+            <div className="h-10 rounded-lg border border-gray-200 bg-white" />
+          </div>
+        </div>
+      ) : variant === "cta" ? (
+        <div
+          className={`flex h-12 w-full max-w-xs items-center justify-center rounded-xl px-6 text-sm font-bold text-gray-900 ${className}`}
+        >
+          Request Callback
+        </div>
+      ) : null}
       <div className="px-1">
         <p className="text-sm font-medium text-gray-900">{className}</p>
         <p className="font-mono text-sm text-gray-500">
@@ -170,64 +192,44 @@ function GradientSwatch(gradient: (typeof bentoGradients)[number]) {
   );
 }
 
+function TextGradientSwatch({
+  gradient,
+}: {
+  gradient: (typeof textGradients)[number];
+}) {
+  return (
+    <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-gray-25 p-6">
+      <div className="overflow-visible py-1">
+        <p className={`${gradient.fontClassName} ${gradient.className}`}>
+          {gradient.sample}
+        </p>
+      </div>
+      <div>
+        <p className="text-sm font-medium text-gray-900">{gradient.className}</p>
+        <p className="font-mono text-sm text-gray-500">
+          {gradient.stops.join(" → ")}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function DesignSystemPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4">
-          <div>
-            <p className="text-sm font-medium text-hello-lime-700">
-              Helloworld Revamp
-            </p>
-            <h1 className="text-xl font-bold text-gray-900">Design System</h1>
-          </div>
-          <nav className="hidden gap-6 text-sm font-medium text-gray-600 md:flex">
-            <Link
-              href="/assets"
-              className="hover:text-gray-900"
-            >
-              Assets
-            </Link>
-            <a href="#logos" className="hover:text-gray-900">
-              Logos
-            </a>
-            <a href="#colors" className="hover:text-gray-900">
-              Colors
-            </a>
-            <a href="#gradients" className="hover:text-gray-900">
-              Gradients
-            </a>
-            <a href="#typography" className="hover:text-gray-900">
-              Typography
-            </a>
-            <a href="#buttons" className="hover:text-gray-900">
-              Buttons
-            </a>
-            <a href="#reviews" className="hover:text-gray-900">
-              Reviews
-            </a>
-            <a href="#inputs" className="hover:text-gray-900">
-              Inputs
-            </a>
-          </nav>
-          <Link
-            href="/"
-            className="text-sm font-medium text-gray-600 hover:text-gray-900"
-          >
-            Home
-          </Link>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-7xl px-6 pb-24">
-        <div className="border-b border-gray-200 py-16">
+    <ShowcaseShell
+      eyebrow="Helloworld Revamp"
+      title="Design System"
+      navItems={[...designSystemNav]}
+      secondaryLink={{ href: "/assets", label: "Assets" }}
+    >
+        <div className="border-b border-gray-200 py-10 sm:py-16">
           <p className="text-sm font-semibold uppercase tracking-wide text-hello-lime-700">
             Figma → Code
           </p>
-          <h1 className="mt-3 max-w-4xl text-display-lg font-bold tracking-tight text-gray-900">
+          <h1 className="mt-3 max-w-4xl text-display-md font-bold tracking-tight text-gray-900 sm:text-display-lg">
             Component library verification
           </h1>
-          <p className="mt-4 max-w-3xl text-lg text-gray-600">
+          <p className="mt-4 max-w-3xl text-base text-gray-600 sm:text-lg">
             Tokens and components mapped from the Helloworld Revamp Figma file.
             Use this page to verify colors, typography, and button variants match
             the design system.
@@ -280,64 +282,51 @@ export default function DesignSystemPage() {
         <Section
           id="gradients"
           title="Gradients"
-          description="Bento locality tiles, ratings bars, and property card banners — global Tailwind utilities from globals.css."
+          description="Background fills and headline text gradients — reusable Tailwind utilities from globals.css."
         >
-          <div className="space-y-10">
-            <div className="flex flex-wrap gap-8">
-              {bentoGradients.map((gradient) => (
-                <GradientSwatch key={gradient.className} {...gradient} />
-              ))}
+          <div className="space-y-12">
+            <div>
+              <h3 className="mb-6 text-lg font-semibold text-gray-900">
+                Background gradients
+              </h3>
+              <div className="flex flex-wrap gap-8">
+                {gradients.map((gradient) => (
+                  <GradientSwatch key={gradient.id} gradient={gradient} />
+                ))}
+              </div>
             </div>
+
+            <div>
+              <h3 className="mb-6 text-lg font-semibold text-gray-900">
+                Text gradients
+              </h3>
+              <div className="grid gap-6 sm:grid-cols-2">
+                {textGradients.map((gradient) => (
+                  <TextGradientSwatch key={gradient.id} gradient={gradient} />
+                ))}
+              </div>
+            </div>
+
             <div className="rounded-2xl border border-gray-200 bg-gray-25 p-6">
               <h3 className="text-sm font-semibold text-gray-900">
                 Stop tokens
               </h3>
               <div className="mt-4 flex flex-wrap gap-6">
-                <div className="flex items-center gap-3">
-                  <span className="size-10 rounded-lg border border-gray-200 bg-bento-sky" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      bento-sky
-                    </p>
-                    <p className="font-mono text-xs text-gray-500">#D2F0FE</p>
+                {Object.values(gradientStops).map((stop) => (
+                  <div key={stop.token} className="flex items-center gap-3">
+                    <span
+                      className={`size-10 rounded-lg border border-gray-200 ${stop.className}`}
+                    />
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {stop.token}
+                      </p>
+                      <p className="font-mono text-xs text-gray-500">
+                        {stop.hex}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="size-10 rounded-lg border border-gray-200 bg-bento-mint" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      bento-mint
-                    </p>
-                    <p className="font-mono text-xs text-gray-500">#E8FFC7</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="size-10 rounded-lg border border-gray-200 bg-bento-lavender" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      bento-lavender
-                    </p>
-                    <p className="font-mono text-xs text-gray-500">#E9D7FE</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="size-10 rounded-lg border border-gray-200 bg-vibe-match-start" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      vibe-match-start
-                    </p>
-                    <p className="font-mono text-xs text-gray-500">#B694FE</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="size-10 rounded-lg border border-gray-200 bg-vibe-match-end" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      vibe-match-end
-                    </p>
-                    <p className="font-mono text-xs text-gray-500">#B9E6FE</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
@@ -536,6 +525,70 @@ export default function DesignSystemPage() {
         </Section>
 
         <Section
+          id="segmented-control"
+          title="Segmented Control"
+          description="Pill toggle for switching locality views — animated sliding thumb with gray track and white active indicator."
+        >
+          <SegmentedControlDemo />
+        </Section>
+
+        <Section
+          id="location-search"
+          title="Location Search"
+          description="Combined city picker and locality search — pill bar with animated dropdowns for city list and filtered localities."
+        >
+          <LocationSearchDemo />
+        </Section>
+
+        <Section
+          id="progress-ring"
+          title="Progress Ring"
+          description="Animated donut charts for vibe match scores and resident recommendation — SVG stroke with gradient fill."
+        >
+          <ProgressRingDemo />
+        </Section>
+
+        <Section
+          id="progress-bar"
+          title="Progress Bar"
+          description="Horizontal recommendation bar — lime-to-forest gradient fill with animated width."
+        >
+          <ProgressBarDemo />
+        </Section>
+
+        <Section
+          id="tab-nav"
+          title="Tab Nav"
+          description="Property detail section tabs with lime active pill and gradient-underlined heading — horizontally scrollable on mobile."
+        >
+          <TabNavDemo />
+        </Section>
+
+        <Section
+          id="srp-card"
+          title="SRP Card"
+          description="Search results property card — image carousel, overlay badges, rating, room types, pricing, and dual CTAs. Variants: filling fast, saved, and offer."
+        >
+          <SrpCardDemo />
+        </Section>
+
+        <Section
+          id="locality-card"
+          title="Locality Card"
+          description="Desktop: wide card with arrow CTA and circular prev/next controls. Mobile: titled horizontal carousel with peek, arrow on card, and pill pagination dots."
+        >
+          <LocalityCardDemo />
+        </Section>
+
+        <Section
+          id="modal"
+          title="Modal"
+          description="Centered dialog overlay with dimmed backdrop, floating close button, and scroll lock. Login variant includes phone input and terms link."
+        >
+          <ModalDemo />
+        </Section>
+
+        <Section
           id="inputs"
           title="Inputs"
           description="Text fields with label, focus ring, disabled/read-only, and error states."
@@ -575,6 +628,13 @@ export default function DesignSystemPage() {
 
             <div>
               <h3 className="mb-6 text-lg font-semibold text-gray-900">
+                Promo / referral code
+              </h3>
+              <PromoCodeInputDemo />
+            </div>
+
+            <div>
+              <h3 className="mb-6 text-lg font-semibold text-gray-900">
                 With helper text
               </h3>
               <div className="max-w-sm">
@@ -587,7 +647,6 @@ export default function DesignSystemPage() {
             </div>
           </div>
         </Section>
-      </main>
-    </div>
+    </ShowcaseShell>
   );
 }

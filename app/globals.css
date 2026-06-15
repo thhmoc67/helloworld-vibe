@@ -160,37 +160,164 @@
   --shadow-md: 0 4px 6px -1px rgb(10 13 18 / 10%), 0 2px 4px -2px rgb(10 13 18 / 6%);
   --shadow-lg: 0 12px 16px -4px rgb(10 13 18 / 8%), 0 4px 6px -2px rgb(10 13 18 / 3%);
 
-  /* Bento card gradients (locality — Transit & Night Life) */
-  --color-bento-sky: #d2f0fe;
-  --color-bento-mint: #e8ffc7;
-  --color-bento-lavender: #e9d7fe;
+  /* Gradient stops — use bg-gradient-{stop} for solid swatches */
+  --color-gradient-sky: #d2f0fe;
+  --color-gradient-mint: #e8ffc7;
+  --color-gradient-lavender: #e9d7fe;
+  --color-gradient-purple: #b694fe;
+  --color-gradient-cyan: #b9e6fe;
+  --color-gradient-contact-sky: #d5ecf9;
+}
 
-  --background-image-bento-transit: linear-gradient(
+@utility bg-gradient-locality-transit {
+  background-image: linear-gradient(
     to bottom right,
-    var(--color-bento-sky) 0%,
-    var(--color-bento-mint) 100%
+    var(--color-gradient-sky) 0%,
+    var(--color-gradient-mint) 100%
   );
-  --background-image-bento-night-life: linear-gradient(
+}
+
+@utility bg-gradient-locality-night-life {
+  background-image: linear-gradient(
     to bottom right,
-    var(--color-bento-sky) 0%,
-    var(--color-bento-lavender) 100%
+    var(--color-gradient-sky) 0%,
+    var(--color-gradient-lavender) 100%
   );
+}
 
-  --background-image-bento-locality-ratings: linear-gradient(
+@utility bg-gradient-locality-ratings {
+  background-image: linear-gradient(
     to right,
-    var(--color-bento-sky) 0%,
-    var(--color-bento-lavender) 100%
+    var(--color-gradient-sky) 0%,
+    var(--color-gradient-lavender) 100%
   );
+}
 
-  /* Vibe Match banner (property card) */
-  --color-vibe-match-start: #b694fe;
-  --color-vibe-match-end: #b9e6fe;
-
-  --background-image-vibe-match: linear-gradient(
+@utility bg-gradient-property-vibe-match {
+  background-image: linear-gradient(
     to right,
-    var(--color-vibe-match-start) 0%,
-    var(--color-vibe-match-end) 100%
+    var(--color-gradient-purple) 0%,
+    var(--color-gradient-cyan) 100%
   );
+}
+
+@utility bg-gradient-contact-card {
+  background-image: linear-gradient(
+    to bottom,
+    var(--color-gradient-contact-sky) 0%,
+    #ffffff 100%
+  );
+}
+
+@utility bg-gradient-callback-cta {
+  background-image: linear-gradient(
+    to bottom,
+    var(--color-hello-lime-100) 0%,
+    var(--color-hello-lime-500) 100%
+  );
+}
+
+@utility bg-gradient-progress-recommend {
+  background-image: linear-gradient(
+    to right,
+    var(--color-hello-lime-100) 0%,
+    var(--color-hello-lime-700) 100%
+  );
+}
+
+@utility text-gradient-vibe {
+  display: inline-block;
+  width: fit-content;
+  padding-block: 0.08em;
+  line-height: 1.2;
+  background-image: linear-gradient(
+    to right,
+    #28b2af 0%,
+    #08a4ed 50%,
+    #8c40c1 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+@utility text-gradient-home {
+  display: inline-block;
+  width: fit-content;
+  padding-block: 0.08em;
+  line-height: 1.2;
+  background-image: linear-gradient(to right, #5876d1 0%, #7a87e0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+@utility text-gradient-belonging {
+  display: inline-block;
+  width: fit-content;
+  padding-block: 0.08em;
+  line-height: 1.2;
+  background-image: linear-gradient(to right, #08a4ed 0%, #8c40c1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+@utility text-gradient-different {
+  display: inline-block;
+  width: fit-content;
+  padding-block: 0.08em;
+  line-height: 1.2;
+  background-image: linear-gradient(
+    to right,
+    #4fb0b0 0%,
+    #4a90e2 40%,
+    #5b7fdb 70%,
+    #7b61ff 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+@utility text-gradient-score-vibe {
+  display: inline-block;
+  width: fit-content;
+  padding-block: 0.08em;
+  line-height: 1.2;
+  background-image: linear-gradient(
+    to right,
+    #378add 0%,
+    #7f77dd 50%,
+    #d4537e 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+@utility scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 body {

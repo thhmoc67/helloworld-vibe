@@ -100,7 +100,7 @@ export function Button({
       type={type}
       disabled={disabled}
       className={cn(
-        "inline-flex items-center justify-center rounded-lg font-semibold transition-colors",
+        "inline-flex items-center justify-center rounded-lg font-semibold transition-colors touch-manipulation",
         "focus-visible:outline-none focus-visible:ring-4",
         "disabled:cursor-not-allowed disabled:opacity-50",
         isLink ? "p-0" : sizeClasses[size],

@@ -82,7 +82,9 @@ export function AssetCard({ asset }: { asset: Asset | LottieAsset }) {
       <div className="flex flex-1 flex-col gap-3">
         <div>
           <p className="text-sm font-semibold text-gray-900">{asset.name}</p>
-          <p className="mt-1 font-mono text-xs text-gray-500">{asset.file}</p>
+          <p className="mt-1 truncate font-mono text-xs text-gray-500">
+            {asset.file}
+          </p>
         </div>
         <a
           href={asset.file}
