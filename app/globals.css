@@ -227,8 +227,9 @@
 
 @utility text-gradient-vibe {
   display: inline-block;
-  width: fit-content;
+  overflow: visible;
   padding-block: 0.08em;
+  padding-inline: 0.02em 0.14em;
   line-height: 1.2;
   background-image: linear-gradient(
     to right,
@@ -236,6 +237,7 @@
     #08a4ed 50%,
     #8c40c1 100%
   );
+  background-size: 100% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -246,10 +248,12 @@
 
 @utility text-gradient-home {
   display: inline-block;
-  width: fit-content;
+  overflow: visible;
   padding-block: 0.08em;
+  padding-inline: 0.02em 0.14em;
   line-height: 1.2;
   background-image: linear-gradient(to right, #5876d1 0%, #7a87e0 100%);
+  background-size: 100% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -260,10 +264,12 @@
 
 @utility text-gradient-belonging {
   display: inline-block;
-  width: fit-content;
+  overflow: visible;
   padding-block: 0.08em;
+  padding-inline: 0.02em 0.14em;
   line-height: 1.2;
   background-image: linear-gradient(to right, #08a4ed 0%, #8c40c1 100%);
+  background-size: 100% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -274,8 +280,9 @@
 
 @utility text-gradient-different {
   display: inline-block;
-  width: fit-content;
+  overflow: visible;
   padding-block: 0.08em;
+  padding-inline: 0.02em 0.14em;
   line-height: 1.2;
   background-image: linear-gradient(
     to right,
@@ -284,6 +291,7 @@
     #5b7fdb 70%,
     #7b61ff 100%
   );
+  background-size: 100% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -294,8 +302,9 @@
 
 @utility text-gradient-score-vibe {
   display: inline-block;
-  width: fit-content;
+  overflow: visible;
   padding-block: 0.08em;
+  padding-inline: 0.02em 0.14em;
   line-height: 1.2;
   background-image: linear-gradient(
     to right,
@@ -303,6 +312,7 @@
     #7f77dd 50%,
     #d4537e 100%
   );
+  background-size: 100% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
