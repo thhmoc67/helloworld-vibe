@@ -9,6 +9,12 @@ import type { NeighborhoodCardData } from "@/src/tokens/neighborhood-card";
 const CARD_ANIMATION_MS = 700;
 const STAGGER_MS = 100;
 const CARD_DELAY_OFFSET_MS = 80;
+const CARD_WIDTH_PX = 220;
+const CARD_GAP_CLASS = "gap-4";
+const TIMELINE_ROW_PADDING_X = "0.25rem";
+const TIMELINE_DOT_OFFSET_PX = CARD_WIDTH_PX / 2;
+const TIMELINE_ROW_HEIGHT_PX = 24;
+const TIMELINE_LINE_TOP_PX = TIMELINE_ROW_HEIGHT_PX / 2;
 
 export interface NeighborhoodCardProps extends NeighborhoodCardData {
   className?: string;
@@ -93,19 +99,15 @@ export function NeighborhoodCard({
   );
 }
 
-function TimelineMarker({
-  index,
-  total,
+function TimelineDot({
   isActive,
   shouldAnimate,
+  delay,
 }: {
-  index: number;
-  total: number;
   isActive: boolean;
   shouldAnimate: boolean;
+  delay: number;
 }) {
-  const delay = index * STAGGER_MS;
-
   return (
     <div
       className={cn(
@@ -119,36 +121,6 @@ function TimelineMarker({
           shouldAnimate && isActive ? `${delay}ms` : "0ms",
       }}
     >
-      {index > 0 ? (
-        <span
-          aria-hidden
-          className={cn(
-            "absolute right-1/2 top-1/2 h-0.5 w-1/2 origin-right -translate-y-1/2 bg-blue-light-800",
-            "transition-transform ease-out motion-reduce:transition-none",
-            shouldAnimate && (isActive ? "scale-x-100" : "scale-x-0"),
-          )}
-          style={{
-            transitionDuration: `${CARD_ANIMATION_MS}ms`,
-            transitionDelay:
-              shouldAnimate && isActive ? `${delay}ms` : "0ms",
-          }}
-        />
-      ) : null}
-      {index < total - 1 ? (
-        <span
-          aria-hidden
-          className={cn(
-            "absolute left-1/2 top-1/2 h-0.5 w-1/2 origin-left -translate-y-1/2 bg-blue-light-800",
-            "transition-transform ease-out motion-reduce:transition-none",
-            shouldAnimate && (isActive ? "scale-x-100" : "scale-x-0"),
-          )}
-          style={{
-            transitionDuration: `${CARD_ANIMATION_MS}ms`,
-            transitionDelay:
-              shouldAnimate && isActive ? `${delay}ms` : "0ms",
-          }}
-        />
-      ) : null}
       <span
         aria-hidden
         className={cn(
@@ -192,7 +164,31 @@ export function NeighborhoodTimeline({
   return (
     <div ref={useInternalRef ? ref : undefined} className={cn("min-w-0", className)}>
       <div className="overflow-x-auto scrollbar-none">
-        <div className="flex w-max min-w-full gap-4 px-1 pb-2">
+        <div
+          className={cn(
+            "relative flex w-max min-w-full px-1 pb-2",
+            CARD_GAP_CLASS,
+          )}
+        >
+          {showTimeline && items.length > 1 ? (
+            <span
+              aria-hidden
+              className={cn(
+                "pointer-events-none absolute z-0 h-0.5 bg-blue-light-800",
+                "origin-left transition-transform ease-out motion-reduce:transition-none",
+                shouldAnimate && (isActive ? "scale-x-100" : "scale-x-0"),
+              )}
+              style={{
+                top: TIMELINE_LINE_TOP_PX,
+                left: `calc(${TIMELINE_ROW_PADDING_X} + ${TIMELINE_DOT_OFFSET_PX}px)`,
+                right: `calc(${TIMELINE_ROW_PADDING_X} + ${TIMELINE_DOT_OFFSET_PX}px)`,
+                transitionDuration: `${CARD_ANIMATION_MS}ms`,
+                transitionDelay:
+                  shouldAnimate && isActive ? `${STAGGER_MS}ms` : "0ms",
+              }}
+            />
+          ) : null}
+
           {items.map((item, index) => {
             const delay = index * STAGGER_MS + CARD_DELAY_OFFSET_MS;
 
@@ -202,11 +198,10 @@ export function NeighborhoodTimeline({
                 className="flex w-[220px] shrink-0 flex-col items-center"
               >
                 {showTimeline ? (
-                  <TimelineMarker
-                    index={index}
-                    total={items.length}
+                  <TimelineDot
                     isActive={isActive}
                     shouldAnimate={shouldAnimate}
+                    delay={index * STAGGER_MS}
                   />
                 ) : null}
 

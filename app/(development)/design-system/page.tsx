@@ -9,6 +9,7 @@ import { SrpCardDemo } from "@/components/marketing/srp-card-demo";
 import { ModalDemo } from "@/components/ui/modal-demo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { VisitSchedulerDemo } from "@/components/booking/visit-scheduler-demo";
 import { LocationSearchDemo } from "@/components/search/location-search-demo";
 import { ProgressBarDemo } from "@/components/ui/progress-bar-demo";
 import { PromoCodeInputDemo } from "@/components/ui/promo-code-input-demo";
@@ -42,6 +43,7 @@ const designSystemNav = [
   { label: "Buttons", id: "buttons" },
   { label: "Segmented Control", id: "segmented-control" },
   { label: "Location Search", id: "location-search" },
+  { label: "Visit Scheduler", id: "visit-scheduler" },
   { label: "Progress Ring", id: "progress-ring" },
   { label: "Progress Bar", id: "progress-bar" },
   { label: "Tab Nav", id: "tab-nav" },
@@ -395,6 +397,14 @@ export default function DesignSystemPage() {
           description="Combined city picker and locality search — pill bar with animated dropdowns for city list and filtered localities."
         >
           <LocationSearchDemo />
+        </Section>
+
+        <Section
+          id="visit-scheduler"
+          title="Visit Scheduler"
+          description="Booking date and time picker — sliding blue-light selection indicators on date cards and time pills, staggered scroll-in entrance, and time slots re-animate when the date changes."
+        >
+          <VisitSchedulerDemo />
         </Section>
 
         <Section
