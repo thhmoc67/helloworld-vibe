@@ -1,0 +1,66 @@
+{
+  "source": "Helloworld Revamp.fig",
+  "nodeId": "2501:24581",
+  "logos": [
+    {
+      "name": "App Icon",
+      "id": "2113:34162",
+      "file": "/logos/app-icon.svg"
+    },
+    {
+      "name": "Logo with Wordmark",
+      "id": "2113:34163",
+      "file": "/logos/logo-with-wordmark.svg"
+    },
+    {
+      "name": "Logo Mark",
+      "id": "2113:34164",
+      "file": "/logos/logo-mark.svg"
+    },
+    {
+      "name": "Favicon",
+      "id": "2501:24585",
+      "file": "/logos/favicon.svg"
+    },
+    {
+      "name": "Logo Variation 1",
+      "id": "2501:24591",
+      "file": "/logos/logo-variation-1.svg"
+    },
+    {
+      "name": "Logo Variation 2",
+      "id": "2501:24593",
+      "file": "/logos/logo-variation-2.svg"
+    },
+    {
+      "name": "Logo Variation 3",
+      "id": "2501:24594",
+      "file": "/logos/logo-variation-3.svg"
+    },
+    {
+      "name": "Monogram 1",
+      "id": "2501:24604",
+      "file": "/logos/monogram-1.svg"
+    },
+    {
+      "name": "Monogram 2",
+      "id": "2501:24605",
+      "file": "/logos/monogram-2.svg"
+    },
+    {
+      "name": "Monogram 3 (on dark)",
+      "id": "2501:24606",
+      "file": "/logos/monogram-3.svg"
+    },
+    {
+      "name": "Word Mark 1",
+      "id": "2501:24609",
+      "file": "/logos/wordmark-1.svg"
+    },
+    {
+      "name": "Word Mark 2",
+      "id": "2501:24610",
+      "file": "/logos/wordmark-2.svg"
+    }
+  ]
+}
