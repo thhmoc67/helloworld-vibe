@@ -54,7 +54,7 @@ export function LocalityCardDemo() {
   }
 
   return (
-    <div className="grid gap-16 xl:grid-cols-2 xl:items-start">
+    <div className="grid gap-16 xl:grid-cols-1 xl:items-start">
       <div>
         <DemoLabel>Desktop</DemoLabel>
         <div className="flex flex-col items-center gap-6">

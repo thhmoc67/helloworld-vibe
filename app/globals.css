@@ -320,6 +320,22 @@
   }
 }
 
+@keyframes tab-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-tab-panel-in {
+  animation: tab-panel-in 300ms ease-out both;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

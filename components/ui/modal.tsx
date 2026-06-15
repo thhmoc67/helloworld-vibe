@@ -3,10 +3,13 @@
 import {
   useEffect,
   useRef,
+  useState,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/src/lib/cn";
+
+const MODAL_TRANSITION_MS = 300;
 
 export interface ModalProps {
   open: boolean;
@@ -47,9 +50,27 @@ export function Modal({
   closeLabel = "Close dialog",
 }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(open);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!open) return;
+    if (open) {
+      setMounted(true);
+      const frame = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setVisible(true));
+      });
+      return () => cancelAnimationFrame(frame);
+    }
+
+    setVisible(false);
+    const timer = window.setTimeout(() => setMounted(false), MODAL_TRANSITION_MS);
+    return () => window.clearTimeout(timer);
+  }, [open]);
+
+  useEffect(() => {
+    if (!mounted) {
+      return;
+    }
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -61,28 +82,50 @@ export function Modal({
     }
 
     document.addEventListener("keydown", handleKeyDown);
-    panelRef.current?.focus();
 
     return () => {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open, onClose]);
+  }, [mounted, onClose]);
 
-  if (!open) {
+  useEffect(() => {
+    if (visible) {
+      panelRef.current?.focus();
+    }
+  }, [visible]);
+
+  if (!mounted) {
     return null;
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+    <div
+      className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6",
+        !visible && "pointer-events-none",
+      )}
+    >
       <button
         type="button"
         aria-label="Close dialog"
         onClick={onClose}
-        className="absolute inset-0 bg-gray-900/60 backdrop-blur-[2px]"
+        className={cn(
+          "absolute inset-0 bg-gray-900/60 backdrop-blur-[2px]",
+          "transition-opacity duration-300 ease-out motion-reduce:transition-none",
+          visible ? "opacity-100" : "opacity-0",
+        )}
       />
 
-      <div className="relative w-full max-w-[400px]">
+      <div
+        className={cn(
+          "relative w-full max-w-[400px]",
+          "transition-all duration-300 ease-out motion-reduce:transition-none",
+          visible
+            ? "translate-y-0 scale-100 opacity-100"
+            : "translate-y-4 scale-95 opacity-0",
+        )}
+      >
         <button
           type="button"
           aria-label={closeLabel}

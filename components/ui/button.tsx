@@ -94,15 +94,27 @@ export function Button({
   ...props
 }: ButtonProps) {
   const isLink = hierarchy === "link-color" || hierarchy === "link-gray";
+  const hasShadow =
+    hierarchy === "primary" ||
+    hierarchy === "secondary-color" ||
+    hierarchy === "secondary-gray";
 
   return (
     <button
       type={type}
       disabled={disabled}
       className={cn(
-        "inline-flex items-center justify-center rounded-lg font-semibold transition-colors touch-manipulation",
+        "inline-flex items-center justify-center rounded-lg font-semibold touch-manipulation",
         "focus-visible:outline-none focus-visible:ring-4",
         "disabled:cursor-not-allowed disabled:opacity-50",
+        isLink
+          ? "transition-colors duration-200 ease-out motion-reduce:transition-none"
+          : cn(
+              "transition-[color,background-color,border-color,box-shadow,transform] duration-200 ease-out",
+              "motion-reduce:transition-none motion-reduce:active:scale-100",
+              "hover:-translate-y-px active:translate-y-0 active:scale-[0.98]",
+              hasShadow && "hover:shadow-sm active:shadow-xs",
+            ),
         isLink ? "p-0" : sizeClasses[size],
         isLink && linkSizeClasses[size],
         getHierarchyClasses(hierarchy, destructive),

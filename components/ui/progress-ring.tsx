@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useState } from "react";
 import { cn } from "@/src/lib/cn";
+import { useAnimateOnView } from "@/src/lib/use-animate-on-view";
+import { useCountUp } from "@/src/lib/use-count-up";
 
 export type ProgressRingVariant = "vibe" | "recommend";
 
@@ -40,6 +42,8 @@ const sizeConfig: Record<
   },
 };
 
+const PROGRESS_ANIMATION_MS = 1000;
+
 function clampValue(value: number) {
   return Math.min(100, Math.max(0, value));
 }
@@ -55,17 +59,28 @@ export function ProgressRing({
   const reactId = useId();
   const gradientId = `${reactId}-ring-gradient`;
   const { dimension, stroke, fontClass, labelClass } = sizeConfig[size];
+  const clampedValue = clampValue(value);
+  const { ref, isActive, shouldAnimate } = useAnimateOnView(animate);
+  const displayValue = useCountUp(clampedValue, {
+    active: isActive,
+    enabled: shouldAnimate,
+    duration: PROGRESS_ANIMATION_MS,
+  });
 
   const radius = (100 - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
-  const targetOffset = circumference * (1 - clampValue(value) / 100);
+  const targetOffset = circumference * (1 - clampedValue / 100);
 
   const [strokeOffset, setStrokeOffset] = useState(
-    animate ? circumference : targetOffset,
+    shouldAnimate ? circumference : targetOffset,
   );
 
   useEffect(() => {
-    if (!animate) {
+    if (!isActive) {
+      return;
+    }
+
+    if (!shouldAnimate) {
       setStrokeOffset(targetOffset);
       return;
     }
@@ -75,14 +90,18 @@ export function ProgressRing({
     });
 
     return () => cancelAnimationFrame(frame);
-  }, [animate, targetOffset, circumference]);
+  }, [isActive, shouldAnimate, targetOffset]);
 
   const isRecommend = variant === "recommend";
 
   return (
     <div
+      ref={ref}
       className={cn(
         "flex flex-col items-center gap-3 text-center",
+        shouldAnimate &&
+          "transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none",
+        shouldAnimate && (isActive ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"),
         className,
       )}
     >
@@ -90,7 +109,7 @@ export function ProgressRing({
         className="relative shrink-0"
         style={{ width: dimension, height: dimension }}
         role="img"
-        aria-label={`${clampValue(value)} percent`}
+        aria-label={`${clampedValue} percent`}
       >
         <svg
           viewBox="0 0 100 100"
@@ -143,8 +162,12 @@ export function ProgressRing({
             strokeDasharray={circumference}
             strokeDashoffset={strokeOffset}
             className={cn(
-              animate && "transition-[stroke-dashoffset] duration-1000 ease-out motion-reduce:transition-none",
+              shouldAnimate &&
+                "transition-[stroke-dashoffset] duration-1000 ease-out motion-reduce:transition-none",
             )}
+            style={{
+              transitionDuration: shouldAnimate ? `${PROGRESS_ANIMATION_MS}ms` : undefined,
+            }}
           />
         </svg>
 
@@ -156,7 +179,7 @@ export function ProgressRing({
                 fontClass,
               )}
             >
-              {clampValue(value)}%
+              {displayValue}%
             </span>
           ) : (
             <span
@@ -165,7 +188,7 @@ export function ProgressRing({
                 fontClass,
               )}
             >
-              {clampValue(value)}%
+              {displayValue}%
             </span>
           )}
         </div>

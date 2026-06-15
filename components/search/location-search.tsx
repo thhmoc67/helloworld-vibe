@@ -352,9 +352,20 @@ export function LocationSearch({
             type="button"
             aria-label="Search localities"
             onClick={handleSearch}
-            className="ml-1 flex size-10 shrink-0 items-center justify-center rounded-full bg-hello-lime-500 text-white transition-colors hover:bg-hello-lime-600 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-hello-lime-100 sm:size-11"
+            className={cn(
+              "group ml-1 flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-hello-lime-500 text-white transition-all duration-200",
+              "hover:w-auto hover:bg-hello-lime-600 hover:pl-4 hover:pr-5",
+              "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-hello-lime-100",
+              "sm:h-11 sm:w-11",
+            )}
           >
-            <SearchIcon className="size-5" />
+            <SearchIcon className="size-5 shrink-0" />
+            <span
+              aria-hidden
+              className="max-w-0 overflow-hidden whitespace-nowrap text-sm font-semibold opacity-0 transition-all duration-200 group-hover:ml-2 group-hover:max-w-16 group-hover:opacity-100"
+            >
+              Search
+            </span>
           </button>
         </div>
       </div>
