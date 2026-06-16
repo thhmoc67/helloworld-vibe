@@ -25,9 +25,10 @@ export type LocalityAmenity = {
 
 export type LocalityProperty = {
   id: string;
+  propertyId: number;
   name: string;
   subtitle: string;
-  images: typeof srpCardSampleImages;
+  images: readonly string[];
   rating: number;
   roomTypes: readonly string[];
   rent: number;
@@ -36,6 +37,9 @@ export type LocalityProperty = {
   statusLabel?: SrpCardStatusLabel;
   visitsToday?: number;
   genderLabel?: string;
+  city?: string;
+  location?: string;
+  propertyUrl?: string;
 };
 
 export type LocalityVibeChip = {
@@ -231,6 +235,7 @@ export const localityVibeChips: readonly LocalityVibeChip[] = [
 export const localityProperties: readonly LocalityProperty[] = [
   {
     id: "park-square",
+    propertyId: 1001,
     name: "HelloWorld Park Square",
     subtitle: `Coliving PG in ${localityPage.name}`,
     images: srpCardSampleImages,
@@ -242,6 +247,7 @@ export const localityProperties: readonly LocalityProperty[] = [
   },
   {
     id: "mahaveer",
+    propertyId: 1002,
     name: "HelloWorld Mahaveer",
     subtitle: `Coliving PG in ${localityPage.name}`,
     images: srpCardSampleImages,
@@ -253,6 +259,7 @@ export const localityProperties: readonly LocalityProperty[] = [
   },
   {
     id: "suncity",
+    propertyId: 1003,
     name: "HelloWorld Sun City",
     subtitle: `Coliving PG in ${localityPage.name}`,
     images: srpCardSampleImages,
@@ -266,6 +273,7 @@ export const localityProperties: readonly LocalityProperty[] = [
   },
   {
     id: "green-view",
+    propertyId: 1004,
     name: "HelloWorld Green View",
     subtitle: `Coliving PG in ${localityPage.name}`,
     images: srpCardSampleImages,
@@ -276,6 +284,7 @@ export const localityProperties: readonly LocalityProperty[] = [
   },
   {
     id: "metro-hub",
+    propertyId: 1005,
     name: "HelloWorld Metro Hub",
     subtitle: `Coliving PG in ${localityPage.name}`,
     images: srpCardSampleImages,
@@ -286,6 +295,7 @@ export const localityProperties: readonly LocalityProperty[] = [
   },
   {
     id: "central",
+    propertyId: 1006,
     name: "HelloWorld Central",
     subtitle: `Coliving PG in ${localityPage.name}`,
     images: srpCardSampleImages,

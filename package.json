@@ -12,11 +12,16 @@
   },
   "dependencies": {
     "fig-kiwi": "^0.0.1",
+    "gray-matter": "^4.0.3",
     "kiwi-schema": "^0.5.0",
     "lottie-react": "^2.4.1",
     "next": "16.2.9",
+    "next-mdx-remote": "^6.0.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

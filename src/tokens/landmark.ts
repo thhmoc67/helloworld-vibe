@@ -106,6 +106,7 @@ export const landmarkDayFromHereItems: readonly NeighborhoodCardData[] = [
 export const landmarkProperties: readonly LocalityProperty[] = [
   {
     id: "pes-greens",
+    propertyId: 2001,
     name: "HelloWorld PES Greens",
     subtitle: `Coliving PG near ${landmarkPage.name}`,
     images: srpCardSampleImages,
@@ -117,6 +118,7 @@ export const landmarkProperties: readonly LocalityProperty[] = [
   },
   {
     id: "campus-view",
+    propertyId: 2002,
     name: "HelloWorld Campus View",
     subtitle: `Coliving PG near ${landmarkPage.name}`,
     images: srpCardSampleImages,
@@ -128,6 +130,7 @@ export const landmarkProperties: readonly LocalityProperty[] = [
   },
   {
     id: "south-ring",
+    propertyId: 2003,
     name: "HelloWorld South Ring",
     subtitle: `Coliving PG near ${landmarkPage.name}`,
     images: srpCardSampleImages,
@@ -141,6 +144,7 @@ export const landmarkProperties: readonly LocalityProperty[] = [
   },
   {
     id: "metro-walk",
+    propertyId: 2004,
     name: "HelloWorld Metro Walk",
     subtitle: `Coliving PG near ${landmarkPage.name}`,
     images: srpCardSampleImages,
@@ -151,6 +155,7 @@ export const landmarkProperties: readonly LocalityProperty[] = [
   },
   {
     id: "student-hub",
+    propertyId: 2005,
     name: "HelloWorld Student Hub",
     subtitle: `Coliving PG near ${landmarkPage.name}`,
     images: srpCardSampleImages,
@@ -161,6 +166,7 @@ export const landmarkProperties: readonly LocalityProperty[] = [
   },
   {
     id: "banashankari-central",
+    propertyId: 2006,
     name: "HelloWorld Banashankari Central",
     subtitle: `Coliving PG near ${landmarkPage.name}`,
     images: srpCardSampleImages,

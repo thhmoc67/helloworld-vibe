@@ -404,3 +404,50 @@ body {
 .font-caveat {
   font-family: var(--font-caveat);
 }
+
+.blog-article {
+  color: #374151;
+  line-height: 1.75;
+}
+
+.blog-article > * + * {
+  margin-top: 1.25rem;
+}
+
+.blog-article h2 {
+  margin-top: 2rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.blog-article h3 {
+  margin-top: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.blog-article a {
+  font-weight: 600;
+  color: #3f6212;
+  text-decoration: underline;
+}
+
+.blog-article a:hover {
+  color: #365314;
+}
+
+.blog-article ul,
+.blog-article ol {
+  padding-left: 1.5rem;
+}
+
+.blog-article li + li {
+  margin-top: 0.5rem;
+}
+
+.blog-article strong {
+  font-weight: 700;
+  color: #111827;
+}

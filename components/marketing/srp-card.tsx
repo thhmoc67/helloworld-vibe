@@ -359,7 +359,10 @@ export function SrpCard({
             hierarchy="secondary-gray"
             size="md"
             className="w-full rounded-lg border-gray-300 text-gray-600"
-            onClick={onRequestCallback}
+            onClick={(event) => {
+              event.stopPropagation();
+              onRequestCallback?.();
+            }}
           >
             Request Callback
           </Button>
@@ -367,7 +370,10 @@ export function SrpCard({
             hierarchy="primary"
             size="md"
             className="w-full rounded-lg bg-hello-lime-400 text-gray-800 ring-0 hover:bg-hello-lime-500 focus-visible:ring-hello-lime-100"
-            onClick={onTakeTour}
+            onClick={(event) => {
+              event.stopPropagation();
+              onTakeTour?.();
+            }}
           >
             Take a Tour
           </Button>

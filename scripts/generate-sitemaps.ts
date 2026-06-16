@@ -12,6 +12,7 @@ import * as fs from "fs";
 import * as path from "path";
 import cities from "../src/constants/cities";
 import { buildLlmsTxt } from "../src/lib/llms-txt";
+import { getAllBlogPostsMeta } from "../src/lib/blog.server";
 import {
   buildSitemapBlogXml,
   buildSitemapCitiesXml,
@@ -213,9 +214,12 @@ async function main() {
   fs.writeFileSync(path.join(publicDir, "sitemap-landmarks.xml"), landmarksXml, "utf8");
   console.warn(`Wrote public/sitemap-landmarks.xml (${landmarks.length} landmarks)`);
 
-  const blogXml = buildSitemapBlogXml(PUBLIC_URL, []);
+  const blogPosts = getAllBlogPostsMeta()
+    .filter((p) => !p.noindex)
+    .map((p) => ({ slug: p.slug, date: p.date, updated: p.updated }));
+  const blogXml = buildSitemapBlogXml(PUBLIC_URL, blogPosts);
   fs.writeFileSync(path.join(publicDir, "sitemap-blog.xml"), blogXml, "utf8");
-  console.warn("Wrote public/sitemap-blog.xml");
+  console.warn(`Wrote public/sitemap-blog.xml (${blogPosts.length} blog posts)`);
 
   const indexXml = buildSitemapIndexXml(PUBLIC_URL);
   fs.writeFileSync(path.join(publicDir, "sitemap.xml"), indexXml, "utf8");

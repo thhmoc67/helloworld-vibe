@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { VisitScheduler } from "@/components/booking/visit-scheduler";
+import { ScheduleVisitFlow } from "@/components/booking/schedule-visit-flow";
 import { Button } from "@/components/ui/button";
 import {
   hdpOccupancies,
@@ -10,10 +10,6 @@ import {
   hdpRoomTypes,
   type HdpOccupancy,
 } from "@/src/tokens/hdp";
-import {
-  visitDateSamples,
-  visitTimeSlotSamples,
-} from "@/src/tokens/visit-scheduler";
 import { cn } from "@/src/lib/cn";
 
 type BookingMode = "tour" | "book";
@@ -23,11 +19,6 @@ function formatRent(amount: number) {
 }
 
 function HdpBookingTourPanel() {
-  const [selectedDateId, setSelectedDateId] = useState(visitDateSamples[0].id);
-  const [selectedTimeSlotId, setSelectedTimeSlotId] = useState(
-    visitTimeSlotSamples[0].id,
-  );
-
   return (
     <div className="mt-6 space-y-6">
       <div className="flex items-center justify-between gap-4">
@@ -52,23 +43,11 @@ function HdpBookingTourPanel() {
         </div>
       </div>
 
-      <VisitScheduler
+      <ScheduleVisitFlow
+        propertyId={hdpProperty.propertyId}
+        propertyName={hdpProperty.name}
         layout="embedded"
-        animate={false}
-        dates={visitDateSamples}
-        timeSlots={visitTimeSlotSamples}
-        selectedDateId={selectedDateId}
-        selectedTimeSlotId={selectedTimeSlotId}
-        onDateChange={setSelectedDateId}
-        onTimeSlotChange={setSelectedTimeSlotId}
       />
-
-      <Button
-        className="w-full bg-hello-lime-400 text-gray-800 hover:bg-hello-lime-500"
-        size="lg"
-      >
-        Take a Tour
-      </Button>
 
       <div className="flex flex-wrap items-center justify-center gap-2 text-base font-medium text-black">
         <span className="inline-flex items-center gap-2">

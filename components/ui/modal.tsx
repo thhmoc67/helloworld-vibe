@@ -16,6 +16,7 @@ export interface ModalProps {
   onClose: () => void;
   children: ReactNode;
   className?: string;
+  maxWidthClassName?: string;
   labelledBy?: string;
   describedBy?: string;
   closeLabel?: string;
@@ -45,6 +46,7 @@ export function Modal({
   onClose,
   children,
   className,
+  maxWidthClassName,
   labelledBy,
   describedBy,
   closeLabel = "Close dialog",
@@ -120,6 +122,7 @@ export function Modal({
       <div
         className={cn(
           "relative w-full max-w-[400px]",
+          maxWidthClassName,
           "transition-all duration-300 ease-out motion-reduce:transition-none",
           visible
             ? "translate-y-0 scale-100 opacity-100"

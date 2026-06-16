@@ -21,6 +21,7 @@ export type HdpVibeMatch = {
 
 export const hdpProperty = {
   name: "Helloworld Park Square",
+  propertyId: 156,
   badge: "Women Only",
   locality: "Neeladri Road, Electronic City Phase 1, Bengaluru",
   trendingLabel: "Trending",
