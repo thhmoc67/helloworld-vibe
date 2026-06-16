@@ -46,7 +46,7 @@ export function SiteHeaderSearch({
           <div className="ml-auto flex items-center gap-3 sm:gap-4">
             <Link
               href="/contact"
-              className="hidden h-9 items-center justify-center rounded-full bg-hello-lime-500 px-5 text-sm font-semibold text-white transition-colors hover:bg-hello-lime-600 sm:inline-flex"
+              className="hidden h-9 items-center justify-center rounded-full bg-hello-lime-500 px-5 text-sm font-semibold text-gray-900 transition-colors hover:bg-hello-lime-600 sm:inline-flex"
             >
               Contact Us
             </Link>

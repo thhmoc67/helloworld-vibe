@@ -18,6 +18,8 @@ import {
   PropertyGalleryMobile,
 } from "@/components/marketing/property-gallery";
 import { hdpProperty } from "@/src/tokens/hdp";
+import { pageLayout } from "@/src/tokens/layout";
+import { cn } from "@/src/lib/cn";
 
 export const metadata: Metadata = {
   title: `${hdpProperty.name} — HelloWorld Coliving PG in Electronic City`,
@@ -27,9 +29,9 @@ export const metadata: Metadata = {
 
 export default function HdpPage() {
   return (
-    <div className="bg-white pb-24 md:pb-0">
+    <div className={cn("bg-white", pageLayout.mobileStickyBottomPadding)}>
       <SiteHeader />
-      <main className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 md:pt-6">
+      <main className={pageLayout.containerWithTopPadding}>
         <HdpHeader />
 
         <div className="mt-4 md:mt-6">
@@ -41,8 +43,8 @@ export default function HdpPage() {
           </div>
         </div>
 
-        <div className="mt-8 md:mt-10 md:flex md:items-start md:justify-between md:gap-8">
-          <div className="min-w-0 md:max-w-[60%]">
+        <div className={cn("mt-8 md:mt-10", pageLayout.twoColumn)}>
+          <div className={pageLayout.mainColumn}>
             <div className="space-y-6">
               <HdpRatingCard />
               <HdpVibeMatch />
@@ -60,7 +62,7 @@ export default function HdpPage() {
             </div>
           </div>
 
-          <div className="hidden md:block md:w-[35%] md:shrink-0 md:self-start md:px-2">
+          <div className={pageLayout.sidebarColumn}>
             <HdpBookingCard sticky />
           </div>
         </div>

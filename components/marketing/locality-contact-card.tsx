@@ -87,7 +87,10 @@ export function LocalityContactCard({
             />
           </label>
 
-          <Button type="submit" className="w-full">
+          <Button
+            type="submit"
+            className="w-full bg-hello-lime-400 text-gray-900 hover:bg-hello-lime-500"
+          >
             Request Callback
           </Button>
         </form>

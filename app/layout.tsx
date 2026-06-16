@@ -30,6 +30,15 @@ export const metadata: Metadata = {
   title: "HelloWorld — Coliving that Matches Your Vibe",
   description:
     "Find premium coliving PGs across India. Just 1 month deposit, no lock-in, no brokerage, and instant move-in.",
+  icons: {
+    icon: [
+      { url: "/assets/logos/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
 };
 
 export const viewport = {
