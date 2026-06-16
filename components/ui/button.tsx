@@ -42,8 +42,8 @@ function getHierarchyClasses(
 ): string {
   if (hierarchy === "primary") {
     return destructive
-      ? "bg-error-600 text-white shadow-xs ring-1 ring-transparent ring-inset hover:bg-error-700 focus-visible:ring-error-100"
-      : "bg-hello-lime-500 text-white shadow-xs ring-1 ring-transparent ring-inset hover:bg-hello-lime-600 focus-visible:ring-hello-lime-100";
+      ? "bg-error-600 text-gray-800 shadow-xs ring-1 ring-transparent ring-inset hover:bg-error-700 focus-visible:ring-error-100"
+      : "bg-hello-lime-400 text-gray-800 shadow-xs ring-1 ring-transparent ring-inset hover:bg-hello-lime-600 focus-visible:ring-hello-lime-100";
   }
 
   if (hierarchy === "secondary-color") {
