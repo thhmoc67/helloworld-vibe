@@ -1,5 +1,6 @@
 "use client";
 
+import type { RefObject, UIEventHandler } from "react";
 import { cn } from "@/src/lib/cn";
 import { useAnimateOnView } from "@/src/lib/use-animate-on-view";
 import {
@@ -12,6 +13,9 @@ export type HomepageReviewsProps = {
   className?: string;
   title?: string;
   animate?: boolean;
+  surface?: "dark" | "light";
+  scrollRef?: RefObject<HTMLDivElement | null>;
+  onScroll?: UIEventHandler<HTMLDivElement>;
 };
 
 const CARD_ANIMATION_MS = 700;
@@ -86,18 +90,27 @@ export function HomepageReviews({
   className,
   title = "Homepage Reviews",
   animate = true,
+  surface = "dark",
+  scrollRef,
+  onScroll,
 }: HomepageReviewsProps) {
   const { ref, isActive, shouldAnimate } = useAnimateOnView(animate);
+  const isLight = surface === "light";
 
   return (
     <section
       ref={ref}
-      className={cn("bg-[#3d3d3d] px-4 py-10 sm:py-12 md:px-8", className)}
+      className={cn(
+        isLight ? "bg-white" : "bg-[#3d3d3d]",
+        "px-4 py-10 sm:py-12 md:px-8",
+        className,
+      )}
     >
       {title ? (
         <h2
           className={cn(
-            "mb-6 text-base font-medium text-gray-300 sm:mb-8 sm:text-lg",
+            "mb-6 text-base font-medium sm:mb-8 sm:text-lg",
+            isLight ? "text-gray-700" : "text-gray-300",
             shouldAnimate &&
               "transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none",
             shouldAnimate &&
@@ -109,7 +122,11 @@ export function HomepageReviews({
           {title}
         </h2>
       ) : null}
-      <div className="-mx-2 flex gap-4 overflow-x-auto px-2 py-4 scrollbar-none sm:gap-5 sm:py-6 md:gap-6">
+      <div
+        ref={scrollRef}
+        onScroll={onScroll}
+        className="-mx-2 flex gap-4 overflow-x-auto px-2 py-4 scrollbar-none sm:gap-5 sm:py-6 md:gap-6"
+      >
         {reviews.map((review, index) => (
           <ReviewCard
             key={`${review.name}-${review.city}`}

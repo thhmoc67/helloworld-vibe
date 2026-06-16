@@ -44,7 +44,7 @@ export const neighborhoodRoutineSamples: readonly NeighborhoodCardData[] = [
   },
   {
     id: "work",
-    emoji: "💼",
+    emoji: "🧑‍💻",
     category: "Work",
     placeName: "Prestige Tech Park",
     imageSrc: "/assets/community/hero/hero-2.png",
@@ -54,7 +54,7 @@ export const neighborhoodRoutineSamples: readonly NeighborhoodCardData[] = [
   },
   {
     id: "lunch",
-    emoji: "🍽️",
+    emoji: "🍔",
     category: "Lunch",
     placeName: "Social, HSR",
     imageSrc: "/assets/locality/dinning-bento-desktop.png",
@@ -64,4 +64,6 @@ export const neighborhoodRoutineSamples: readonly NeighborhoodCardData[] = [
   },
 ] as const;
 
-export const neighborhoodSectionTitle = "Your neighborhood routine";
+export const neighborhoodSectionTitle = "A Day from here";
+export const neighborhoodSectionSubtitle =
+  "What living at HW Park Square actually looks like.";

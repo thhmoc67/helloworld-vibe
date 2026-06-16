@@ -31,6 +31,7 @@ export function SrpCardDemo() {
               rent={variant.rent}
               originalRent={"originalRent" in variant ? variant.originalRent : undefined}
               offerLabel={"offerLabel" in variant ? variant.offerLabel : undefined}
+              statusLabel={"statusLabel" in variant ? variant.statusLabel : undefined}
               visitsToday={"visitsToday" in variant ? variant.visitsToday : undefined}
               genderLabel={"genderLabel" in variant ? variant.genderLabel : undefined}
               saved={saved}

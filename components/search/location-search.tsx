@@ -3,19 +3,22 @@
 import {
   useEffect,
   useId,
-  useMemo,
   useRef,
   useState,
   type ReactNode,
 } from "react";
+import { fetchLocalitySuggest } from "@/src/apis/search";
 import { cn } from "@/src/lib/cn";
+import { useDebounce } from "@/src/lib/use-debounce";
 import {
   cities,
   defaultCitySlug,
   getCityLabel,
   type CitySlug,
 } from "@/src/tokens/cities";
-import { getLocalitiesForCity } from "@/src/tokens/localities";
+
+const LOCALITY_SUGGEST_DEBOUNCE_MS = 500;
+const LOCALITY_SUGGEST_MIN_LENGTH = 3;
 
 export interface LocationSearchValue {
   city: CitySlug;
@@ -29,6 +32,7 @@ export interface LocationSearchProps {
   locality?: string;
   defaultLocality?: string;
   localityPlaceholder?: string;
+  strictLocality?: boolean;
   onCityChange?: (city: CitySlug) => void;
   onLocalityChange?: (locality: string) => void;
   onSearch?: (value: LocationSearchValue) => void;
@@ -137,6 +141,7 @@ export function LocationSearch({
   locality: localityProp,
   defaultLocality = "",
   localityPlaceholder = "Search for Localities",
+  strictLocality = true,
   onCityChange,
   onLocalityChange,
   onSearch,
@@ -153,20 +158,31 @@ export function LocationSearch({
   const [highlightedLocality, setHighlightedLocality] = useState<string | null>(
     null,
   );
+  const [localitySuggestions, setLocalitySuggestions] = useState<string[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const [hasFetchedSuggestions, setHasFetchedSuggestions] = useState(false);
+
+  const debouncedLocalityQuery = useDebounce(
+    localityQuery,
+    LOCALITY_SUGGEST_DEBOUNCE_MS,
+  );
 
   const city = cityProp ?? internalCity;
   const locality = localityProp ?? internalLocality;
 
   const cityOpen = activePanel === "city";
   const localityOpen = activePanel === "locality";
-
-  const localities = useMemo(() => getLocalitiesForCity(city), [city]);
-
-  const filteredLocalities = useMemo(() => {
-    const query = localityQuery.trim().toLowerCase();
-    if (!query) return [...localities];
-    return localities.filter((item) => item.toLowerCase().includes(query));
-  }, [localities, localityQuery]);
+  const trimmedLocalityQuery = localityQuery.trim();
+  const canSuggestLocalities =
+    trimmedLocalityQuery.length >= LOCALITY_SUGGEST_MIN_LENGTH;
+  const isDebouncingSuggestions =
+    canSuggestLocalities && trimmedLocalityQuery !== debouncedLocalityQuery.trim();
+  const showLocalityDropdown =
+    localityOpen &&
+    canSuggestLocalities &&
+    (isLoadingSuggestions ||
+      isDebouncingSuggestions ||
+      hasFetchedSuggestions);
 
   function updateCity(nextCity: CitySlug) {
     if (cityProp === undefined) setInternalCity(nextCity);
@@ -174,6 +190,8 @@ export function LocationSearch({
       setInternalLocality("");
       setLocalityQuery("");
     }
+    setLocalitySuggestions([]);
+    setHasFetchedSuggestions(false);
     onCityChange?.(nextCity);
     setActivePanel(null);
     setHighlightedCity(null);
@@ -193,6 +211,55 @@ export function LocationSearch({
     onSearch?.({ city, locality: localityQuery.trim() || locality });
     setActivePanel(null);
   }
+
+  useEffect(() => {
+    const query = debouncedLocalityQuery.trim();
+
+    if (query.length < LOCALITY_SUGGEST_MIN_LENGTH) {
+      setLocalitySuggestions([]);
+      setIsLoadingSuggestions(false);
+      setHasFetchedSuggestions(false);
+      return;
+    }
+
+    const abortController = new AbortController();
+
+    async function loadSuggestions() {
+      setIsLoadingSuggestions(true);
+      setHasFetchedSuggestions(false);
+
+      try {
+        const { success, data } = await fetchLocalitySuggest({
+          city,
+          keyword: query,
+          campaign: strictLocality ? "ok" : "",
+          signal: abortController.signal,
+        });
+
+        if (abortController.signal.aborted) return;
+
+        setLocalitySuggestions(success ? data.locality : []);
+        setHasFetchedSuggestions(true);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        setLocalitySuggestions([]);
+        setHasFetchedSuggestions(true);
+      } finally {
+        if (!abortController.signal.aborted) {
+          setIsLoadingSuggestions(false);
+        }
+      }
+    }
+
+    void loadSuggestions();
+
+    return () => {
+      abortController.abort();
+    };
+  }, [city, debouncedLocalityQuery, strictLocality]);
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
@@ -288,65 +355,82 @@ export function LocationSearch({
           className="h-px w-full shrink-0 bg-gray-200 sm:mx-2 sm:h-10 sm:w-px"
         />
 
-        <div className="relative flex w-full min-w-0 flex-1 items-center">
-          <label htmlFor={localityInputId} className="sr-only">
-            {localityPlaceholder}
-          </label>
-          <input
-            id={localityInputId}
-            type="search"
-            value={localityQuery}
-            placeholder={localityPlaceholder}
-            onChange={(event) => {
-              setLocalityQuery(event.target.value);
-              setActivePanel("locality");
-            }}
-            onFocus={() => setActivePanel("locality")}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault();
-                if (highlightedLocality) {
-                  updateLocality(highlightedLocality);
-                  return;
+        <div className="flex w-full min-w-0 flex-1 items-center">
+          <div className="relative min-w-0 flex-1">
+            <label htmlFor={localityInputId} className="sr-only">
+              {localityPlaceholder}
+            </label>
+            <input
+              id={localityInputId}
+              type="search"
+              value={localityQuery}
+              placeholder={localityPlaceholder}
+              onChange={(event) => {
+                setLocalityQuery(event.target.value);
+                setActivePanel("locality");
+                setHighlightedLocality(null);
+                if (event.target.value.trim().length < LOCALITY_SUGGEST_MIN_LENGTH) {
+                  setLocalitySuggestions([]);
+                  setHasFetchedSuggestions(false);
                 }
-                if (filteredLocalities[0]) {
-                  updateLocality(filteredLocalities[0]);
-                  return;
+              }}
+              onFocus={() => setActivePanel("locality")}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  if (highlightedLocality) {
+                    updateLocality(highlightedLocality);
+                    return;
+                  }
+                  if (localitySuggestions[0]) {
+                    updateLocality(localitySuggestions[0]);
+                    return;
+                  }
+                  handleSearch();
                 }
-                handleSearch();
-              }
-            }}
-            className="min-w-0 flex-1 bg-transparent px-2 py-2.5 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none sm:px-3"
-          />
+              }}
+              className="w-full bg-transparent px-2 py-2.5 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none sm:px-3"
+            />
 
-          <SearchDropdown
-            open={localityOpen && filteredLocalities.length > 0}
-            className="left-0 right-0 sm:left-auto sm:right-0 sm:min-w-[18rem]"
-          >
-            {filteredLocalities.map((option, index) => {
-              const isHighlighted =
-                highlightedLocality === option ||
-                (highlightedLocality === null && index === 0 && localityQuery);
+            <SearchDropdown
+              open={showLocalityDropdown}
+              className="left-0 right-0"
+            >
+              {isLoadingSuggestions || isDebouncingSuggestions ? (
+                <p className="px-4 py-3.5 text-sm text-gray-500">Searching…</p>
+              ) : localitySuggestions.length > 0 ? (
+                localitySuggestions.map((option, index) => {
+                  const isHighlighted =
+                    highlightedLocality === option ||
+                    (highlightedLocality === null &&
+                      index === 0 &&
+                      trimmedLocalityQuery);
 
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  role="option"
-                  aria-selected={locality === option}
-                  onMouseEnter={() => setHighlightedLocality(option)}
-                  onMouseLeave={() => setHighlightedLocality(null)}
-                  onClick={() => updateLocality(option)}
-                  className={cn(
-                    "w-full border-b border-gray-100 px-4 py-3.5 text-left text-sm text-gray-900 transition-colors last:border-b-0",
-                    isHighlighted ? "bg-gray-25" : "hover:bg-gray-25",
-                  )}
-                >
-                  {option}
-                </button>
-              );
-            })}
-          </SearchDropdown>
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      role="option"
+                      aria-selected={locality === option}
+                      onMouseEnter={() => setHighlightedLocality(option)}
+                      onMouseLeave={() => setHighlightedLocality(null)}
+                      onClick={() => updateLocality(option)}
+                      className={cn(
+                        "w-full border-b border-gray-100 px-4 py-3.5 text-left text-sm text-gray-900 transition-colors last:border-b-0",
+                        isHighlighted ? "bg-gray-25" : "hover:bg-gray-25",
+                      )}
+                    >
+                      {option}
+                    </button>
+                  );
+                })
+              ) : (
+                <p className="px-4 py-3.5 text-sm text-gray-500">
+                  No locality found
+                </p>
+              )}
+            </SearchDropdown>
+          </div>
 
           <button
             type="button"

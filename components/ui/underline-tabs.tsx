@@ -21,6 +21,7 @@ export interface UnderlineTabsProps<T extends string = string> {
   onChange: (id: T) => void;
   className?: string;
   baseId?: string;
+  layout?: "stretch" | "inline";
   "aria-label"?: string;
 }
 
@@ -35,6 +36,7 @@ export function UnderlineTabs<T extends string>({
   onChange,
   className,
   baseId,
+  layout = "stretch",
   "aria-label": ariaLabel = "Sections",
 }: UnderlineTabsProps<T>) {
   const generatedId = useId();
@@ -43,6 +45,7 @@ export function UnderlineTabs<T extends string>({
   const tabRefs = useRef(new Map<string, HTMLButtonElement>());
   const hasMountedRef = useRef(false);
   const [indicator, setIndicator] = useState<IndicatorStyle | null>(null);
+  const isInline = layout === "inline";
 
   const updateIndicator = useCallback(() => {
     const list = listRef.current;
@@ -89,7 +92,12 @@ export function UnderlineTabs<T extends string>({
         role="tablist"
         aria-label={ariaLabel}
         aria-orientation="horizontal"
-        className="relative flex overflow-x-auto scroll-smooth scrollbar-none sm:overflow-visible"
+        className={cn(
+          "relative flex overflow-x-auto scroll-smooth scrollbar-none",
+          isInline
+            ? "justify-center gap-8 sm:overflow-visible"
+            : "sm:overflow-visible",
+        )}
       >
         {items.map((item) => {
           const isActive = item.id === value;
@@ -111,7 +119,10 @@ export function UnderlineTabs<T extends string>({
               aria-controls={`${tabListId}-${item.id}-panel`}
               onClick={() => onChange(item.id as T)}
               className={cn(
-                "relative shrink-0 px-3 py-4 text-sm font-semibold transition-colors duration-300 sm:flex-1 sm:px-4 sm:text-center",
+                "relative shrink-0 py-2.5 text-sm font-semibold transition-colors duration-300",
+                isInline
+                  ? "px-0"
+                  : "px-3 py-4 sm:flex-1 sm:px-4 sm:text-center",
                 "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-hello-lime-100",
                 "motion-reduce:transition-none",
                 isActive

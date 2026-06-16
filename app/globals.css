@@ -193,6 +193,22 @@
   );
 }
 
+@utility bg-gradient-locality-dining {
+  background-image: linear-gradient(
+    325deg,
+    var(--color-gradient-sky) 9%,
+    var(--color-gradient-lavender) 98%
+  );
+}
+
+@utility bg-gradient-locality-health {
+  background-image: linear-gradient(
+    224deg,
+    var(--color-gradient-sky) 48%,
+    var(--color-gradient-mint) 108%
+  );
+}
+
 @utility bg-gradient-property-vibe-match {
   background-image: linear-gradient(
     to right,
@@ -251,8 +267,12 @@
   overflow: visible;
   padding-block: 0.08em;
   padding-inline: 0.02em 0.14em;
-  line-height: 1.2;
-  background-image: linear-gradient(to right, #5876d1 0%, #7a87e0 100%);
+  line-height: 1.22;
+  background-image: linear-gradient(
+    177deg,
+    #08a4ed 18.911%,
+    #8c40c1 66.827%
+  );
   background-size: 100% 100%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -290,6 +310,27 @@
     #4a90e2 40%,
     #5b7fdb 70%,
     #7b61ff 100%
+  );
+  background-size: 100% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+@utility text-gradient-community-accent {
+  display: inline-block;
+  overflow: visible;
+  padding-block: 0.08em;
+  padding-inline: 0.02em 0.14em;
+  line-height: 0.97;
+  background-image: linear-gradient(
+    90deg,
+    #28b2af 0%,
+    #08a4ed 39.904%,
+    #8c40c1 66.827%
   );
   background-size: 100% 100%;
   -webkit-background-clip: text;

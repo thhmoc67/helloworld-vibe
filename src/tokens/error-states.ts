@@ -1,0 +1,109 @@
+import type { Asset } from "@/src/tokens/assets";
+import { getAssetById } from "@/src/tokens/assets";
+
+export type ErrorStateId =
+  | "not-found"
+  | "server-error"
+  | "no-results"
+  | "offline"
+  | "empty-wishlist"
+  | "forbidden";
+
+export type ErrorStateActionVariant = "primary" | "secondary";
+
+export type ErrorStateAction = {
+  label: string;
+  href?: string;
+  variant?: ErrorStateActionVariant;
+};
+
+export type ErrorStateConfig = {
+  id: ErrorStateId;
+  title: string;
+  description: string;
+  image: Asset;
+  imageWidth: number;
+  imageHeight: number;
+  actions: ErrorStateAction[];
+};
+
+function requireAsset(id: string): Asset {
+  const asset = getAssetById("error", id);
+  if (!asset) {
+    throw new Error(`Missing error asset: ${id}`);
+  }
+  return asset;
+}
+
+export const errorStates = {
+  "not-found": {
+    id: "not-found",
+    title: "Uh-oh, We Lost the Scent!",
+    description:
+      "Even the finest noses can lose the trail. Let's get you back on track and find what you're looking for.",
+    image: requireAsset("404-1"),
+    imageWidth: 320,
+    imageHeight: 280,
+    actions: [{ label: "Back to Home", href: "/", variant: "primary" }],
+  },
+  "server-error": {
+    id: "server-error",
+    title: "We're Fixing Things Up!",
+    description:
+      "Our tail-wagging team is on it! We'll be back in no time. Thank you for your patience.",
+    image: requireAsset("error-500-server-error"),
+    imageWidth: 320,
+    imageHeight: 280,
+    actions: [
+      { label: "Try Refreshing", variant: "secondary" },
+      { label: "Back", href: "/", variant: "primary" },
+    ],
+  },
+  "no-results": {
+    id: "no-results",
+    title: "No results found.",
+    description:
+      "Please check for spelling errors or try different keywords. Let's find your dream stay together!",
+    image: requireAsset("empty-state-1"),
+    imageWidth: 320,
+    imageHeight: 280,
+    actions: [
+      { label: "Clear Filters", variant: "secondary" },
+      { label: "Contact Us", href: "/contact", variant: "primary" },
+    ],
+  },
+  offline: {
+    id: "offline",
+    title: "You're not connected to the internet.",
+    description:
+      "It looks like you're offline. Check your connection and give it another go.",
+    image: requireAsset("no-internet-1"),
+    imageWidth: 320,
+    imageHeight: 280,
+    actions: [{ label: "Try Again", variant: "primary" }],
+  },
+  "empty-wishlist": {
+    id: "empty-wishlist",
+    title: "Your Wishlist Looks Empty 👀",
+    description:
+      "Start exploring and add your favorite stays to your wishlist for later.",
+    image: requireAsset("empty-state-1"),
+    imageWidth: 320,
+    imageHeight: 280,
+    actions: [{ label: "Explore Stays", href: "/", variant: "primary" }],
+  },
+  forbidden: {
+    id: "forbidden",
+    title: "You don't have access to this page.",
+    description:
+      "This section is reserved for special guests. Please contact support if you believe this is a mistake.",
+    image: requireAsset("403-2"),
+    imageWidth: 320,
+    imageHeight: 280,
+    actions: [{ label: "Go Home", href: "/", variant: "primary" }],
+  },
+} satisfies Record<ErrorStateId, ErrorStateConfig>;
+
+export function getErrorState(id: ErrorStateId): ErrorStateConfig {
+  return errorStates[id];
+}

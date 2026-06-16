@@ -99,6 +99,7 @@ export interface VisitSchedulerProps {
   title?: string;
   className?: string;
   animate?: boolean;
+  layout?: "default" | "embedded";
 }
 
 export function VisitScheduler({
@@ -111,14 +112,16 @@ export function VisitScheduler({
   title = visitSchedulerTitle,
   className,
   animate = true,
+  layout = "default",
 }: VisitSchedulerProps) {
+  const embedded = layout === "embedded";
   const dateGroupId = useId();
   const timeGroupId = useId();
   const {
     ref: viewRef,
     isActive: inView,
     shouldAnimate,
-  } = useAnimateOnView(animate);
+  } = useAnimateOnView(animate && !embedded);
   const {
     containerRef: dateListRef,
     itemRefs: dateItemRefs,
@@ -133,21 +136,42 @@ export function VisitScheduler({
   return (
     <div
       ref={viewRef}
-      className={cn("mx-auto w-full max-w-3xl px-2 text-center", className)}
+      className={cn(
+        embedded
+          ? "w-full text-left"
+          : "mx-auto w-full max-w-3xl px-2 text-center",
+        className,
+      )}
     >
-      <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">{title}</h2>
+      <h2
+        className={cn(
+          embedded
+            ? "text-base font-medium text-[#343434]"
+            : "text-lg font-semibold text-gray-900 sm:text-xl",
+        )}
+      >
+        {title}
+      </h2>
 
       <StaggeredRow
         isActive={inView}
         shouldAnimate={shouldAnimate}
         delayOffset={80}
       >
-        <div className="mt-8 overflow-x-auto scrollbar-none">
+        <div
+          className={cn(
+            "overflow-x-auto scrollbar-none",
+            embedded ? "mt-4" : "mt-8",
+          )}
+        >
           <div
             ref={dateListRef}
             role="radiogroup"
             aria-label="Visit date"
-            className="relative flex w-max min-w-full justify-center gap-3 px-3 py-2 sm:gap-4"
+            className={cn(
+              "relative flex w-max min-w-full gap-3 py-2 sm:gap-4",
+              embedded ? "justify-start px-0" : "justify-center px-3",
+            )}
           >
           {dateIndicator ? (
             <span
@@ -224,13 +248,16 @@ export function VisitScheduler({
         shouldAnimate={shouldAnimate}
         delayOffset={180}
       >
-        <div className="mt-6 sm:mt-8">
+        <div className={embedded ? "mt-4" : "mt-6 sm:mt-8"}>
           <div
             key={selectedDateId}
             ref={timeListRef}
             role="radiogroup"
             aria-label="Visit time"
-            className="relative flex flex-wrap justify-center gap-3 px-2 py-2"
+            className={cn(
+              "relative flex flex-wrap gap-3 py-2",
+              embedded ? "justify-start px-0" : "justify-center px-2",
+            )}
           >
           {timeIndicator ? (
             <span

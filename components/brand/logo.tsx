@@ -32,7 +32,10 @@ export function Logo({
   priority = false,
 }: LogoProps) {
   const asset = resolveAsset(variant);
-  const sharedClassName = cn("h-auto max-w-full w-auto object-contain", className);
+  const sharedClassName = cn(
+    "max-w-full shrink-0 object-contain",
+    className ?? "h-auto w-auto",
+  );
 
   if (isSvg(asset.file)) {
     return (

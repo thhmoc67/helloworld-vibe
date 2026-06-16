@@ -50,6 +50,22 @@ export const gradients: Gradient[] = [
     rating: "4.9",
   },
   {
+    id: "locality-dining",
+    name: "Dining",
+    className: "bg-gradient-locality-dining",
+    variant: "tile",
+    stops: [gradientStops.sky.hex, gradientStops.lavender.hex],
+    rating: "4.9",
+  },
+  {
+    id: "locality-health",
+    name: "Health",
+    className: "bg-gradient-locality-health",
+    variant: "tile",
+    stops: [gradientStops.sky.hex, gradientStops.mint.hex],
+    rating: "4.6",
+  },
+  {
     id: "locality-ratings",
     name: "Locality Ratings",
     className: "bg-gradient-locality-ratings",
@@ -122,7 +138,7 @@ export const textGradients: TextGradient[] = [
     name: "Different",
     className: "text-gradient-different",
     sample: "Different",
-    fontClassName: "font-playfair text-4xl font-bold italic leading-normal sm:text-5xl",
+    fontClassName: "font-satoshi text-4xl font-bold italic leading-normal sm:text-5xl",
     stops: ["#4FB0B0", "#4A90E2", "#5B7FDB", "#7B61FF"],
   },
 ];

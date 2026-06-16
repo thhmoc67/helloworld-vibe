@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/src/lib/cn";
-import { formatRent } from "@/src/tokens/srp-card";
+import { formatRent, type SrpCardStatusLabel } from "@/src/tokens/srp-card";
 
 export interface SrpCardProps {
   name: string;
@@ -15,6 +15,7 @@ export interface SrpCardProps {
   rent: number;
   originalRent?: number;
   offerLabel?: string;
+  statusLabel?: SrpCardStatusLabel;
   visitsToday?: number;
   genderLabel?: string;
   saved?: boolean;
@@ -27,12 +28,7 @@ export interface SrpCardProps {
 
 function ChevronIcon({ direction }: { direction: "left" | "right" }) {
   return (
-    <svg
-      aria-hidden
-      viewBox="0 0 20 20"
-      fill="none"
-      className="size-4"
-    >
+    <svg aria-hidden viewBox="0 0 20 20" fill="none" className="size-3.5">
       <path
         d={direction === "left" ? "M12.5 15L7.5 10L12.5 5" : "M7.5 15L12.5 10L7.5 5"}
         stroke="currentColor"
@@ -102,6 +98,34 @@ function ShareIcon({ className }: { className?: string }) {
   );
 }
 
+function WarningIcon({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden viewBox="0 0 12 12" fill="none" className={className}>
+      <path
+        d="M6 4.5V6.75M6 8.25h.005M4.558 1.875 1.182 7.125A1.125 1.125 0 0 0 2.143 8.625h7.714a1.125 1.125 0 0 0 .961-1.5L7.442 1.875a1.125 1.125 0 0 0-1.884 0Z"
+        stroke="currentColor"
+        strokeWidth="1.1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function TrendingIcon({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden viewBox="0 0 12 7" fill="none" className={className}>
+      <path
+        d="M1 5.5 4.25 2.25 6.5 4.5 11 0"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function PercentIcon({ className }: { className?: string }) {
   return (
     <svg aria-hidden viewBox="0 0 16 16" fill="none" className={className}>
@@ -115,6 +139,43 @@ function PercentIcon({ className }: { className?: string }) {
       />
     </svg>
   );
+}
+
+function LeftImageBadge({
+  statusLabel,
+  visitsToday,
+}: {
+  statusLabel?: SrpCardStatusLabel;
+  visitsToday?: number;
+}) {
+  if (statusLabel === "filling-fast") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-2xl bg-[#fff0d1] px-2 py-0.5 text-xs font-medium text-[#7a271a]">
+        <WarningIcon className="size-3" />
+        Filling Fast
+      </span>
+    );
+  }
+
+  if (statusLabel === "trending") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-2xl bg-hello-lime-50 px-2 py-0.5 text-xs font-medium text-hello-lime-800">
+        <TrendingIcon className="size-3" />
+        Trending
+      </span>
+    );
+  }
+
+  if (visitsToday != null) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-2xl bg-[#f4ebff] px-2 py-0.5 text-xs font-medium text-[#53389e]">
+        <UsersIcon className="size-3" />
+        {visitsToday} Visits Today
+      </span>
+    );
+  }
+
+  return null;
 }
 
 function SrpCardCarousel({
@@ -132,13 +193,13 @@ function SrpCardCarousel({
   }
 
   return (
-    <div className="relative aspect-[342/220] w-full overflow-hidden bg-gray-100">
+    <div className="relative h-[14.25rem] w-full overflow-hidden bg-gray-100">
       <Image
         src={images[activeIndex]}
         alt={`${alt} — photo ${activeIndex + 1} of ${slideCount}`}
         fill
         className="object-cover"
-        sizes="(max-width: 640px) 100vw, 342px"
+        sizes="411px"
       />
 
       {slideCount > 1 ? (
@@ -147,7 +208,7 @@ function SrpCardCarousel({
             type="button"
             aria-label="Previous photo"
             onClick={() => goTo(-1)}
-            className="absolute left-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-gray-900/40 text-white backdrop-blur-sm transition-colors hover:bg-gray-900/55"
+            className="absolute left-4 top-1/2 flex size-[25px] -translate-y-1/2 items-center justify-center rounded-full bg-gray-900/40 text-white backdrop-blur-sm transition-colors hover:bg-gray-900/55"
           >
             <ChevronIcon direction="left" />
           </button>
@@ -155,12 +216,12 @@ function SrpCardCarousel({
             type="button"
             aria-label="Next photo"
             onClick={() => goTo(1)}
-            className="absolute right-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-gray-900/40 text-white backdrop-blur-sm transition-colors hover:bg-gray-900/55"
+            className="absolute right-4 top-1/2 flex size-[25px] -translate-y-1/2 items-center justify-center rounded-full bg-gray-900/40 text-white backdrop-blur-sm transition-colors hover:bg-gray-900/55"
           >
             <ChevronIcon direction="right" />
           </button>
 
-          <div className="absolute inset-x-0 bottom-3 flex items-center justify-center gap-1.5">
+          <div className="absolute inset-x-0 bottom-4 flex items-center justify-center gap-1.5">
             {images.map((image, index) => (
               <button
                 key={image}
@@ -190,6 +251,7 @@ export function SrpCard({
   rent,
   originalRent,
   offerLabel,
+  statusLabel,
   visitsToday,
   genderLabel,
   saved = false,
@@ -200,95 +262,87 @@ export function SrpCard({
   onShare,
 }: SrpCardProps) {
   const hasOffer = originalRent != null && originalRent > rent;
+  const leftBadge = (
+    <LeftImageBadge statusLabel={statusLabel} visitsToday={visitsToday} />
+  );
 
   return (
     <article
       className={cn(
-        "flex w-full max-w-[342px] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md",
+        "flex w-full max-w-[25.6875rem] flex-col overflow-hidden rounded-2xl border border-[#e6e6e6] bg-white shadow-[6px_6px_23.5px_rgba(0,0,0,0.08)]",
         className,
       )}
     >
       <div className="relative">
         <SrpCardCarousel images={images} alt={name} />
 
-        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
-          {visitsToday != null ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F3F0FB] px-2.5 py-1 text-xs font-medium text-[#7F77DD]">
-              <UsersIcon className="size-3.5" />
-              {visitsToday} Visits today
-            </span>
-          ) : (
-            <span aria-hidden />
-          )}
-
+        <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-4">
+          {leftBadge ?? <span aria-hidden />}
           {genderLabel ? (
-            <span className="rounded-full bg-blue-light-50 px-2.5 py-1 text-xs font-medium text-blue-light-700">
+            <span className="rounded-2xl bg-[#fecdca] px-2 py-0.5 text-xs font-medium text-gray-800">
               {genderLabel}
             </span>
           ) : null}
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-4 p-4">
-        <div className="space-y-2">
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="text-lg font-bold leading-tight text-gray-900">{name}</h3>
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-blue-light-50 px-2 py-0.5 text-sm font-semibold text-gray-900">
-              {rating.toFixed(1)}
-              <span className="text-yelloworld-700" aria-hidden>
-                ★
-              </span>
-            </span>
-          </div>
+      <div className="flex flex-1 flex-col gap-2 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="truncate text-lg font-medium leading-7 text-gray-900">
+            {name}
+          </h3>
+          <span className="inline-flex shrink-0 items-center rounded-2xl bg-[#f0f9ff] px-2 py-0.5 text-xs font-medium text-[#0086c9]">
+            {rating.toFixed(1)}★
+          </span>
+        </div>
 
-          <div className="flex items-center justify-between gap-3">
-            <p className="min-w-0 text-sm text-gray-600">{subtitle}</p>
-            <div className="flex shrink-0 items-center gap-2">
-              <button
-                type="button"
-                aria-label={saved ? "Remove from saved" : "Save property"}
-                aria-pressed={saved}
-                onClick={onSaveToggle}
-                className={cn(
-                  "transition-colors",
-                  saved
-                    ? "text-error-500"
-                    : "text-gray-500 hover:text-gray-700",
-                )}
-              >
-                <HeartIcon filled={saved} />
-              </button>
-              <button
-                type="button"
-                aria-label="Share property"
-                onClick={onShare}
-                className={cn(
-                  "transition-colors",
-                  saved
-                    ? "text-hello-lime-600 hover:text-hello-lime-700"
-                    : "text-gray-500 hover:text-gray-700",
-                )}
-              >
-                <ShareIcon className="size-5" />
-              </button>
-            </div>
+        <div className="flex items-center justify-between gap-3">
+          <p className="min-w-0 truncate text-xs text-gray-600">{subtitle}</p>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              aria-label={saved ? "Remove from saved" : "Save property"}
+              aria-pressed={saved}
+              onClick={onSaveToggle}
+              className={cn(
+                "transition-colors",
+                saved ? "text-error-500" : "text-gray-500 hover:text-gray-700",
+              )}
+            >
+              <HeartIcon filled={saved} />
+            </button>
+            <button
+              type="button"
+              aria-label="Share property"
+              onClick={onShare}
+              className={cn(
+                "transition-colors",
+                saved
+                  ? "text-hello-lime-600 hover:text-hello-lime-700"
+                  : "text-gray-500 hover:text-gray-700",
+              )}
+            >
+              <ShareIcon className="size-5" />
+            </button>
           </div>
         </div>
 
-        <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
-          <BedIcon className="size-3.5 text-gray-500" />
+        <span className="inline-flex w-fit items-center gap-1 rounded-2xl bg-[#e9eaeb] px-2 py-0.5 text-xs font-medium text-gray-900">
+          <BedIcon className="size-3 text-gray-700" />
           {roomTypes.join(" · ")}
         </span>
 
-        <div className="space-y-1">
-          <p className="text-xs text-gray-500">Starting Rent</p>
-          <div className="flex flex-wrap items-center gap-2">
+        <div>
+          <p className="text-xs text-gray-600">Starting Rent</p>
+          <div className="mt-0.5 flex flex-wrap items-center gap-2">
             {hasOffer ? (
               <span className="text-sm text-gray-400 line-through">
                 {formatRent(originalRent)}
               </span>
             ) : null}
-            <p className="text-xl font-bold text-gray-900">{formatRent(rent)}</p>
+            <p className="text-2xl font-bold leading-8 text-gray-900">
+              {formatRent(rent)}
+            </p>
             {offerLabel ? (
               <span className="inline-flex items-center gap-1 rounded-md bg-blue-light-50 px-2 py-1 text-xs font-semibold text-blue-light-700">
                 <span className="flex size-4 items-center justify-center rounded-full bg-blue-light-500 text-white">
@@ -300,11 +354,11 @@ export function SrpCard({
           </div>
         </div>
 
-        <div className="mt-auto grid grid-cols-2 gap-3">
+        <div className="mt-1 grid grid-cols-2 gap-2">
           <Button
             hierarchy="secondary-gray"
             size="md"
-            className="w-full"
+            className="w-full rounded-lg border-gray-300 text-gray-600"
             onClick={onRequestCallback}
           >
             Request Callback
@@ -312,7 +366,7 @@ export function SrpCard({
           <Button
             hierarchy="primary"
             size="md"
-            className="w-full bg-hello-lime-300 text-gray-900 ring-0 hover:bg-hello-lime-400 focus-visible:ring-hello-lime-100"
+            className="w-full rounded-lg bg-hello-lime-400 text-gray-800 ring-0 hover:bg-hello-lime-500 focus-visible:ring-hello-lime-100"
             onClick={onTakeTour}
           >
             Take a Tour

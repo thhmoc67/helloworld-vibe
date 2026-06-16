@@ -1,0 +1,77 @@
+import type { Metadata } from "next";
+import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
+import { HdpAbout } from "@/components/marketing/hdp-about";
+import { HdpAmenities } from "@/components/marketing/hdp-amenities";
+import { HdpBookingCard } from "@/components/marketing/hdp-booking-card";
+import { HdpFaq } from "@/components/marketing/hdp-faq";
+import { HdpHeader } from "@/components/marketing/hdp-header";
+import { HdpMobileActions } from "@/components/marketing/hdp-mobile-actions";
+import { HdpNearbyPlaces } from "@/components/marketing/hdp-nearby-places";
+import { HdpRatingCard } from "@/components/marketing/hdp-rating-card";
+import { HdpSectionNav } from "@/components/marketing/hdp-section-nav";
+import { HdpSimilarProperties } from "@/components/marketing/hdp-similar-properties";
+import { HdpVibeMatch } from "@/components/marketing/hdp-vibe-match";
+import { HdpReviews } from "@/components/marketing/hdp-reviews";
+import {
+  PropertyGalleryDesktop,
+  PropertyGalleryMobile,
+} from "@/components/marketing/property-gallery";
+import { hdpProperty } from "@/src/tokens/hdp";
+
+export const metadata: Metadata = {
+  title: `${hdpProperty.name} — HelloWorld Coliving PG in Electronic City`,
+  description:
+    "Book a free visit at Helloworld Park Square — coliving PG in Electronic City, Bengaluru with amenities, vibe match, and room categories.",
+};
+
+export default function HdpPage() {
+  return (
+    <div className="bg-white pb-24 md:pb-0">
+      <SiteHeader />
+      <main className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 md:pt-6">
+        <HdpHeader />
+
+        <div className="mt-4 md:mt-6">
+          <div className="hidden md:block">
+            <PropertyGalleryDesktop />
+          </div>
+          <div className="md:hidden">
+            <PropertyGalleryMobile />
+          </div>
+        </div>
+
+        <div className="mt-8 md:mt-10 md:flex md:items-start md:justify-between md:gap-8">
+          <div className="min-w-0 md:max-w-[60%]">
+            <div className="space-y-6">
+              <HdpRatingCard />
+              <HdpVibeMatch />
+            </div>
+
+            <HdpSectionNav className="mt-6" />
+
+            <div className="mt-8 space-y-10 md:mt-10 md:space-y-12">
+              <HdpAbout />
+              <HdpAmenities />
+              <HdpNearbyPlaces />
+              <section id="hdp-reviews" className="scroll-mt-32">
+                <HdpReviews />
+              </section>
+            </div>
+          </div>
+
+          <div className="hidden md:block md:w-[35%] md:shrink-0 md:self-start md:px-2">
+            <HdpBookingCard sticky />
+          </div>
+        </div>
+
+        <div className="mt-12 space-y-12 md:mt-16 md:space-y-16">
+          <HdpSimilarProperties />
+          <HdpFaq />
+        </div>
+      </main>
+      <SiteFooter />
+      <HdpMobileActions />
+    </div>
+  );
+}

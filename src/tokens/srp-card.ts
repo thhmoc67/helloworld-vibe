@@ -6,6 +6,8 @@ export const srpCardSampleImages = [
   "/assets/community/sports/rectangle-2363-3.png",
 ] as const;
 
+export type SrpCardStatusLabel = "filling-fast" | "trending";
+
 export const srpCardVariants = {
   default: {
     id: "default",
@@ -14,10 +16,10 @@ export const srpCardVariants = {
     subtitle: "Coliving PG in HSR Layout",
     images: srpCardSampleImages,
     rating: 4.5,
-    roomTypes: ["Double", "Triple"],
+    roomTypes: ["Private", "Double", "Triple", "Quadruple"],
     rent: 12500,
-    visitsToday: 7,
-    genderLabel: "Men Only",
+    statusLabel: "filling-fast" as SrpCardStatusLabel,
+    genderLabel: "Women Only",
     saved: false,
   },
   saved: {
@@ -26,9 +28,11 @@ export const srpCardVariants = {
     name: "HelloWorld Mahaveer",
     subtitle: "Coliving PG in HSR Layout",
     images: srpCardSampleImages,
-    rating: 4.9,
+    rating: 4.5,
     roomTypes: ["Private", "Double", "Triple", "Quadruple"],
     rent: 12500,
+    visitsToday: 7,
+    genderLabel: "Women Only",
     saved: true,
   },
   offer: {
@@ -38,10 +42,12 @@ export const srpCardVariants = {
     subtitle: "Coliving PG in HSR Layout",
     images: srpCardSampleImages,
     rating: 4.5,
-    roomTypes: ["Double"],
+    roomTypes: ["Private", "Double", "Triple", "Quadruple"],
     rent: 8750,
     originalRent: 12500,
     offerLabel: "Upto 30% Off",
+    statusLabel: "trending" as SrpCardStatusLabel,
+    genderLabel: "Women Only",
     saved: false,
   },
 } as const;

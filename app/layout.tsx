@@ -27,8 +27,9 @@ const caveat = Caveat({
 });
 
 export const metadata: Metadata = {
-  title: "HelloWorld Revamp",
-  description: "HelloWorld design system and revamp",
+  title: "HelloWorld — Coliving that Matches Your Vibe",
+  description:
+    "Find premium coliving PGs across India. Just 1 month deposit, no lock-in, no brokerage, and instant move-in.",
 };
 
 export const viewport = {
@@ -46,7 +47,7 @@ export default function RootLayout({
       lang="en"
       className={`${satoshi.variable} ${playfair.variable} ${caveat.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-satoshi text-gray-900">
+      <body className="min-h-full flex flex-col bg-white font-satoshi text-gray-900">
         {children}
       </body>
     </html>
