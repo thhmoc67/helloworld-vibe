@@ -61,6 +61,38 @@ export interface SrpPageSchema {
   faqPage?: FAQPageSchema;
 }
 
+export interface PlaceSchema {
+  "@context": "https://schema.org";
+  "@type": "LodgingBusiness";
+  name: string;
+  description?: string;
+  url?: string;
+  image?: string | string[];
+  address?: {
+    "@type": "PostalAddress";
+    streetAddress?: string;
+    addressLocality?: string;
+    addressRegion?: string;
+    postalCode?: string;
+    addressCountry?: string;
+  };
+  amenityFeature?: { "@type": "LocationFeatureSpecification"; name: string }[];
+  priceRange?: string;
+  aggregateRating?: {
+    "@type": "AggregateRating";
+    ratingValue: number;
+    reviewCount: number;
+    bestRating: number;
+  };
+}
+
+export interface HdpPageSchema {
+  webPage: WebPageSchema;
+  breadcrumb: BreadcrumbSchema;
+  place?: PlaceSchema;
+  faqPage?: FAQPageSchema;
+}
+
 export function getPublicSiteUrl(): string {
   const fromEnv = process.env.NEXT_PUBLIC_URL?.trim();
   if (fromEnv) return fromEnv.replace(/\/$/, "");
@@ -166,5 +198,95 @@ export function getFAQPageSchema(
           text: q.answer,
         },
       })),
+  };
+}
+
+export function getPlaceSchema(options: {
+  name: string;
+  description?: string;
+  pageUrl: string;
+  imageUrl?: string;
+  imageUrls?: string[];
+  address?: {
+    line1?: string;
+    line2?: string;
+    city?: string;
+    state?: string;
+    pincode?: string | number;
+    country?: string;
+  };
+  amenities?: string[];
+  rentIncludes?: string[];
+  minRent?: number;
+  aggregateRating?: {
+    ratingValue: number;
+    reviewCount: number;
+    bestRating?: number;
+  };
+}): PlaceSchema {
+  const images = [
+    ...(options.imageUrl ? [options.imageUrl] : []),
+    ...(options.imageUrls ?? []),
+  ].filter(Boolean);
+
+  const amenityNames = Array.from(
+    new Set([...(options.amenities ?? []), ...(options.rentIncludes ?? [])]),
+  )
+    .filter(Boolean)
+    .slice(0, 20);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "LodgingBusiness",
+    name: options.name,
+    ...(options.description ? { description: options.description } : {}),
+    url: options.pageUrl,
+    ...(images.length ? { image: images.length === 1 ? images[0] : images } : {}),
+    ...(options.address
+      ? {
+          address: {
+            "@type": "PostalAddress",
+            ...(options.address.line1
+              ? { streetAddress: options.address.line1 }
+              : {}),
+            ...(options.address.line2 || options.address.city
+              ? {
+                  addressLocality:
+                    options.address.line2 || options.address.city,
+                }
+              : {}),
+            ...(options.address.state
+              ? { addressRegion: options.address.state }
+              : {}),
+            ...(options.address.pincode
+              ? { postalCode: String(options.address.pincode) }
+              : {}),
+            ...(options.address.country
+              ? { addressCountry: options.address.country }
+              : {}),
+          },
+        }
+      : {}),
+    ...(amenityNames.length
+      ? {
+          amenityFeature: amenityNames.map((name) => ({
+            "@type": "LocationFeatureSpecification" as const,
+            name,
+          })),
+        }
+      : {}),
+    ...(options.minRent != null && options.minRent > 0
+      ? { priceRange: `₹${options.minRent}+` }
+      : {}),
+    ...(options.aggregateRating
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: options.aggregateRating.ratingValue,
+            reviewCount: options.aggregateRating.reviewCount,
+            bestRating: options.aggregateRating.bestRating ?? 5,
+          },
+        }
+      : {}),
   };
 }

@@ -5,6 +5,7 @@ import {
   NEIGHBORHOOD_CARD_WIDTH_PX,
   NeighborhoodTimeline,
 } from "@/components/marketing/neighborhood-card";
+import type { NeighborhoodCardData } from "@/src/tokens/neighborhood-card";
 import {
   neighborhoodRoutineSamples,
   neighborhoodSectionSubtitle,
@@ -60,8 +61,21 @@ function CarouselChevron({
   );
 }
 
-export function HdpNearbyPlaces({ className }: { className?: string }) {
+export function HdpNearbyPlaces({
+  items,
+  mapUrl,
+  subtitle,
+  className,
+}: {
+  items?: readonly NeighborhoodCardData[];
+  mapUrl?: string;
+  subtitle?: string;
+  className?: string;
+}) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const resolvedItems =
+    items && items.length > 0 ? items : neighborhoodRoutineSamples;
+  const hasApiItems = Boolean(items && items.length > 0);
 
   function scrollCarousel(direction: "prev" | "next") {
     scrollRef.current?.scrollBy({
@@ -79,21 +93,36 @@ export function HdpNearbyPlaces({ className }: { className?: string }) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 md:text-[2rem] md:leading-10">
-            {neighborhoodSectionTitle}
+            {hasApiItems ? "What's nearby?" : neighborhoodSectionTitle}
           </h2>
           <p className="mt-1 text-base text-gray-600">
-            {neighborhoodSectionSubtitle}
+            {subtitle ||
+              (hasApiItems
+                ? "See nearby utilities, facilities, transport, hospitals and more."
+                : neighborhoodSectionSubtitle)}
           </p>
         </div>
 
         <div className="flex shrink-0 flex-col items-start gap-3 sm:items-end">
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-hello-lime-600 transition-colors hover:text-hello-lime-700"
-          >
-            <MapPinIcon className="size-4" />
-            Show on Maps
-          </button>
+          {mapUrl ? (
+            <a
+              href={mapUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-hello-lime-600 transition-colors hover:text-hello-lime-700"
+            >
+              <MapPinIcon className="size-4" />
+              Show on Maps
+            </a>
+          ) : (
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-hello-lime-600 transition-colors hover:text-hello-lime-700"
+            >
+              <MapPinIcon className="size-4" />
+              Show on Maps
+            </button>
+          )}
 
           <div className="flex items-center gap-1">
             <CarouselChevron
@@ -112,7 +141,7 @@ export function HdpNearbyPlaces({ className }: { className?: string }) {
 
       <div className="mt-6">
         <NeighborhoodTimeline
-          items={neighborhoodRoutineSamples}
+          items={resolvedItems}
           animate={false}
           scrollContainerRef={scrollRef}
         />

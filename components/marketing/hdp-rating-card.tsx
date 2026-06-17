@@ -1,70 +1,68 @@
 import Image from "next/image";
+import type { HdpPageView } from "@/src/lib/hdp/hdp-page-view";
 import { hdpProperty } from "@/src/tokens/hdp";
 import { cn } from "@/src/lib/cn";
 
-function Stat({
-  value,
-  label,
-  accent,
-}: {
-  value: string | number;
-  label: string;
-  accent?: React.ReactNode;
-}) {
+function Stat({ value, label }: { value: number | string; label: string }) {
   return (
-    <div className="flex flex-col items-center gap-0.5 text-center">
-      <p className="text-xl font-bold text-gray-900">{value}</p>
-      <p className="text-xs font-medium text-gray-400">
-        {accent}
-        {label}
-      </p>
+    <div className="text-center">
+      <p className="text-2xl font-bold text-gray-900">{value}</p>
+      <p className="text-xs text-gray-500">{label}</p>
     </div>
   );
 }
 
-export function HdpRatingCard({ className }: { className?: string }) {
+export function HdpRatingCard({
+  view,
+  className,
+}: {
+  view?: HdpPageView;
+  className?: string;
+}) {
+  const displayName = view?.displayName ?? hdpProperty.name;
+  const trendingLabel = view?.trendingLabel ?? hdpProperty.trendingLabel;
+  const topChoiceCopy = view?.topChoiceCopy ?? hdpProperty.topChoiceCopy;
+  const rating = view?.rating ?? hdpProperty.rating;
+  const visitsToday = view?.visitsToday ?? hdpProperty.visitsToday;
+  const reviewCount = view?.reviewCount ?? hdpProperty.reviewCount;
+
   return (
     <section
       className={cn(
-        "relative overflow-hidden rounded-2xl border border-gray-300/60 p-4",
-        "bg-[linear-gradient(136deg,rgba(255,255,255,0.56)_44.68%,rgba(213,236,249,0.56)_108.29%),linear-gradient(90deg,#fff_0%,#fff_100%)]",
+        "flex items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm md:p-6",
         className,
       )}
-      aria-label="Property highlights"
+      aria-label="Property rating summary"
     >
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-        <div className="max-w-md space-y-2">
-          <span className="inline-flex items-center gap-1 rounded-2xl bg-hello-lime-50 px-2 py-0.5 text-xs font-medium text-hello-lime-800">
-            <span aria-hidden>📈</span>
-            {hdpProperty.trendingLabel}
+      <div className="min-w-0 space-y-3">
+        {trendingLabel ? (
+          <span className="inline-flex rounded-full bg-hello-lime-50 px-2 py-0.5 text-xs font-semibold text-hello-lime-800">
+            {trendingLabel}
           </span>
-          <p className="text-lg font-bold leading-snug text-gray-800 md:text-xl">
-            {hdpProperty.name}{" "}
-            <span className="font-medium text-gray-700">
-              {hdpProperty.topChoiceCopy}
-            </span>
-          </p>
-        </div>
-
-        <div className="flex items-center gap-4 pr-16 sm:pr-20">
-          <Stat
-            value={hdpProperty.rating}
-            label="Rating"
-            accent={<span className="text-amber-400">★ </span>}
-          />
-          <span className="h-8 w-px bg-gray-300" aria-hidden />
-          <Stat value={hdpProperty.visitsToday} label="Visits today" />
-          <span className="h-8 w-px bg-gray-300" aria-hidden />
-          <Stat value={hdpProperty.reviewCount} label="Reviews" />
+        ) : null}
+        <p className="text-sm text-gray-700 md:text-base">
+          <span className="font-semibold text-gray-900">{displayName}</span>{" "}
+          <span className="text-gray-600">{topChoiceCopy}</span>
+        </p>
+        <div className="flex flex-wrap items-center gap-6">
+          <Stat value={rating.toFixed(1)} label="Rating" />
+          {visitsToday != null ? (
+            <>
+              <div className="hidden h-10 w-px bg-gray-200 sm:block" aria-hidden />
+              <Stat value={visitsToday} label="Visits today" />
+            </>
+          ) : null}
+          <div className="hidden h-10 w-px bg-gray-200 sm:block" aria-hidden />
+          <Stat value={reviewCount} label="Reviews" />
         </div>
       </div>
 
       <Image
         src={hdpProperty.trophySrc}
         alt=""
-        width={84}
-        height={84}
-        className="pointer-events-none absolute bottom-2 right-2 size-16 object-contain sm:size-20"
+        width={72}
+        height={72}
+        className="hidden size-[4.5rem] shrink-0 object-contain sm:block"
       />
     </section>
   );

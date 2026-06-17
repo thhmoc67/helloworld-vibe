@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import type { HdpPageView } from "@/src/lib/hdp/hdp-page-view";
 import { hdpProperty } from "@/src/tokens/hdp";
 import { cn } from "@/src/lib/cn";
 
@@ -32,14 +33,25 @@ function MapPinIcon({ className }: { className?: string }) {
   );
 }
 
-export function HdpHeader({ className }: { className?: string }) {
+export function HdpHeader({
+  view,
+  className,
+}: {
+  view?: HdpPageView;
+  className?: string;
+}) {
+  const pageTitle = view?.pageTitle ?? hdpProperty.name;
+  const badge = view?.badge ?? hdpProperty.badge;
+  const locality = view?.locality ?? hdpProperty.locality;
+  const startingRent = view?.startingRent ?? hdpProperty.startingRent;
+  const mapUrl = view?.mapUrl;
+
   async function handleShare() {
     if (typeof window === "undefined") return;
     const url = window.location.href;
-    const title = hdpProperty.name;
     try {
       if (navigator.share) {
-        await navigator.share({ title, url });
+        await navigator.share({ title: pageTitle, url });
         return;
       }
       await navigator.clipboard?.writeText(url);
@@ -54,29 +66,43 @@ export function HdpHeader({ className }: { className?: string }) {
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="font-satoshi text-2xl font-bold text-gray-800 md:text-3xl">
-              {hdpProperty.name}
+              {pageTitle}
             </h1>
-            <span className="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-700">
-              {hdpProperty.badge}
-            </span>
+            {badge ? (
+              <span className="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-700">
+                {badge}
+              </span>
+            ) : null}
           </div>
           <p className="text-base font-medium text-gray-600 md:text-lg">
-            {hdpProperty.locality}
+            {locality}
           </p>
         </div>
 
         <div className="flex shrink-0 items-center gap-4 self-start">
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-gray-800 underline-offset-4 hover:underline"
-          >
-            <MapPinIcon className="size-4" />
-            Show on Maps
-          </button>
+          {mapUrl ? (
+            <a
+              href={mapUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-gray-800 underline-offset-4 hover:underline"
+            >
+              <MapPinIcon className="size-4" />
+              Show on Maps
+            </a>
+          ) : (
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-gray-800 underline-offset-4 hover:underline"
+            >
+              <MapPinIcon className="size-4" />
+              Show on Maps
+            </button>
+          )}
           <button
             type="button"
             onClick={handleShare}
-            aria-label={`Share ${hdpProperty.name}`}
+            aria-label={`Share ${pageTitle}`}
             className="inline-flex size-9 items-center justify-center rounded-full border border-gray-900 text-gray-900 transition-colors hover:border-gray-700 hover:text-gray-700"
           >
             <ShareIcon className="size-4" />
@@ -89,7 +115,7 @@ export function HdpHeader({ className }: { className?: string }) {
           <div>
             <p className="text-xs font-medium text-gray-500">Rent starting from</p>
             <p className="text-lg font-bold text-hello-lime-800">
-              ₹{hdpProperty.startingRent.toLocaleString("en-IN")}/month
+              ₹{startingRent.toLocaleString("en-IN")}/month
             </p>
           </div>
           <Image

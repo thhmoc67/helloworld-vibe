@@ -1,7 +1,17 @@
+import type { HdpPageView } from "@/src/lib/hdp/hdp-page-view";
 import { hdpAbout, hdpProperty } from "@/src/tokens/hdp";
 import { cn } from "@/src/lib/cn";
 
-export function HdpAbout({ className }: { className?: string }) {
+export function HdpAbout({
+  view,
+  className,
+}: {
+  view?: HdpPageView;
+  className?: string;
+}) {
+  const displayName = view?.displayName ?? hdpProperty.name;
+  const about = view?.about || hdpAbout;
+
   return (
     <section
       id="hdp-about"
@@ -9,9 +19,9 @@ export function HdpAbout({ className }: { className?: string }) {
       aria-label="About section"
     >
       <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">
-        About {hdpProperty.name}
+        About {displayName}
       </h2>
-      <p className="text-base leading-7 text-gray-700">{hdpAbout}</p>
+      <p className="text-base leading-7 text-gray-700">{about}</p>
     </section>
   );
 }

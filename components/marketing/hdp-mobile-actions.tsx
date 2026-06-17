@@ -1,9 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import type { HdpPageView } from "@/src/lib/hdp/hdp-page-view";
 import { cn } from "@/src/lib/cn";
 
-export function HdpMobileActions({ className }: { className?: string }) {
+export function HdpMobileActions({
+  className,
+}: {
+  view?: HdpPageView;
+  className?: string;
+}) {
   return (
     <footer
       className={cn(

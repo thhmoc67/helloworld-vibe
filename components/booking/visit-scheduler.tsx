@@ -11,7 +11,10 @@ import {
 import { cn } from "@/src/lib/cn";
 import { useAnimateOnView } from "@/src/lib/use-animate-on-view";
 import type { VisitDate, VisitTimeSlot } from "@/src/tokens/visit-scheduler";
-import { visitSchedulerTitle } from "@/src/tokens/visit-scheduler";
+import {
+  visitSchedulerTitle,
+  visitTimeSlotListMaxHeight,
+} from "@/src/tokens/visit-scheduler";
 
 type IndicatorStyle = {
   left: number;
@@ -250,15 +253,19 @@ export function VisitScheduler({
       >
         <div className={embedded ? "mt-4" : "mt-6 sm:mt-8"}>
           <div
-            key={selectedDateId}
-            ref={timeListRef}
-            role="radiogroup"
-            aria-label="Visit time"
-            className={cn(
-              "relative flex flex-wrap gap-3 py-2",
-              embedded ? "justify-start px-0" : "justify-center px-2",
-            )}
+            className="overflow-y-auto scrollbar-none"
+            style={{ maxHeight: visitTimeSlotListMaxHeight }}
           >
+            <div
+              key={selectedDateId}
+              ref={timeListRef}
+              role="radiogroup"
+              aria-label="Visit time"
+              className={cn(
+                "relative flex flex-wrap gap-3 py-2",
+                embedded ? "justify-start px-0" : "justify-center px-2",
+              )}
+            >
           {timeIndicator ? (
             <span
               aria-hidden
@@ -314,6 +321,7 @@ export function VisitScheduler({
               </label>
             );
           })}
+            </div>
           </div>
         </div>
       </StaggeredRow>

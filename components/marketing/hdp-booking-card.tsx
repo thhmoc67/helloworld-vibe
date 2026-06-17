@@ -4,11 +4,13 @@ import Image from "next/image";
 import { useState } from "react";
 import { ScheduleVisitFlow } from "@/components/booking/schedule-visit-flow";
 import { Button } from "@/components/ui/button";
+import type { HdpPageView } from "@/src/lib/hdp/hdp-page-view";
 import {
   hdpOccupancies,
   hdpProperty,
   hdpRoomTypes,
   type HdpOccupancy,
+  type HdpRoomType,
 } from "@/src/tokens/hdp";
 import { cn } from "@/src/lib/cn";
 
@@ -18,7 +20,7 @@ function formatRent(amount: number) {
   return `₹${amount.toLocaleString("en-IN")}/mo`;
 }
 
-function HdpBookingTourPanel() {
+function HdpBookingTourPanel({ view }: { view: HdpPageView }) {
   return (
     <div className="mt-6 space-y-6">
       <div className="flex items-center justify-between gap-4">
@@ -27,7 +29,7 @@ function HdpBookingTourPanel() {
             Rent Starting From
           </p>
           <p className="text-xl font-bold text-hello-lime-700">
-            ₹{hdpProperty.startingRent.toLocaleString("en-IN")}/month
+            ₹{view.startingRent.toLocaleString("en-IN")}/month
           </p>
         </div>
 
@@ -38,14 +40,15 @@ function HdpBookingTourPanel() {
             Security Deposit
           </p>
           <p className="text-xl font-bold text-[#0a0e14]">
-            {hdpProperty.securityDepositLabel}
+            {view.securityDepositLabel}
           </p>
         </div>
       </div>
 
       <ScheduleVisitFlow
-        propertyId={hdpProperty.propertyId}
-        propertyName={hdpProperty.name}
+        propertyId={view.propertyId}
+        propertyName={view.displayName}
+        propertyUrl={view.propertyUrl}
         layout="embedded"
       />
 
@@ -79,21 +82,48 @@ function HdpBookingTourPanel() {
 }
 
 export function HdpBookingCard({
+  view,
   className,
-  sticky = false,
 }: {
+  view?: HdpPageView;
   className?: string;
-  sticky?: boolean;
 }) {
+  const resolvedView: HdpPageView = view ?? {
+    propertyId: hdpProperty.propertyId,
+    pageTitle: hdpProperty.name,
+    displayName: hdpProperty.name,
+    name: hdpProperty.name,
+    badge: hdpProperty.badge,
+    locality: hdpProperty.locality,
+    startingRent: hdpProperty.startingRent,
+    securityDepositMonths: 1,
+    securityDepositLabel: hdpProperty.securityDepositLabel,
+    minStayMonths: hdpProperty.minStayMonths,
+    rating: hdpProperty.rating,
+    reviewCount: hdpProperty.reviewCount,
+    visitsToday: hdpProperty.visitsToday,
+    about: "",
+    amenities: [],
+    galleryImages: [],
+    propertyUrl: "",
+    soldOut: false,
+    roomTypes: hdpRoomTypes,
+    nearbyItems: [],
+    reviewSummary: null,
+    residentReviews: [],
+  };
+
+  const roomTypes: readonly HdpRoomType[] =
+    resolvedView.roomTypes.length > 0 ? resolvedView.roomTypes : hdpRoomTypes;
+
   const [mode, setMode] = useState<BookingMode>("tour");
   const [occupancy, setOccupancy] = useState<HdpOccupancy>("private");
-  const [selectedRoomId, setSelectedRoomId] = useState(hdpRoomTypes[0]?.id);
+  const [selectedRoomId, setSelectedRoomId] = useState(roomTypes[0]?.id);
 
   return (
     <aside
       className={cn(
         "rounded-2xl border border-gray-200 bg-white p-6 shadow-[0_2px_10px_rgba(134,144,163,0.4)]",
-        sticky && "md:sticky md:top-24 md:max-h-[calc(100vh-7rem)] md:overflow-y-auto",
         className,
       )}
       aria-label="Booking actions"
@@ -120,7 +150,7 @@ export function HdpBookingCard({
       </div>
 
       {mode === "tour" ? (
-        <HdpBookingTourPanel />
+        <HdpBookingTourPanel view={resolvedView} />
       ) : (
         <div className="mt-4 space-y-4">
           <div className="space-y-3">
@@ -150,7 +180,7 @@ export function HdpBookingCard({
           </div>
 
           <div className="max-h-64 space-y-3 overflow-y-auto pr-1">
-            {hdpRoomTypes.map((room) => {
+            {roomTypes.map((room) => {
               const isSelected = selectedRoomId === room.id;
               return (
                 <label
@@ -185,12 +215,16 @@ export function HdpBookingCard({
             })}
           </div>
 
-          <Button className="w-full bg-hello-lime-400 text-gray-900 hover:bg-hello-lime-500" size="lg">
-            Book Now
+          <Button
+            className="w-full bg-hello-lime-400 text-gray-900 hover:bg-hello-lime-500"
+            size="lg"
+            disabled={resolvedView.soldOut}
+          >
+            {resolvedView.soldOut ? "Sold Out" : "Book Now"}
           </Button>
           <p className="text-center text-xs text-gray-500">
             Full Refund of Security Deposit requires a minimum{" "}
-            {hdpProperty.minStayMonths}-month stay.
+            {resolvedView.minStayMonths}-month stay.
           </p>
         </div>
       )}

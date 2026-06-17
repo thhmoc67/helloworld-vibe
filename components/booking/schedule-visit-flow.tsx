@@ -20,15 +20,10 @@ import {
   mapVisitSlots,
   type MappedTimeSlot,
 } from "@/src/lib/visit-slots";
-import type { VisitFormError, VisitType } from "@/src/models/visit";
+import type { VisitFormError } from "@/src/models/visit";
 import type { VisitDate, VisitTimeSlot } from "@/src/tokens/visit-scheduler";
 
 type FlowStep = "schedule" | "details" | "otp" | "success";
-
-const visitTypeOptions: { id: VisitType; label: string }[] = [
-  { id: "physical", label: "Physical visit" },
-  { id: "video", label: "Video tour" },
-];
 
 export interface ScheduleVisitFlowProps {
   propertyId: number;
@@ -48,7 +43,6 @@ export function ScheduleVisitFlow({
   const embedded = layout === "embedded";
   const formId = useId();
   const [step, setStep] = useState<FlowStep>("schedule");
-  const [visitType, setVisitType] = useState<VisitType>("physical");
   const [dates, setDates] = useState<VisitDate[]>([]);
   const [timeSlots, setTimeSlots] = useState<VisitTimeSlot[]>([]);
   const [rawDateBySlotId, setRawDateBySlotId] = useState<Record<string, string>>(
@@ -156,7 +150,7 @@ export function ScheduleVisitFlow({
 
     const response = await postCreateVisit({
       date: formatVisitDate(rawDate),
-      savType: visitType,
+      savType: "physical",
       time: slot.timeValue,
       name,
       email,
@@ -360,32 +354,6 @@ export function ScheduleVisitFlow({
 
   return (
     <form className="space-y-6" onSubmit={handleScheduleContinue}>
-      <div className="space-y-3">
-        <p className="text-sm font-medium text-gray-900">
-          How would you like to see around?
-        </p>
-        <div className="flex gap-2">
-          {visitTypeOptions.map((option) => {
-            const active = visitType === option.id;
-            return (
-              <button
-                key={option.id}
-                type="button"
-                onClick={() => setVisitType(option.id)}
-                className={cn(
-                  "flex-1 rounded-full px-4 py-2.5 text-sm font-semibold transition-colors",
-                  active
-                    ? "bg-blue-light-100 text-blue-light-800"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200",
-                )}
-              >
-                {option.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       {loadingSlots ? (
         <p className="text-sm text-gray-500">Loading available slots...</p>
       ) : noSlots ? (

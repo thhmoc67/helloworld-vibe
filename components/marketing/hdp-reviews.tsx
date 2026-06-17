@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { HomepageCarouselNav } from "@/components/marketing/homepage-carousel-nav";
+import type { HdpReviewSummaryView } from "@/src/lib/hdp/map-hdp-api";
 import {
   hdpResidentReviews,
   hdpReviewSummary,
@@ -104,10 +106,27 @@ function ReviewCard({ review }: { review: HdpResidentReview }) {
   );
 }
 
-export function HdpReviews({ className }: { className?: string }) {
+export function HdpReviews({
+  reviewSummary,
+  residentReviews,
+  googleLink,
+  className,
+}: {
+  reviewSummary?: HdpReviewSummaryView | null;
+  residentReviews?: readonly HdpResidentReview[];
+  googleLink?: string;
+  className?: string;
+}) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(true);
+
+  const summary = reviewSummary ?? hdpReviewSummary;
+  const reviews =
+    residentReviews && residentReviews.length > 0
+      ? residentReviews
+      : hdpResidentReviews;
+  const allReviewsLink = googleLink;
 
   function updateScrollState() {
     const container = scrollRef.current;
@@ -122,7 +141,7 @@ export function HdpReviews({ className }: { className?: string }) {
     updateScrollState();
     window.addEventListener("resize", updateScrollState);
     return () => window.removeEventListener("resize", updateScrollState);
-  }, []);
+  }, [reviews.length]);
 
   function scrollByCards(direction: "prev" | "next") {
     const container = scrollRef.current;
@@ -132,14 +151,28 @@ export function HdpReviews({ className }: { className?: string }) {
     container.scrollBy({ left: delta, behavior: "smooth" });
   }
 
+  if (reviews.length === 0) return null;
+
   return (
     <section
       className={cn("space-y-8", className)}
       aria-label="What residents say"
     >
-      <h2 className="text-2xl font-medium text-black md:text-[1.875rem] md:leading-[2.375rem]">
-        What Residents Say
-      </h2>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <h2 className="text-2xl font-medium text-black md:text-[1.875rem] md:leading-[2.375rem]">
+          What Residents Say
+        </h2>
+        {allReviewsLink ? (
+          <Link
+            href={allReviewsLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold text-hello-lime-600 hover:text-hello-lime-700 hover:underline"
+          >
+            Show all Google reviews
+          </Link>
+        ) : null}
+      </div>
 
       <div className="space-y-4">
         <div
@@ -153,22 +186,22 @@ export function HdpReviews({ className }: { className?: string }) {
               <div className="space-y-0.5">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-[1.875rem] font-medium leading-[2.375rem] text-gray-800">
-                    {hdpReviewSummary.rating}
+                    {summary.rating}
                     <span className="text-amber-400">★</span>
                   </p>
                   <p className="text-base font-bold text-gray-900">
-                    {hdpReviewSummary.label}
+                    {summary.label}
                   </p>
                 </div>
                 <p className="text-xs font-medium text-gray-500">
-                  Based on {hdpReviewSummary.reviewCount} verified reviews
+                  Based on {summary.reviewCount} verified reviews
                 </p>
               </div>
 
               <div className="h-px bg-gray-300" />
 
               <div className="flex items-center gap-4">
-                <RecommendRing percent={hdpReviewSummary.recommendPercent} />
+                <RecommendRing percent={summary.recommendPercent} />
                 <p className="max-w-[9.375rem] text-sm font-medium leading-5 text-gray-800">
                   Residents would recommend to a friend
                 </p>
@@ -178,7 +211,7 @@ export function HdpReviews({ className }: { className?: string }) {
             <div className="hidden w-px shrink-0 bg-gray-300 lg:block" />
 
             <div className="flex min-w-0 flex-1 flex-col justify-center gap-4 lg:max-w-[18.875rem]">
-              {hdpReviewSummary.categories.map((category) => (
+              {summary.categories.map((category) => (
                 <CategoryBar
                   key={category.label}
                   label={category.label}
@@ -195,17 +228,19 @@ export function HdpReviews({ className }: { className?: string }) {
             onScroll={updateScrollState}
             className="-mx-1 flex gap-6 overflow-x-auto px-1 pb-1 scrollbar-none snap-x snap-mandatory"
           >
-            {hdpResidentReviews.map((review) => (
+            {reviews.map((review) => (
               <ReviewCard key={review.id} review={review} />
             ))}
           </div>
 
-          <HomepageCarouselNav
-            onPrev={() => scrollByCards("prev")}
-            onNext={() => scrollByCards("next")}
-            prevDisabled={!canScrollPrev}
-            nextDisabled={!canScrollNext}
-          />
+          {reviews.length > 1 ? (
+            <HomepageCarouselNav
+              onPrev={() => scrollByCards("prev")}
+              onNext={() => scrollByCards("next")}
+              prevDisabled={!canScrollPrev}
+              nextDisabled={!canScrollNext}
+            />
+          ) : null}
         </div>
       </div>
     </section>

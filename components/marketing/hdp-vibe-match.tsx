@@ -50,8 +50,15 @@ function VibeScoreRing({ score }: { score: number }) {
   );
 }
 
-export function HdpVibeMatch({ className }: { className?: string }) {
+export function HdpVibeMatch({
+  displayName,
+  className,
+}: {
+  displayName?: string;
+  className?: string;
+}) {
   const [expanded, setExpanded] = useState(true);
+  const propertyLabel = displayName ?? "this property";
 
   return (
     <section
@@ -109,7 +116,7 @@ export function HdpVibeMatch({ className }: { className?: string }) {
 
       <div className="mt-4 flex items-center justify-between gap-3">
         <p className="text-xs font-medium text-gray-800">
-          See what residents at HelloWorld Park Square are usually into
+          See what residents at {propertyLabel} are usually into
         </p>
         <button
           type="button"

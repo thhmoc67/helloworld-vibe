@@ -11,6 +11,13 @@ export interface VisitTimeSlot {
 
 export const visitSchedulerTitle = "Pick your visit date & time";
 
+/** py-3 + text-sm line-height on time slot pills */
+export const visitTimeSlotRowHeight = "2.75rem";
+/** gap-3 between wrapped time slot rows */
+export const visitTimeSlotRowGap = "0.75rem";
+/** Scroll area: 2 full rows + half of a 3rd row (plus top py-2 padding) */
+export const visitTimeSlotListMaxHeight = `calc(0.5rem + 2.5 * ${visitTimeSlotRowHeight} + 2 * ${visitTimeSlotRowGap})`;
+
 export const visitDateSamples: readonly VisitDate[] = [
   { id: "today", label: "Today", day: 20 },
   { id: "thu-21", label: "Thu", day: 21 },

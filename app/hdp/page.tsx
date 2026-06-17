@@ -1,79 +1,34 @@
 import type { Metadata } from "next";
-import { SiteFooter } from "@/components/layout/site-footer";
-import { SiteHeader } from "@/components/layout/site-header";
-import { HdpAbout } from "@/components/marketing/hdp-about";
-import { HdpAmenities } from "@/components/marketing/hdp-amenities";
-import { HdpBookingCard } from "@/components/marketing/hdp-booking-card";
-import { HdpFaq } from "@/components/marketing/hdp-faq";
-import { HdpHeader } from "@/components/marketing/hdp-header";
-import { HdpMobileActions } from "@/components/marketing/hdp-mobile-actions";
-import { HdpNearbyPlaces } from "@/components/marketing/hdp-nearby-places";
-import { HdpRatingCard } from "@/components/marketing/hdp-rating-card";
-import { HdpSectionNav } from "@/components/marketing/hdp-section-nav";
-import { HdpSimilarProperties } from "@/components/marketing/hdp-similar-properties";
-import { HdpVibeMatch } from "@/components/marketing/hdp-vibe-match";
-import { HdpReviews } from "@/components/marketing/hdp-reviews";
-import {
-  PropertyGalleryDesktop,
-  PropertyGalleryMobile,
-} from "@/components/marketing/property-gallery";
-import { hdpProperty } from "@/src/tokens/hdp";
-import { pageLayout } from "@/src/tokens/layout";
-import { cn } from "@/src/lib/cn";
+import { notFound } from "next/navigation";
+import { HdpPageContent } from "@/components/marketing/hdp-page-content";
+import { resolveHdpPage } from "@/src/lib/hdp/resolve-hdp-page";
+import { getPublicSiteUrl } from "@/src/lib/schema";
 
-export const metadata: Metadata = {
-  title: `${hdpProperty.name} — HelloWorld Coliving PG in Electronic City`,
-  description:
-    "Book a free visit at Helloworld Park Square — coliving PG in Electronic City, Bengaluru with amenities, vibe match, and room categories.",
-};
+const DEMO_SRP = "coliving-in-bangalore";
+const DEMO_LOCALITY = "electronic-city";
+const DEMO_HDP = "helloworld-park-square";
 
-export default function HdpPage() {
-  return (
-    <div className={cn("bg-white", pageLayout.mobileStickyBottomPadding)}>
-      <SiteHeader />
-      <main className={pageLayout.containerWithTopPadding}>
-        <HdpHeader />
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await resolveHdpPage(DEMO_SRP, DEMO_LOCALITY, DEMO_HDP);
+  if (!config) {
+    return {
+      title: "HelloWorld Property",
+      description: "Book a free visit at HelloWorld coliving PG.",
+    };
+  }
 
-        <div className="mt-4 md:mt-6">
-          <div className="hidden md:block">
-            <PropertyGalleryDesktop />
-          </div>
-          <div className="md:hidden">
-            <PropertyGalleryMobile />
-          </div>
-        </div>
+  const baseUrl = getPublicSiteUrl();
+  return {
+    title: config.pageTitle,
+    description: config.pageMetaDescription,
+    alternates: {
+      canonical: `${baseUrl}/${config.canonicalPath}`,
+    },
+  };
+}
 
-        <div className={cn("mt-8 md:mt-10", pageLayout.twoColumn)}>
-          <div className={pageLayout.mainColumn}>
-            <div className="space-y-6">
-              <HdpRatingCard />
-              <HdpVibeMatch />
-            </div>
-
-            <HdpSectionNav className="mt-6" />
-
-            <div className="mt-8 space-y-10 md:mt-10 md:space-y-12">
-              <HdpAbout />
-              <HdpAmenities />
-              <HdpNearbyPlaces />
-              <section id="hdp-reviews" className="scroll-mt-32">
-                <HdpReviews />
-              </section>
-            </div>
-          </div>
-
-          <div className={pageLayout.sidebarColumn}>
-            <HdpBookingCard sticky />
-          </div>
-        </div>
-
-        <div className="mt-12 space-y-12 md:mt-16 md:space-y-16">
-          <HdpSimilarProperties />
-          <HdpFaq />
-        </div>
-      </main>
-      <SiteFooter />
-      <HdpMobileActions />
-    </div>
-  );
+export default async function HdpDemoPage() {
+  const config = await resolveHdpPage(DEMO_SRP, DEMO_LOCALITY, DEMO_HDP);
+  if (!config) notFound();
+  return <HdpPageContent config={config} />;
 }

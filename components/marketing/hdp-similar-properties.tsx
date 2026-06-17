@@ -1,10 +1,41 @@
 "use client";
 
 import { SrpCard } from "@/components/marketing/srp-card";
+import { useOptionalPropertyActions } from "@/components/booking/property-actions-provider";
+import { mapPropertyToSrpCard } from "@/src/lib/map-property";
+import type { SimilarProperty } from "@/src/models/property";
+import type { LocalityProperty } from "@/src/tokens/locality";
 import { hdpSimilarProperties } from "@/src/tokens/hdp";
 import { cn } from "@/src/lib/cn";
 
-export function HdpSimilarProperties({ className }: { className?: string }) {
+export function HdpSimilarProperties({
+  properties,
+  srpSlug,
+  localitySlug,
+  className,
+}: {
+  properties?: SimilarProperty[];
+  srpSlug?: string;
+  localitySlug?: string;
+  className?: string;
+}) {
+  const propertyActions = useOptionalPropertyActions();
+  const apiCards: LocalityProperty[] =
+    properties && properties.length > 0
+      ? properties.map((property) =>
+          mapPropertyToSrpCard(
+            property,
+            property.locality || localitySlug?.replace(/-/g, " ") || "",
+            {
+              city: property.address?.city || property.city,
+              locality: property.locality || localitySlug?.replace(/-/g, " "),
+            },
+          ),
+        )
+      : [];
+  const usingApiCards = apiCards.length > 0;
+  const cards = usingApiCards ? apiCards : hdpSimilarProperties;
+
   return (
     <section
       className={cn("space-y-6", className)}
@@ -17,7 +48,7 @@ export function HdpSimilarProperties({ className }: { className?: string }) {
       </div>
 
       <div className="hidden gap-6 lg:grid lg:grid-cols-3">
-        {hdpSimilarProperties.map((property) => (
+        {cards.map((property) => (
           <SrpCard
             key={property.id}
             name={property.name}
@@ -31,12 +62,33 @@ export function HdpSimilarProperties({ className }: { className?: string }) {
             statusLabel={property.statusLabel}
             visitsToday={property.visitsToday}
             genderLabel={property.genderLabel}
+            onRequestCallback={
+              usingApiCards && propertyActions
+                ? () =>
+                    propertyActions.openRequestCallback({
+                      propertyId: (property as LocalityProperty).propertyId,
+                      propertyName: property.name,
+                      location: (property as LocalityProperty).location,
+                      city: (property as LocalityProperty).city,
+                    })
+                : undefined
+            }
+            onTakeTour={
+              usingApiCards && propertyActions
+                ? () =>
+                    propertyActions.openScheduleVisit({
+                      propertyId: (property as LocalityProperty).propertyId,
+                      propertyName: property.name,
+                      propertyUrl: (property as LocalityProperty).propertyUrl,
+                    })
+                : undefined
+            }
           />
         ))}
       </div>
 
       <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 scrollbar-none lg:hidden">
-        {hdpSimilarProperties.map((property) => (
+        {cards.map((property) => (
           <SrpCard
             key={property.id}
             className="w-[min(342px,85vw)] shrink-0"
@@ -51,6 +103,27 @@ export function HdpSimilarProperties({ className }: { className?: string }) {
             statusLabel={property.statusLabel}
             visitsToday={property.visitsToday}
             genderLabel={property.genderLabel}
+            onRequestCallback={
+              usingApiCards && propertyActions
+                ? () =>
+                    propertyActions.openRequestCallback({
+                      propertyId: (property as LocalityProperty).propertyId,
+                      propertyName: property.name,
+                      location: (property as LocalityProperty).location,
+                      city: (property as LocalityProperty).city,
+                    })
+                : undefined
+            }
+            onTakeTour={
+              usingApiCards && propertyActions
+                ? () =>
+                    propertyActions.openScheduleVisit({
+                      propertyId: (property as LocalityProperty).propertyId,
+                      propertyName: property.name,
+                      propertyUrl: (property as LocalityProperty).propertyUrl,
+                    })
+                : undefined
+            }
           />
         ))}
       </div>
