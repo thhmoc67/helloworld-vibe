@@ -50,6 +50,7 @@ export function formatLocalityDetails(
   startingRent: number,
   propertyCount: number,
 ): string {
+  if (propertyCount <= 0) return "View properties";
   const rent = formatRent(startingRent);
   const label = propertyCount === 1 ? "Property" : "Properties";
   return `Starting ${rent} | ${propertyCount} ${label}`;

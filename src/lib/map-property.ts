@@ -3,7 +3,7 @@ import { getPropertyHref } from "@/src/lib/sitemap-slug";
 import { getPublicSiteUrl } from "@/src/lib/schema";
 import type { WishlistPropertyCard } from "@/src/models/wishlist";
 import type { Property } from "@/src/models/property";
-import { srpCardDefaultImage, type SrpCardStatusLabel } from "@/src/tokens/srp-card";
+import { srpCardDefaultImage, SRP_CARD_MAX_IMAGES, type SrpCardStatusLabel } from "@/src/tokens/srp-card";
 import type { LocalityProperty } from "@/src/tokens/locality";
 
 function normalizeImageSource(value: unknown): string {
@@ -48,7 +48,9 @@ function propertyImages(property: Property): readonly string[] {
     .filter((url) => url.length > 0);
 
   const unique = [...new Set(urls)];
-  return unique.length > 0 ? unique : [srpCardDefaultImage];
+  return unique.length > 0
+    ? unique.slice(0, SRP_CARD_MAX_IMAGES)
+    : [srpCardDefaultImage];
 }
 
 export function mapPropertyToSrpCard(

@@ -1,18 +1,12 @@
 import {
-  cities,
   defaultCitySlug,
+  isCitySlug,
   type CitySlug,
 } from "@/src/tokens/cities";
 
 const STORAGE_KEY = "helloworld-selected-city";
 
 export const CITY_CHANGE_EVENT = "helloworld:city-change";
-
-const validCitySlugs = new Set(cities.map((city) => city.slug));
-
-function isCitySlug(value: string): value is CitySlug {
-  return validCitySlugs.has(value as CitySlug);
-}
 
 export function readStoredCity(): CitySlug {
   if (typeof window === "undefined") return defaultCitySlug;

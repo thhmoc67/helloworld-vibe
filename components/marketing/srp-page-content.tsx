@@ -17,6 +17,8 @@ import {
 } from "@/components/marketing/locality-mobile-tabs";
 import { SrpFaq } from "@/components/marketing/srp-faq";
 import { SrpListingsSection } from "@/components/marketing/srp-listings-section";
+import { SrpLocalitySeoLinks } from "@/components/marketing/srp-locality-seo-links";
+import { SrpPopularLocalities } from "@/components/marketing/srp-popular-localities";
 import { PropertyActionsProvider } from "@/components/booking/property-actions-provider";
 import { JsonLd } from "@/components/seo/json-ld";
 import { mapPropertiesToSrpCards } from "@/src/lib/map-property";
@@ -172,10 +174,14 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
       <JsonLd schema={config.schema} />
       <SiteHeaderSearch
         city={config.city as CitySlug}
+        defaultLocality={
+          config.kind === "locality" ? config.localityName : undefined
+        }
+        srpSlug={config.canonicalPath}
         navigateOnCityChange
       />
 
-      <main className={cn(pageLayout.container, "pt-0 lg:pt-8")}>
+      <main className={cn(pageLayout.container, "pt-0 lg:pt-8 pb-10")}>
         <SrpHero config={config} />
 
         <div className="mt-8 md:mt-12">
@@ -231,11 +237,23 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
             <LocalityContactCard {...contactCardProps} />
           </div>
 
+          {config.localityLinks.length > 0 ? (
+            <SrpPopularLocalities
+              className="mt-12 md:mt-16"
+              city={config.city}
+              canonicalPath={config.canonicalPath}
+              localityLinks={config.localityLinks}
+              properties={properties}
+            />
+          ) : null}
+
           {!config.hideFaqSection ? (
             <div className="mt-12 md:mt-16">
               <SrpFaq items={config.faqs} />
             </div>
           ) : null}
+
+          <SrpLocalitySeoLinks config={config} className="mt-12 md:mt-16" />
         </div>
       </main>
 

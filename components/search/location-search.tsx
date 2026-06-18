@@ -281,6 +281,16 @@ export function LocationSearch({
   }, [cityProp]);
 
   useEffect(() => {
+    if (localityProp !== undefined) {
+      setLocalityQuery(localityProp);
+      return;
+    }
+
+    setLocalityQuery(defaultLocality);
+    setInternalLocality(defaultLocality);
+  }, [localityProp, defaultLocality]);
+
+  useEffect(() => {
     const query = debouncedLocalityQuery.trim();
 
     if (query.length < LOCALITY_SUGGEST_MIN_LENGTH) {
@@ -442,6 +452,7 @@ export function LocationSearch({
               id={localityInputId}
               type="search"
               role="combobox"
+              autoComplete="off"
               aria-expanded={showLocalityDropdown}
               aria-controls={localityListboxId}
               aria-autocomplete="list"

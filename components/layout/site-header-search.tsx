@@ -26,12 +26,14 @@ export function SiteHeaderSearch({
   userPhone: userPhoneProp = null,
   onLogout: onLogoutProp,
   city,
+  defaultLocality,
   srpSlug,
   navigateOnCityChange = false,
 }: {
   userPhone?: string | null;
   onLogout?: () => void;
   city?: CitySlug;
+  defaultLocality?: string;
   srpSlug?: string;
   navigateOnCityChange?: boolean;
 } = {}) {
@@ -55,6 +57,7 @@ export function SiteHeaderSearch({
   const locationSearchProps = {
     localityPlaceholder: "Search for Localities" as const,
     city,
+    defaultLocality,
     srpSlug,
     navigateOnCityChange,
   };

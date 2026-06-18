@@ -9,6 +9,7 @@ import { cn } from "@/src/lib/cn";
 import {
   formatRent,
   isSrpComingSoonImage,
+  SRP_CARD_MAX_IMAGES,
   srpCardDefaultImage,
   type SrpCardStatusLabel,
 } from "@/src/tokens/srp-card";
@@ -193,7 +194,10 @@ function SrpCardCarousel({
   images: readonly string[];
   alt: string;
 }) {
-  const slides = images.length > 0 ? images : [srpCardDefaultImage];
+  const slides = (images.length > 0 ? images : [srpCardDefaultImage]).slice(
+    0,
+    SRP_CARD_MAX_IMAGES,
+  );
   const [activeIndex, setActiveIndex] = useState(0);
   const slideCount = slides.length;
   const imageSrc = slides[activeIndex] ?? srpCardDefaultImage;

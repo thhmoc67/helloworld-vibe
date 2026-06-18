@@ -18,6 +18,25 @@ export const localitiesByCity: Record<CitySlug, readonly string[]> = {
   hyderabad: ["Gachibowli", "Madhapur", "Kondapur", "Hitech City", "Kukatpally"],
   indore: ["Vijay Nagar", "Bhawarkua", "Palasia", "Rau"],
   jaipur: ["Malviya Nagar", "Vaishali Nagar", "Mansarovar", "C Scheme"],
+  kolkata: ["Salt Lake", "New Town", "Park Street", "Ballygunge", "Kasba"],
+  kota: [
+    "Talwandi",
+    "Rajeev Gandhi Nagar",
+    "Indra Vihar",
+    "Mahaveer Nagar",
+    "Jawahar Nagar",
+    "Vigyan Nagar",
+  ],
+  mumbai: ["Powai", "Andheri", "Vashi", "Ghatkopar", "Thane West", "Navi Mumbai"],
+  noida: ["Sector 18", "Sector 62", "Sector 137", "Sector 15", "Sector 76"],
+  pune: ["Hinjewadi", "Kharadi", "Viman Nagar", "Wakad", "Baner", "Hadapsar"],
+  visakhapatnam: [
+    "MVP Colony",
+    "Madhurawada",
+    "Dwaraka Nagar",
+    "Gajuwaka",
+    "Rushikonda",
+  ],
 };
 
 export function getLocalitiesForCity(city: string) {
