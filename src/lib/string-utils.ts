@@ -12,3 +12,15 @@ export function localitySlugToName(slug: string): string {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(" ");
 }
+
+/** Display name → URL slug (e.g. "Hsr Layout" → "hsr-layout"). */
+export function localityNameToSlug(name: string): string {
+  if (!name || typeof name !== "string") return "";
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/_/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}

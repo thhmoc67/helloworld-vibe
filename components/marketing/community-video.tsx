@@ -5,11 +5,12 @@ import {
   communityExplorePropertiesHref,
   communityPageVideo,
 } from "@/src/tokens/community";
+import { pageShell } from "@/src/tokens/layout";
 
 export function CommunityVideo() {
   return (
     <section className="bg-white">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className={pageShell.community}>
         <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-14">
           <div className="overflow-hidden rounded-tl-[1.685rem] bg-gray-900 shadow-[9px_8px_0_0_#0baaec,5px_5px_23px_rgba(0,0,0,0.15)] lg:w-[48.5%] lg:max-w-[38.8125rem]">
             <video

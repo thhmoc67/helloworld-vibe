@@ -387,6 +387,22 @@
   animation: tab-panel-in 300ms ease-out both;
 }
 
+@keyframes carousel-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(0.75rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@utility animate-carousel-panel-in {
+  animation: carousel-panel-in 300ms ease-out both;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

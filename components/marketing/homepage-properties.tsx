@@ -1,22 +1,49 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchAllProperty } from "@/src/apis/srp";
 import { SrpCard } from "@/components/marketing/srp-card";
-import { LocalityPaginationDots } from "@/components/marketing/locality-card";
-import { HomepageCarouselNav } from "@/components/marketing/homepage-carousel-nav";
 import { HomepageSectionHeading } from "@/components/marketing/homepage-section-heading";
-import { homepageFeaturedProperties, type HomepageFeaturedProperty } from "@/src/tokens/homepage";
+import { PaginatedCarousel } from "@/components/ui/paginated-carousel";
+import { mapPropertiesToSrpCards } from "@/src/lib/map-property";
+import { useSelectedCity } from "@/src/lib/use-selected-city";
+import { pageShell } from "@/src/tokens/layout";
+import { getCityLabel } from "@/src/tokens/cities";
+import type { LocalityProperty } from "@/src/tokens/locality";
 import { cn } from "@/src/lib/cn";
+
+const HOMEPAGE_PROPERTIES_PAGE_SIZE = 12;
+const VISIBLE_DESKTOP_COUNT = 3;
+
+function PropertyCardSkeleton({ className }: { className?: string }) {
+  return (
+    <div
+      aria-hidden
+      className={cn(
+        "animate-pulse overflow-hidden rounded-2xl border border-gray-100 bg-white",
+        className,
+      )}
+    >
+      <div className="aspect-[4/3] bg-gray-200" />
+      <div className="space-y-3 p-4">
+        <div className="h-5 w-3/4 rounded bg-gray-200" />
+        <div className="h-4 w-1/2 rounded bg-gray-100" />
+        <div className="h-8 w-1/3 rounded bg-gray-200" />
+      </div>
+    </div>
+  );
+}
 
 function PropertyCard({
   property,
   className,
 }: {
-  property: HomepageFeaturedProperty;
+  property: LocalityProperty;
   className?: string;
 }) {
   return (
     <SrpCard
+      href={property.href}
       name={property.name}
       subtitle={property.subtitle}
       images={property.images}
@@ -34,46 +61,49 @@ function PropertyCard({
 }
 
 export function HomepageProperties() {
-  const [mobileIndex, setMobileIndex] = useState(0);
-  const [desktopIndex, setDesktopIndex] = useState(0);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const count = homepageFeaturedProperties.length;
-  const visibleDesktopCount = 3;
+  const city = useSelectedCity();
+  const [properties, setProperties] = useState<LocalityProperty[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  function goToMobileIndex(index: number) {
-    setMobileIndex(index);
-    const container = scrollRef.current;
-    const card = container?.children[index] as HTMLElement | undefined;
-    card?.scrollIntoView({
-      behavior: "smooth",
-      inline: "start",
-      block: "nearest",
-    });
-  }
+  useEffect(() => {
+    let cancelled = false;
 
-  function handleMobileScroll() {
-    const container = scrollRef.current;
-    if (!container) return;
+    async function loadProperties() {
+      setIsLoading(true);
 
-    const cards = Array.from(container.children) as HTMLElement[];
-    const scrollLeft = container.scrollLeft;
-    const nextIndex = cards.findIndex((card, index) => {
-      const nextCard = cards[index + 1];
-      if (!nextCard) return index === cards.length - 1;
-      return scrollLeft < nextCard.offsetLeft - container.offsetLeft - 24;
-    });
+      const { data, success } = await fetchAllProperty(
+        { city },
+        { page: 1, page_size: HOMEPAGE_PROPERTIES_PAGE_SIZE },
+      );
 
-    setMobileIndex(nextIndex === -1 ? 0 : nextIndex);
-  }
+      if (cancelled) return;
 
-  const desktopItems = homepageFeaturedProperties.slice(
-    desktopIndex,
-    desktopIndex + visibleDesktopCount,
-  );
+      if (success && data.length > 0) {
+        setProperties(
+          mapPropertiesToSrpCards(
+            data,
+            (property) =>
+              `Coliving PG in ${property.locality || getCityLabel(city)}`,
+            { city },
+          ),
+        );
+      } else {
+        setProperties([]);
+      }
+
+      setIsLoading(false);
+    }
+
+    void loadProperties();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [city]);
 
   return (
     <section className="bg-white py-12 sm:py-16 lg:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className={pageShell.homepage}>
         <div className="flex justify-center">
           <HomepageSectionHeading
             prefix="This could be your"
@@ -82,50 +112,31 @@ export function HomepageProperties() {
           />
         </div>
 
-        <div className="mt-8 hidden items-start justify-center gap-6 lg:flex">
-          {desktopItems.map((property) => (
-            <PropertyCard
-              key={property.id}
-              property={property}
-              className="w-[25.6875rem] shrink-0"
-            />
-          ))}
-        </div>
-
-        <HomepageCarouselNav
-          className="mt-8 hidden lg:flex"
-          prevDisabled={desktopIndex === 0}
-          nextDisabled={desktopIndex >= count - visibleDesktopCount}
-          onPrev={() => setDesktopIndex((index) => Math.max(0, index - 1))}
-          onNext={() =>
-            setDesktopIndex((index) =>
-              Math.min(count - visibleDesktopCount, index + 1),
-            )
+        <PaginatedCarousel
+          items={properties}
+          getItemKey={(property) => property.id}
+          resetKey={city}
+          isLoading={isLoading}
+          visibleDesktopCount={VISIBLE_DESKTOP_COUNT}
+          mobileScrollGap={24}
+          desktopItemClassName="w-full"
+          mobileItemClassName="w-[min(100%,25.6875rem)]"
+          desktopTrackClassName="mt-8"
+          mobileTrackClassName="mt-8"
+          paginationClassName="mt-8"
+          mobilePaginationClassName="mt-6"
+          renderSkeleton={(className) => (
+            <PropertyCardSkeleton className={className} />
+          )}
+          renderItem={(property, className) => (
+            <PropertyCard property={property} className={className} />
+          )}
+          emptyState={
+            <p className="mt-8 text-center text-base text-gray-600">
+              No properties found in {getCityLabel(city)} right now.
+            </p>
           }
         />
-
-        <div className="mt-8 lg:hidden">
-          <div
-            ref={scrollRef}
-            onScroll={handleMobileScroll}
-            className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-none"
-          >
-            {homepageFeaturedProperties.map((property) => (
-              <PropertyCard
-                key={property.id}
-                property={property}
-                className={cn("w-[min(100%,25.6875rem)] shrink-0 snap-center")}
-              />
-            ))}
-          </div>
-          <div className="mt-6">
-            <LocalityPaginationDots
-              count={count}
-              activeIndex={mobileIndex}
-              onSelect={goToMobileIndex}
-            />
-          </div>
-        </div>
       </div>
     </section>
   );

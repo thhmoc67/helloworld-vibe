@@ -1,10 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, type MouseEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/src/lib/cn";
-import { formatRent, type SrpCardStatusLabel } from "@/src/tokens/srp-card";
+import {
+  formatRent,
+  srpCardDefaultImage,
+  type SrpCardStatusLabel,
+} from "@/src/tokens/srp-card";
 
 export interface SrpCardProps {
   name: string;
@@ -20,6 +26,7 @@ export interface SrpCardProps {
   genderLabel?: string;
   saved?: boolean;
   className?: string;
+  href?: string;
   onRequestCallback?: () => void;
   onTakeTour?: () => void;
   onSaveToggle?: () => void;
@@ -185,8 +192,16 @@ function SrpCardCarousel({
   images: readonly string[];
   alt: string;
 }) {
+  const slides = images.length > 0 ? images : [srpCardDefaultImage];
   const [activeIndex, setActiveIndex] = useState(0);
-  const slideCount = images.length;
+  const slideCount = slides.length;
+  const [imageSrc, setImageSrc] = useState(
+    () => slides[activeIndex] ?? srpCardDefaultImage,
+  );
+
+  useEffect(() => {
+    setImageSrc(slides[activeIndex] ?? srpCardDefaultImage);
+  }, [activeIndex, slides]);
 
   function goTo(direction: -1 | 1) {
     setActiveIndex((current) => (current + direction + slideCount) % slideCount);
@@ -194,41 +209,60 @@ function SrpCardCarousel({
 
   return (
     <div className="relative h-[14.25rem] w-full overflow-hidden bg-gray-100">
-      <Image
-        src={images[activeIndex]}
-        alt={`${alt} — photo ${activeIndex + 1} of ${slideCount}`}
-        fill
-        className="object-cover"
-        sizes="411px"
-      />
+      <div className="relative h-full w-full">
+        <Image
+          src={imageSrc}
+          alt={
+            imageSrc === srpCardDefaultImage
+              ? `${alt} coming soon`
+              : `${alt} — photo ${activeIndex + 1} of ${slideCount}`
+          }
+          fill
+          className="object-cover"
+          sizes="411px"
+          onError={() => setImageSrc(srpCardDefaultImage)}
+        />
+      </div>
 
       {slideCount > 1 ? (
         <>
           <button
             type="button"
             aria-label="Previous photo"
-            onClick={() => goTo(-1)}
-            className="absolute left-4 top-1/2 flex size-[25px] -translate-y-1/2 items-center justify-center rounded-full bg-gray-900/40 text-white backdrop-blur-sm transition-colors hover:bg-gray-900/55"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              goTo(-1);
+            }}
+            className="absolute left-4 top-1/2 z-10 flex size-[25px] -translate-y-1/2 items-center justify-center rounded-full bg-gray-900/40 text-white backdrop-blur-sm transition-colors hover:bg-gray-900/55"
           >
             <ChevronIcon direction="left" />
           </button>
           <button
             type="button"
             aria-label="Next photo"
-            onClick={() => goTo(1)}
-            className="absolute right-4 top-1/2 flex size-[25px] -translate-y-1/2 items-center justify-center rounded-full bg-gray-900/40 text-white backdrop-blur-sm transition-colors hover:bg-gray-900/55"
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              goTo(1);
+            }}
+            className="absolute right-4 top-1/2 z-10 flex size-[25px] -translate-y-1/2 items-center justify-center rounded-full bg-gray-900/40 text-white backdrop-blur-sm transition-colors hover:bg-gray-900/55"
           >
             <ChevronIcon direction="right" />
           </button>
 
-          <div className="absolute inset-x-0 bottom-4 flex items-center justify-center gap-1.5">
-            {images.map((image, index) => (
+          <div className="absolute inset-x-0 bottom-4 z-10 flex items-center justify-center gap-1.5">
+            {slides.map((slide, index) => (
               <button
-                key={image}
+                key={slide}
                 type="button"
                 aria-label={`Go to photo ${index + 1}`}
                 aria-current={index === activeIndex}
-                onClick={() => setActiveIndex(index)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setActiveIndex(index);
+                }}
                 className={cn(
                   "h-1.5 rounded-full bg-white/90 transition-all",
                   index === activeIndex ? "w-5" : "w-1.5 opacity-70",
@@ -256,22 +290,43 @@ export function SrpCard({
   genderLabel,
   saved = false,
   className,
+  href,
   onRequestCallback,
   onTakeTour,
   onSaveToggle,
   onShare,
 }: SrpCardProps) {
+  const router = useRouter();
   const hasOffer = originalRent != null && originalRent > rent;
   const leftBadge = (
     <LeftImageBadge statusLabel={statusLabel} visitsToday={visitsToday} />
   );
 
+  function navigateToHdp(event: MouseEvent<HTMLElement>) {
+    if (!href) return;
+    if ((event.target as HTMLElement).closest("button, a")) return;
+    router.push(href);
+  }
+
   return (
     <article
       className={cn(
         "flex w-full max-w-[25.6875rem] flex-col overflow-hidden rounded-2xl border border-[#e6e6e6] bg-white shadow-[6px_6px_23.5px_rgba(0,0,0,0.08)]",
+        href && "cursor-pointer",
         className,
       )}
+      onClick={navigateToHdp}
+      onKeyDown={
+        href
+          ? (event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                if ((event.target as HTMLElement).closest("button, a")) return;
+                event.preventDefault();
+                router.push(href);
+              }
+            }
+          : undefined
+      }
     >
       <div className="relative">
         <SrpCardCarousel images={images} alt={name} />
@@ -288,8 +343,18 @@ export function SrpCard({
 
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex items-center justify-between gap-3">
-          <h3 className="truncate text-lg font-medium leading-7 text-gray-900">
-            {name}
+          <h3 className="min-w-0 text-lg font-medium leading-7 text-gray-900">
+            {href ? (
+              <Link
+                href={href}
+                onClick={(event) => event.stopPropagation()}
+                className="block truncate transition-colors hover:text-hello-lime-700 hover:underline"
+              >
+                {name}
+              </Link>
+            ) : (
+              <span className="block truncate">{name}</span>
+            )}
           </h3>
           <span className="inline-flex shrink-0 items-center rounded-2xl bg-[#f0f9ff] px-2 py-0.5 text-xs font-medium text-[#0086c9]">
             {rating.toFixed(1)}★
@@ -303,7 +368,10 @@ export function SrpCard({
               type="button"
               aria-label={saved ? "Remove from saved" : "Save property"}
               aria-pressed={saved}
-              onClick={onSaveToggle}
+              onClick={(event) => {
+                event.stopPropagation();
+                onSaveToggle?.();
+              }}
               className={cn(
                 "transition-colors",
                 saved ? "text-error-500" : "text-gray-500 hover:text-gray-700",
@@ -314,7 +382,10 @@ export function SrpCard({
             <button
               type="button"
               aria-label="Share property"
-              onClick={onShare}
+              onClick={(event) => {
+                event.stopPropagation();
+                onShare?.();
+              }}
               className={cn(
                 "transition-colors",
                 saved

@@ -9,6 +9,7 @@ import {
   getAllBlogPostsMeta,
   getBlogPostBySlug,
 } from "@/src/lib/blog.server";
+import { pageShell } from "@/src/tokens/layout";
 
 export const revalidate = 86400;
 
@@ -88,7 +89,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const bannerImage = post.banner || post.thumbnail;
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-10">
+    <div className={pageShell.blogArticle}>
       <div className="mb-6">
         <Link href="/blogs" className="text-sm text-gray-600 hover:underline">
           ← Back to blogs

@@ -14,6 +14,7 @@ import {
   communityTabs,
   type CommunityTabId,
 } from "@/src/tokens/community-tabs";
+import { pageShell } from "@/src/tokens/layout";
 
 export function CommunityEvents() {
   const baseId = useId();
@@ -22,8 +23,8 @@ export function CommunityEvents() {
 
   return (
     <section className="bg-white">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="mx-auto max-w-3xl text-center">
+      <div className={pageShell.community}>
+        <div className={pageShell.communityIntro}>
           <CommunitySectionTitle>
             What&apos;s Happening Around Here
           </CommunitySectionTitle>

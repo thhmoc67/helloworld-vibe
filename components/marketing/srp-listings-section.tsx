@@ -1,24 +1,27 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, type RefObject } from "react";
 import { SrpCard } from "@/components/marketing/srp-card";
 import { useOptionalPropertyActions } from "@/components/booking/property-actions-provider";
+import { VibeChips } from "@/components/ui/vibe-chips";
+import { useSelectedVibes } from "@/src/lib/use-selected-vibes";
 import { localityVibeChips } from "@/src/tokens/locality";
 import type { LocalityProperty } from "@/src/tokens/locality";
 import { cn } from "@/src/lib/cn";
 
-function VibeCheckIcon({ className }: { className?: string }) {
+function SrpCardSkeleton() {
   return (
-    <svg aria-hidden viewBox="0 0 16 16" fill="none" className={className}>
-      <circle cx="8" cy="8" r="7" fill="currentColor" />
-      <path
-        d="M5 8l2 2 4-4"
-        stroke="white"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <div
+      aria-hidden
+      className="animate-pulse overflow-hidden rounded-2xl border border-gray-100 bg-white"
+    >
+      <div className="aspect-[4/3] bg-gray-200" />
+      <div className="space-y-3 p-4">
+        <div className="h-5 w-3/4 rounded bg-gray-200" />
+        <div className="h-4 w-1/2 rounded bg-gray-100" />
+        <div className="h-8 w-1/3 rounded bg-gray-200" />
+      </div>
+    </div>
   );
 }
 
@@ -26,23 +29,18 @@ export function SrpListingsSection({
   heading,
   properties,
   className,
+  isLoadingMore = false,
+  loadMoreRef,
 }: {
   heading: string;
   properties: readonly LocalityProperty[];
   className?: string;
+  isLoadingMore?: boolean;
+  loadMoreRef?: RefObject<HTMLDivElement | null>;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [selectedVibes, setSelectedVibes] = useState<Set<string>>(new Set());
+  const { selectedVibes, toggleVibe, clearSelectedVibes } = useSelectedVibes();
   const propertyActions = useOptionalPropertyActions();
-
-  function toggleVibe(id: string) {
-    setSelectedVibes((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
 
   function scrollChips(direction: "left" | "right") {
     scrollRef.current?.scrollBy({
@@ -99,39 +97,17 @@ export function SrpListingsSection({
             </div>
           </div>
 
-          <div
-            ref={scrollRef}
-            className="flex gap-2 overflow-x-auto pb-1 scrollbar-none"
-          >
-            {localityVibeChips.map((chip) => {
-              const selected = selectedVibes.has(chip.id);
-              return (
-                <button
-                  key={chip.id}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => toggleVibe(chip.id)}
-                  className={cn(
-                    "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-sm font-medium transition-colors",
-                    selected
-                      ? "border-hello-lime-500 bg-hello-lime-50 text-gray-900"
-                      : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
-                  )}
-                >
-                  <span aria-hidden>{chip.emoji}</span>
-                  {chip.label}
-                  {selected ? (
-                    <VibeCheckIcon className="size-4 text-hello-lime-600" />
-                  ) : null}
-                </button>
-              );
-            })}
-          </div>
+          <VibeChips
+            chips={localityVibeChips}
+            selectedIds={selectedVibes}
+            onToggle={toggleVibe}
+            scrollRef={scrollRef}
+          />
 
           {selectedVibes.size > 0 ? (
             <button
               type="button"
-              onClick={() => setSelectedVibes(new Set())}
+              onClick={clearSelectedVibes}
               className="text-sm font-semibold text-hello-lime-600 hover:text-hello-lime-700"
             >
               Clear All
@@ -144,6 +120,7 @@ export function SrpListingsSection({
         {properties.map((property) => (
           <SrpCard
             key={property.id}
+            href={property.href}
             name={property.name}
             subtitle={property.subtitle}
             images={property.images}
@@ -178,7 +155,14 @@ export function SrpListingsSection({
             }
           />
         ))}
+        {isLoadingMore
+          ? Array.from({ length: 3 }, (_, index) => (
+              <SrpCardSkeleton key={`loading-${index}`} />
+            ))
+          : null}
       </div>
+
+      <div ref={loadMoreRef} aria-hidden className="h-px w-full" />
     </section>
   );
 }

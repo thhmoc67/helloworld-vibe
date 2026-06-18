@@ -5,6 +5,7 @@ import { BlogPostCard } from "@/components/blog/blog-post-card";
 import { getApiOriginHeader } from "@/src/lib/api";
 import { getAllBlogPostsMeta } from "@/src/lib/blog.server";
 import { BLOG_PAGE_SIZE, paginate } from "@/src/lib/pagination";
+import { pageShell } from "@/src/tokens/layout";
 
 export const revalidate = 86400;
 
@@ -26,7 +27,7 @@ export default function BlogsIndexPage() {
   const featuredImage = featured?.banner || featured?.thumbnail;
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8 md:py-10">
+    <div className={pageShell.blogIndex}>
       {featured ? (
         <section className="mb-10 overflow-hidden rounded-2xl border border-gray-200 bg-black">
           <Link href={featured.urlPath} className="group relative block">

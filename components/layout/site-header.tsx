@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Logo } from "@/components/brand/logo";
 import { SiteHeaderSidebar } from "@/components/layout/site-header-sidebar";
 import { cn } from "@/src/lib/cn";
+import { pageShell } from "@/src/tokens/layout";
 
 function MenuIcon({ className }: { className?: string }) {
   return (
@@ -43,7 +44,12 @@ export function SiteHeader({
             : "sticky top-0 border-b border-gray-100 bg-white/95 backdrop-blur-sm",
         )}
       >
-        <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-4 sm:px-6">
+        <div
+          className={cn(
+            pageShell.chrome,
+            "flex h-[4.5rem] items-center justify-between",
+          )}
+        >
           <Link href="/" className="shrink-0">
             <Logo
               width={105}

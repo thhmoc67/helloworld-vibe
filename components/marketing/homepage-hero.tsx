@@ -1,38 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
 import { LocationSearch } from "@/components/search/location-search";
+import { VibeChips } from "@/components/ui/vibe-chips";
 import { cn } from "@/src/lib/cn";
+import { useSelectedVibes } from "@/src/lib/use-selected-vibes";
+import { pageShell } from "@/src/tokens/layout";
 import {
   homepageHeroDesktop,
   homepageHeroMobile,
   homepageVibeChips,
-  homepageVibeMoreCount,
 } from "@/src/tokens/homepage";
 
 const heroImageBlendOverlayClass =
-  "pointer-events-none absolute inset-y-0 left-0 w-[55%] bg-[linear-gradient(to_right,#ffffff_0%,color-mix(in_srgb,#ffffff_96%,transparent)_30%,color-mix(in_srgb,#ffffff_70%,transparent)_48%,color-mix(in_srgb,#ffffff_30%,transparent)_66%,transparent_84%)]";
-
-function VibeCheckIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 16 16"
-      fill="none"
-      className={className}
-    >
-      <circle cx="8" cy="8" r="7" fill="currentColor" />
-      <path
-        d="M5 8l2 2 4-4"
-        stroke="white"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+  "pointer-events-none absolute inset-y-0 left-0 w-[55%] bg-[linear-gradient(to_right,#FAFAFA_0%,color-mix(in_srgb,#FAFAFA_96%,transparent)_30%,color-mix(in_srgb,#ffffff_70%,transparent)_48%,color-mix(in_srgb,#FAFAFA_30%,transparent)_66%,transparent_84%)]";
 
 function HomepageHeroHeading({
   className,
@@ -79,61 +60,22 @@ function VibeFilters({
         <span className="text-xs italic text-gray-400">(optional)</span>
       </p>
 
-      <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-none lg:flex-wrap lg:overflow-visible">
-        {homepageVibeChips.map((chip) => {
-          const selected = selectedVibes.has(chip.id);
-
-          return (
-            <button
-              key={chip.id}
-              type="button"
-              aria-pressed={selected}
-              onClick={() => onToggle(chip.id)}
-              className={cn(
-                "inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium transition-colors",
-                selected
-                  ? "border-[#28b2b0] bg-white text-gray-900"
-                  : "border-gray-200 bg-white text-gray-600 hover:border-gray-300",
-              )}
-            >
-              <span aria-hidden>{chip.emoji}</span>
-              {chip.label}
-              {selected ? (
-                <VibeCheckIcon className="size-4 text-hello-lime-500" />
-              ) : null}
-            </button>
-          );
-        })}
-        <button
-          type="button"
-          className="inline-flex shrink-0 items-center rounded-full bg-hello-lime-100 px-3 py-2 text-sm font-medium text-gray-900 transition-colors hover:bg-hello-lime-200"
-        >
-          +{homepageVibeMoreCount} More
-        </button>
-      </div>
+      <VibeChips
+        chips={homepageVibeChips}
+        selectedIds={selectedVibes}
+        onToggle={onToggle}
+        showMaxCount={4}
+        className="mt-3 lg:flex-wrap lg:overflow-visible"
+      />
     </div>
   );
 }
 
 export function HomepageHero() {
-  const [selectedVibes, setSelectedVibes] = useState<Set<string>>(
-    () => new Set(homepageVibeChips.map((chip) => chip.id)),
-  );
-
-  function toggleVibe(id: string) {
-    setSelectedVibes((current) => {
-      const next = new Set(current);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  }
+  const { selectedVibes, toggleVibe } = useSelectedVibes();
 
   return (
-    <section className="relative bg-white">
+    <section className="relative bg-white max-w-7xl mx-auto ">
       {/* Mobile */}
       <div className="lg:hidden">
         <div className="relative h-[17.25rem] w-full overflow-hidden bg-white">
@@ -161,7 +103,7 @@ export function HomepageHero() {
       </div>
 
       {/* Desktop */}
-      <div className="relative hidden bg-white lg:block lg:min-h-[28.875rem]">
+      <div className="relative hidden bg-gray-50 lg:block lg:min-h-[28.875rem] rounded-b-[50px] ">
         <div className="pointer-events-none absolute inset-y-0 right-0 w-[58%]">
           <Image
             src={homepageHeroDesktop.file}
@@ -169,13 +111,13 @@ export function HomepageHero() {
             fill
             priority
             sizes="58vw"
-            className="object-contain object-right-bottom"
+            className="object-cover object-left-bottom rounded-b-[50px] overflow-hidden"
           />
           <div aria-hidden className={heroImageBlendOverlayClass} />
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="max-w-[36rem] pb-10 pt-10 xl:pb-12 xl:pt-12">
+        <div className={pageShell.homepageHero}>
+          <div className={cn(pageShell.homepageHeroCopy, "pb-10 pt-10 xl:pb-12 xl:pt-12")}>
             <HomepageHeroHeading />
 
             <div className="relative z-20 mt-8">

@@ -1,0 +1,276 @@
+"use client";
+
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { HomepageCarouselPagination } from "@/components/marketing/homepage-carousel-pagination";
+import { cn } from "@/src/lib/cn";
+
+export type PaginatedCarouselProps<T> = {
+  items: readonly T[];
+  getItemKey: (item: T, index: number) => string;
+  renderItem: (item: T, className: string, index: number) => ReactNode;
+  visibleDesktopCount?: number;
+  desktopItemClassName?: string;
+  mobileItemClassName?: string;
+  desktopTrackClassName?: string;
+  mobileTrackClassName?: string;
+  paginationClassName?: string;
+  mobilePaginationClassName?: string;
+  /** Gap offset (px) used when inferring the active slide from mobile scroll. */
+  mobileScrollGap?: number;
+  isLoading?: boolean;
+  loadingSkeletonCount?: number;
+  renderSkeleton?: (className: string, index: number) => ReactNode;
+  placeholderPageCount?: number;
+  emptyState?: ReactNode;
+  resetKey?: string | number;
+};
+
+type DesktopMetrics = {
+  step: number;
+  itemWidth: number;
+};
+
+function measureDesktopTrack(
+  viewport: HTMLElement,
+  track: HTMLElement,
+  visibleDesktopCount: number,
+): DesktopMetrics {
+  const viewportWidth = viewport.clientWidth;
+  if (!viewportWidth) return { step: 0, itemWidth: 0 };
+
+  const styles = getComputedStyle(track);
+  const gap =
+    Number.parseFloat(styles.columnGap) || Number.parseFloat(styles.gap) || 0;
+  const itemWidth =
+    (viewportWidth - gap * Math.max(0, visibleDesktopCount - 1)) /
+    visibleDesktopCount;
+  const step = itemWidth + gap;
+
+  return { step, itemWidth };
+}
+
+export function PaginatedCarousel<T>({
+  items,
+  getItemKey,
+  renderItem,
+  visibleDesktopCount = 3,
+  desktopItemClassName,
+  mobileItemClassName,
+  desktopTrackClassName,
+  mobileTrackClassName,
+  paginationClassName,
+  mobilePaginationClassName,
+  mobileScrollGap = 16,
+  isLoading = false,
+  loadingSkeletonCount,
+  renderSkeleton,
+  placeholderPageCount = 6,
+  emptyState = null,
+  resetKey,
+}: PaginatedCarouselProps<T>) {
+  const [mobileIndex, setMobileIndex] = useState(0);
+  const [desktopIndex, setDesktopIndex] = useState(0);
+  const [desktopMetrics, setDesktopMetrics] = useState<DesktopMetrics>({
+    step: 0,
+    itemWidth: 0,
+  });
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const desktopViewportRef = useRef<HTMLDivElement>(null);
+  const desktopTrackRef = useRef<HTMLDivElement>(null);
+
+  const count = items.length;
+  const skeletonCount = loadingSkeletonCount ?? visibleDesktopCount;
+  const desktopPageCount = Math.max(0, count - visibleDesktopCount + 1);
+
+  useEffect(() => {
+    setMobileIndex(0);
+    setDesktopIndex(0);
+    scrollRef.current?.scrollTo({ left: 0, behavior: "instant" });
+  }, [resetKey, count]);
+
+  useEffect(() => {
+    const viewport = desktopViewportRef.current;
+    const track = desktopTrackRef.current;
+    if (!viewport || !track || isLoading || count === 0) return;
+
+    const updateMetrics = () => {
+      setDesktopMetrics(
+        measureDesktopTrack(viewport, track, visibleDesktopCount),
+      );
+    };
+
+    updateMetrics();
+
+    const observer = new ResizeObserver(updateMetrics);
+    observer.observe(viewport);
+
+    return () => observer.disconnect();
+  }, [count, isLoading, items, visibleDesktopCount]);
+
+  function goToMobileIndex(index: number) {
+    setMobileIndex(index);
+    const container = scrollRef.current;
+    const card = container?.children[index] as HTMLElement | undefined;
+    card?.scrollIntoView({
+      behavior: "smooth",
+      inline: "start",
+      block: "nearest",
+    });
+  }
+
+  function handleMobileScroll() {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const cards = Array.from(container.children) as HTMLElement[];
+    const scrollLeft = container.scrollLeft;
+    const nextIndex = cards.findIndex((card, index) => {
+      const nextCard = cards[index + 1];
+      if (!nextCard) return index === cards.length - 1;
+      return scrollLeft < nextCard.offsetLeft - container.offsetLeft - mobileScrollGap;
+    });
+
+    setMobileIndex(nextIndex === -1 ? 0 : nextIndex);
+  }
+
+  function goToDesktopIndex(index: number) {
+    setDesktopIndex(index);
+  }
+
+  if (isLoading && renderSkeleton) {
+    return (
+      <>
+        <div
+          className={cn(
+            "hidden w-full gap-6 lg:flex",
+            desktopTrackClassName,
+          )}
+        >
+          {Array.from({ length: skeletonCount }, (_, index) =>
+            renderSkeleton(
+              cn(desktopItemClassName, "min-w-0 flex-1"),
+              index,
+            ),
+          )}
+        </div>
+
+        <div
+          className={cn(
+            "flex gap-4 overflow-x-auto pb-2 scrollbar-none lg:hidden",
+            mobileTrackClassName,
+          )}
+        >
+          {Array.from({ length: skeletonCount }, (_, index) =>
+            renderSkeleton(mobileItemClassName ?? "", index),
+          )}
+        </div>
+
+        <HomepageCarouselPagination
+          className={paginationClassName}
+          pageCount={placeholderPageCount}
+          activeIndex={0}
+          prevDisabled
+          nextDisabled
+          placeholder
+          onPrev={() => {}}
+          onNext={() => {}}
+        />
+      </>
+    );
+  }
+
+  if (!isLoading && count === 0) {
+    return emptyState;
+  }
+
+  const showDesktopPagination = desktopPageCount > 1;
+  const showMobilePagination = count > 1;
+
+  return (
+    <>
+      <div className={cn("hidden w-full lg:block", desktopTrackClassName)}>
+        <div ref={desktopViewportRef} className="w-full overflow-hidden">
+          <div
+            ref={desktopTrackRef}
+            className="flex gap-6 transition-transform duration-300 ease-out motion-reduce:transition-none"
+            style={
+              desktopMetrics.step > 0
+                ? { transform: `translateX(-${desktopIndex * desktopMetrics.step}px)` }
+                : undefined
+            }
+          >
+            {items.map((item, index) => (
+              <div
+                key={getItemKey(item, index)}
+                data-carousel-slide
+                className="shrink-0"
+                style={
+                  desktopMetrics.itemWidth > 0
+                    ? { width: desktopMetrics.itemWidth }
+                    : undefined
+                }
+              >
+                {renderItem(
+                  item,
+                  cn(desktopItemClassName, "w-full max-w-none"),
+                  index,
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {showDesktopPagination ? (
+        <HomepageCarouselPagination
+          className={cn("hidden lg:flex", paginationClassName)}
+          pageCount={desktopPageCount}
+          activeIndex={desktopIndex}
+          prevDisabled={desktopIndex === 0}
+          nextDisabled={desktopIndex >= desktopPageCount - 1}
+          onPrev={() => setDesktopIndex((index) => Math.max(0, index - 1))}
+          onNext={() =>
+            setDesktopIndex((index) =>
+              Math.min(desktopPageCount - 1, index + 1),
+            )
+          }
+          onSelectPage={goToDesktopIndex}
+        />
+      ) : null}
+
+      <div className="lg:hidden">
+        <div
+          ref={scrollRef}
+          onScroll={handleMobileScroll}
+          className={cn(
+            "flex scroll-smooth gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-none",
+            mobileTrackClassName,
+          )}
+        >
+          {items.map((item, index) => (
+            <div key={getItemKey(item, index)} className="contents">
+              {renderItem(
+                item,
+                cn(mobileItemClassName, "shrink-0 snap-center"),
+                index,
+              )}
+            </div>
+          ))}
+        </div>
+
+        {showMobilePagination ? (
+          <HomepageCarouselPagination
+            className={mobilePaginationClassName}
+            pageCount={count}
+            activeIndex={mobileIndex}
+            prevDisabled={mobileIndex === 0}
+            nextDisabled={mobileIndex >= count - 1}
+            onPrev={() => goToMobileIndex(mobileIndex - 1)}
+            onNext={() => goToMobileIndex(mobileIndex + 1)}
+            onSelectPage={goToMobileIndex}
+          />
+        ) : null}
+      </div>
+    </>
+  );
+}

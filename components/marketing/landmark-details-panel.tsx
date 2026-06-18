@@ -136,6 +136,7 @@ export function LandmarkDetailsPanel({ className }: { className?: string }) {
           {visibleSimilar.map((property) => (
             <SrpCard
               key={property.id}
+              href={property.href}
               name={property.name}
               subtitle={property.subtitle}
               images={property.images}
@@ -159,6 +160,7 @@ export function LandmarkDetailsPanel({ className }: { className?: string }) {
             {landmarkSimilarProperties.map((property) => (
               <SrpCard
                 key={property.id}
+                href={property.href}
                 name={property.name}
                 subtitle={property.subtitle}
                 images={property.images}

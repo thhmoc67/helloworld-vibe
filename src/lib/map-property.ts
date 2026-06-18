@@ -1,6 +1,8 @@
 import { imageUrlFormatter } from "@/src/lib/images";
+import { getPropertyHref } from "@/src/lib/sitemap-slug";
+import { getPublicSiteUrl } from "@/src/lib/schema";
 import type { Property } from "@/src/models/property";
-import type { SrpCardStatusLabel } from "@/src/tokens/srp-card";
+import { srpCardDefaultImage, type SrpCardStatusLabel } from "@/src/tokens/srp-card";
 import type { LocalityProperty } from "@/src/tokens/locality";
 
 function genderLabel(gender?: string): string | undefined {
@@ -30,9 +32,9 @@ function propertyImages(property: Property): readonly string[] {
     ? property.property_image
     : [];
   const urls = [primary, ...gallery]
-    .filter(Boolean)
-    .map((url) => imageUrlFormatter("srp", String(url)));
-  return urls.length > 0 ? urls : ["/assets/community/hero/hero-1.png"];
+    .map((url) => imageUrlFormatter("srp", String(url ?? "").trim()))
+    .filter((url) => url.length > 0);
+  return urls.length > 0 ? urls : [srpCardDefaultImage];
 }
 
 export function mapPropertyToSrpCard(
@@ -40,6 +42,10 @@ export function mapPropertyToSrpCard(
   subtitle: string,
   context?: { city?: string; locality?: string; propertyUrl?: string },
 ): LocalityProperty {
+  const href = getPropertyHref(property);
+  const propertyUrl =
+    context?.propertyUrl ?? `${getPublicSiteUrl()}${href}`;
+
   return {
     id: String(property.id),
     propertyId: property.id,
@@ -51,9 +57,10 @@ export function mapPropertyToSrpCard(
     rent: property.min_rent ?? 0,
     statusLabel: statusLabel(property),
     genderLabel: genderLabel(property.gender),
-    city: context?.city,
-    location: context?.locality,
-    propertyUrl: context?.propertyUrl,
+    city: context?.city ?? property.address?.city ?? property.city,
+    location: context?.locality ?? property.locality,
+    href,
+    propertyUrl,
   };
 }
 

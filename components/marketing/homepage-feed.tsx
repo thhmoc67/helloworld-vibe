@@ -8,6 +8,7 @@ import {
 } from "@/components/marketing/locality-card";
 import { HomepageSectionHeading } from "@/components/marketing/homepage-section-heading";
 import { homepageFeedItems } from "@/src/tokens/homepage";
+import { pageShell } from "@/src/tokens/layout";
 
 export function HomepageFeed() {
   const [desktopIndex, setDesktopIndex] = useState(0);
@@ -49,7 +50,7 @@ export function HomepageFeed() {
 
   return (
     <section className="py-12 sm:py-16 lg:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className={pageShell.homepage}>
         <div className="flex justify-center">
           <HomepageSectionHeading
             prefix="Straight from the"

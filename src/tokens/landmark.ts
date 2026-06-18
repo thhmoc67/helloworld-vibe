@@ -11,6 +11,7 @@ import {
   srpCardSampleImages,
   type SrpCardStatusLabel,
 } from "@/src/tokens/srp-card";
+import { buildNestedHdpHref } from "@/src/lib/sitemap-slug";
 
 export const landmarkPage = {
   name: "PES University",
@@ -29,12 +30,22 @@ export const landmarkPage = {
     "Banashankari around PES University is a student-friendly pocket of South Bangalore — affordable eats, quick BMTC connections, and coliving homes within walking distance of campus. HelloWorld PGs here are fully furnished with biometric access, community events, and zero brokerage so you can focus on college life from day one.",
 } as const;
 
+const landmarkLocalitySlug = landmarkPage.locality.toLowerCase().replace(/\s+/g, "-");
+
+function landmarkPropertyHref(name: string) {
+  return buildNestedHdpHref(
+    landmarkPage.citySlug,
+    landmarkLocalitySlug,
+    name,
+  );
+}
+
+export const landmarkPropertiesHeading = `${landmarkPage.propertyCount} Coliving PGs in near ${landmarkPage.name}, ${landmarkPage.locality}, ${landmarkPage.city}`;
+
 export const landmarkHeroSubtitle = formatLocalityDetails(
   landmarkPage.startingRent,
   landmarkPage.propertyCount,
 );
-
-export const landmarkPropertiesHeading = `${landmarkPage.propertyCount} Coliving PGs in near ${landmarkPage.name}, ${landmarkPage.locality}, ${landmarkPage.city}`;
 
 export const landmarkDayFromHereTitle = "A Day from here";
 export const landmarkDayFromHereSubtitle =
@@ -103,7 +114,7 @@ export const landmarkDayFromHereItems: readonly NeighborhoodCardData[] = [
   },
 ] as const;
 
-export const landmarkProperties: readonly LocalityProperty[] = [
+export const landmarkProperties: LocalityProperty[] = [
   {
     id: "pes-greens",
     propertyId: 2001,
@@ -175,7 +186,10 @@ export const landmarkProperties: readonly LocalityProperty[] = [
     rent: 9500,
     genderLabel: "Women Only",
   },
-] as const;
+].map((property) => ({
+  ...property,
+  href: landmarkPropertyHref(property.name),
+})) as LocalityProperty[];
 
 export const landmarkSimilarProperties = landmarkProperties.slice(0, 3);
 

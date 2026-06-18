@@ -121,3 +121,70 @@ export function kotaPgFlatLocalityPath(localitySlug: string): string {
   if (!loc) return "";
   return `/pg-in-${loc}-kota`;
 }
+
+export function getPropertyCityForUrl(property: {
+  address?: { city?: string };
+  city?: string;
+}): string {
+  return String(property.address?.city ?? property.city ?? "").trim();
+}
+
+/** Gender-specific hostel SRP path (e.g. boys-hostels-in-kota). */
+export function genderedHostelsSrpSlug(
+  city: string,
+  gender: "boys" | "girls",
+): string {
+  const normalizedCity = String(city ?? "")
+    .trim()
+    .toLowerCase();
+  return `${gender}-hostels-in-${normalizedCity}`;
+}
+
+export function marketingSrpSlugFromProperty(property: {
+  address?: { city?: string };
+  city?: string;
+  gender?: string;
+}): string {
+  const city = getPropertyCityForUrl(property);
+  if (!isKotaCity(city)) {
+    return srpSlug(city);
+  }
+  const gender = String(property.gender || "").toUpperCase();
+  if (gender === "MALE") return genderedHostelsSrpSlug(city, "boys");
+  if (gender === "FEMALE") return genderedHostelsSrpSlug(city, "girls");
+  return srpSlug(city);
+}
+
+/** Canonical nested HDP path from an SRP listing (e.g. /coliving-in-bangalore/hsr-layout/helloworld-arden). */
+export function getPropertyHref(property: {
+  name?: string;
+  display_name?: string;
+  locality?: string;
+  address?: { line2?: string; city?: string };
+  city?: string;
+  gender?: string;
+}): string {
+  const srp = marketingSrpSlugFromProperty(property);
+  const locality = getLocalitySlug(property);
+  const hdp = createHdpSlug(property);
+  return locality ? `/${srp}/${locality}/${hdp}` : `/${srp}/${hdp}`;
+}
+
+/** Nested HDP path from city, locality slug, and property display name. */
+export function buildNestedHdpHref(
+  city: string,
+  localitySlug: string,
+  propertyName: string,
+): string {
+  const srp = marketingSrpSlugFromProperty({
+    city,
+    address: { city },
+  });
+  const locality = localitySlug
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/_/g, "-");
+  const hdp = createHdpSlug({ name: propertyName });
+  return locality ? `/${srp}/${locality}/${hdp}` : `/${srp}/${hdp}`;
+}

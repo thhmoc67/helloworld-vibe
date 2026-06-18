@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { HomepageCarouselNav } from "@/components/marketing/homepage-carousel-nav";
 import { HomepageReviews } from "@/components/marketing/homepage-reviews";
 import { HomepageSectionHeading } from "@/components/marketing/homepage-section-heading";
+import { pageLayout, pageShell } from "@/src/tokens/layout";
+import { cn } from "@/src/lib/cn";
 
 export function HomepageTestimonials() {
   const [canScrollPrev, setCanScrollPrev] = useState(false);
@@ -39,12 +41,13 @@ export function HomepageTestimonials() {
   }
 
   return (
-    <section className="py-12 sm:py-16 lg:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+    <section className={cn("py-12 sm:py-16 lg:py-20", pageLayout.container)}>
+      <div className={pageShell.homepage}>
         <HomepageSectionHeading
           prefix="Hear from our"
           highlight="Tribe!"
           gradient="home"
+          className="text-center"
         />
       </div>
       <div className="mt-8">
@@ -56,7 +59,7 @@ export function HomepageTestimonials() {
           onScroll={updateScrollState}
         />
       </div>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className={pageShell.homepage}>
         <HomepageCarouselNav
           className="mt-8"
           prevDisabled={!canScrollPrev}

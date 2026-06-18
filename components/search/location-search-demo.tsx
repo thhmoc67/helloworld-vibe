@@ -11,6 +11,7 @@ export function LocationSearchDemo() {
   return (
     <div className="w-full max-w-3xl space-y-4">
       <LocationSearch
+        searchOnly
         city={city}
         locality={locality}
         onCityChange={setCity}

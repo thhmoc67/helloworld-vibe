@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { SitemapSection } from "@/src/lib/sitemap-pages/data.server";
+import { pageShell } from "@/src/tokens/layout";
 
 export function SitemapListPage(props: {
   baseUrl: string;
@@ -25,7 +26,7 @@ export function SitemapListPage(props: {
   const total = sections.reduce((sum, s) => sum + s.items.length, 0);
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-10">
+    <main className={pageShell.sitemap}>
       <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-3xl font-bold text-gray-900">{title}</h1>

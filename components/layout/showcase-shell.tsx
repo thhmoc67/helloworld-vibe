@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/src/lib/cn";
+import { pageShell } from "@/src/tokens/layout";
 
 export type ShowcaseNavItem = {
   label: string;
@@ -54,7 +55,12 @@ export function ShowcaseShell({
   return (
     <div className="min-h-screen bg-white">
       <header className="sticky top-0 z-20 border-b border-gray-200 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+        <div
+          className={cn(
+            pageShell.showcase,
+            "flex items-center justify-between gap-4 py-4",
+          )}
+        >
           <div className="min-w-0">
             <p className="text-sm font-medium text-hello-lime-700">{eyebrow}</p>
             <h1 className="truncate text-lg font-bold text-gray-900 sm:text-xl">
@@ -77,7 +83,7 @@ export function ShowcaseShell({
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-7xl gap-8 px-4 sm:px-6 lg:gap-12">
+      <div className={cn(pageShell.showcase, "flex gap-8 lg:gap-12")}>
         <aside className="hidden w-52 shrink-0 lg:block">
           <nav
             aria-label={`${title} sections`}

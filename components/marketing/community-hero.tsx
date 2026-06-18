@@ -4,6 +4,7 @@ import {
   communityHeroFrame,
   communityHeroPolaroids,
 } from "@/src/tokens/community";
+import { pageShell } from "@/src/tokens/layout";
 
 function toPercent(value: number, total: number) {
   return `${(value / total) * 100}%`;
@@ -60,7 +61,7 @@ function PolaroidCard({
 export function CommunityHero() {
   return (
     <section className="bg-white">
-      <div className="mx-auto hidden max-w-[72.79rem] px-4 sm:px-6 lg:block">
+      <div className={pageShell.communityHeroDesktop}>
         <div
           className="relative mx-auto w-full"
           style={{ aspectRatio: `${communityHeroFrame.width} / ${communityHeroFrame.height}` }}
@@ -85,7 +86,7 @@ export function CommunityHero() {
       </div>
 
       <div className="px-4 py-8 sm:px-6 lg:hidden">
-        <div className="mx-auto max-w-md">
+        <div className={pageShell.communityMobileHero}>
           <CommunityWeekendsHeading size="mobile" className="w-full" />
           <div className="-mx-4 mt-10 overflow-x-auto px-4 pb-2 scrollbar-none">
             <div className="flex w-max gap-4">

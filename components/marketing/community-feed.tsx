@@ -11,6 +11,7 @@ import {
   communityFeedItems,
   communityInstagramUrl,
 } from "@/src/tokens/community";
+import { pageShell } from "@/src/tokens/layout";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -87,7 +88,7 @@ export function CommunityFeed() {
 
   return (
     <section className="bg-white pb-12 sm:pb-16 lg:pb-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className={pageShell.community}>
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8">
           <CommunityFeedHeading />
           <FollowButton />

@@ -1,10 +1,11 @@
 import { HomepageAsset } from "@/components/marketing/homepage-asset";
 import { homepageBenefits } from "@/src/tokens/homepage";
+import { pageShell } from "@/src/tokens/layout";
 
 export function HomepageBenefits() {
   return (
-    <section className="bg-white pb-10 pt-2 sm:pb-12 sm:pt-4">
-      <div className="mx-auto max-w-[66.375rem] px-4 sm:px-6">
+    <section className="bg-white pb-10 pt-2 sm:pb-12 sm:pt-12">
+      <div className={pageShell.homepageBenefits}>
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:gap-x-10 lg:grid-cols-4 lg:justify-between">
           {homepageBenefits.map((benefit) => (
             <div

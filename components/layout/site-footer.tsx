@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { pageShell } from "@/src/tokens/layout";
 import { Logo } from "@/components/brand/logo";
 import { cn } from "@/src/lib/cn";
 import {
@@ -156,7 +157,7 @@ function FooterSocialLinks({ variant }: { variant: "desktop" | "mobile" }) {
 export function SiteFooter() {
   return (
     <footer className="border-t border-[#e6e6e6] bg-gray-100 text-[#0a0e14]">
-      <div className="mx-auto max-w-7xl px-6 py-6 lg:px-20 lg:py-16">
+      <div className={pageShell.footer}>
         <div className="lg:flex lg:items-start lg:justify-between">
           <div className="shrink-0 lg:w-[18.5rem]">
             <Link href="/" className="inline-block">

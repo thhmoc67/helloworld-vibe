@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { HomepageAsset } from "@/components/marketing/homepage-asset";
 import { cn } from "@/src/lib/cn";
+import { pageShell } from "@/src/tokens/layout";
 import type {
   ErrorStateAction,
   ErrorStateActionVariant,
@@ -59,7 +60,7 @@ export function ErrorState({
 }) {
   return (
     <section className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6 sm:py-16">
-      <div className="flex w-full max-w-lg flex-col items-center text-center">
+      <div className={cn(pageShell.errorContent, "flex flex-col items-center text-center")}>
         <HomepageAsset
           asset={image}
           width={imageWidth}

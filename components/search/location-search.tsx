@@ -7,8 +7,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 import { fetchLocalitySuggest } from "@/src/apis/search";
 import { cn } from "@/src/lib/cn";
+import { persistCity, readStoredCity } from "@/src/lib/city-storage";
+import { buildCitySrpHref, buildLocalitySrpHref } from "@/src/lib/srp/locality-srp-href";
 import { useDebounce } from "@/src/lib/use-debounce";
 import {
   cities,
@@ -33,6 +37,10 @@ export interface LocationSearchProps {
   defaultLocality?: string;
   localityPlaceholder?: string;
   strictLocality?: boolean;
+  /** When true, selecting a locality only updates state — no navigation. */
+  searchOnly?: boolean;
+  /** Override SRP slug used when building locality URLs (defaults from route + city). */
+  srpSlug?: string;
   onCityChange?: (city: CitySlug) => void;
   onLocalityChange?: (locality: string) => void;
   onSearch?: (value: LocationSearchValue) => void;
@@ -83,23 +91,21 @@ function SearchIcon({ className }: { className?: string }) {
   return (
     <svg
       aria-hidden
-      viewBox="0 0 20 20"
+      viewBox="0 0 24 24"
       fill="none"
       className={className}
     >
       <path
-        d="M9.16667 15.8333C12.8486 15.8333 15.8333 12.8486 15.8333 9.16667C15.8333 5.48477 12.8486 2.5 9.16667 2.5C5.48477 2.5 2.5 5.48477 2.5 9.16667C2.5 12.8486 5.48477 15.8333 9.16667 15.8333Z"
+        d="M15 15L21 21"
         stroke="currentColor"
-        strokeWidth="1.67"
+        strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M17.5 17.5L13.875 13.875"
+        d="M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
         stroke="currentColor"
-        strokeWidth="1.67"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        strokeWidth="2"
       />
     </svg>
   );
@@ -110,14 +116,17 @@ function SearchDropdown({
   children,
   className,
   labelledBy,
+  id,
 }: {
   open: boolean;
   children: ReactNode;
   className?: string;
   labelledBy?: string;
+  id?: string;
 }) {
   return (
     <div
+      id={id}
       role="listbox"
       aria-labelledby={labelledBy}
       className={cn(
@@ -142,22 +151,26 @@ export function LocationSearch({
   defaultLocality = "",
   localityPlaceholder = "Search for Localities",
   strictLocality = true,
+  searchOnly = false,
+  srpSlug,
   onCityChange,
   onLocalityChange,
   onSearch,
 }: LocationSearchProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const rootRef = useRef<HTMLDivElement>(null);
+  const localityOptionRefs = useRef(new Map<number, HTMLButtonElement>());
   const cityButtonId = useId();
   const localityInputId = useId();
+  const localityListboxId = useId();
 
   const [internalCity, setInternalCity] = useState<CitySlug>(defaultCity);
   const [internalLocality, setInternalLocality] = useState(defaultLocality);
   const [localityQuery, setLocalityQuery] = useState(defaultLocality);
   const [activePanel, setActivePanel] = useState<Panel>(null);
   const [highlightedCity, setHighlightedCity] = useState<CitySlug | null>(null);
-  const [highlightedLocality, setHighlightedLocality] = useState<string | null>(
-    null,
-  );
+  const [highlightedLocalityIndex, setHighlightedLocalityIndex] = useState(-1);
   const [localitySuggestions, setLocalitySuggestions] = useState<string[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [hasFetchedSuggestions, setHasFetchedSuggestions] = useState(false);
@@ -184,8 +197,37 @@ export function LocationSearch({
       isDebouncingSuggestions ||
       hasFetchedSuggestions);
 
+  const activeLocalityOptionId =
+    highlightedLocalityIndex >= 0 &&
+    highlightedLocalityIndex < localitySuggestions.length
+      ? `${localityListboxId}-option-${highlightedLocalityIndex}`
+      : undefined;
+
+  const citySrpHref = buildCitySrpHref(city, { pathname, srpSlug });
+
+  function localityOptionId(index: number) {
+    return `${localityListboxId}-option-${index}`;
+  }
+
+  function moveHighlightedLocality(direction: 1 | -1) {
+    if (localitySuggestions.length === 0) return;
+
+    setHighlightedLocalityIndex((current) => {
+      if (current < 0) {
+        return direction === 1 ? 0 : localitySuggestions.length - 1;
+      }
+      const next = current + direction;
+      if (next < 0) return 0;
+      if (next >= localitySuggestions.length) {
+        return localitySuggestions.length - 1;
+      }
+      return next;
+    });
+  }
+
   function updateCity(nextCity: CitySlug) {
     if (cityProp === undefined) setInternalCity(nextCity);
+    persistCity(nextCity);
     if (localityProp === undefined) {
       setInternalLocality("");
       setLocalityQuery("");
@@ -204,13 +246,35 @@ export function LocationSearch({
     }
     onLocalityChange?.(nextLocality);
     setActivePanel(null);
-    setHighlightedLocality(null);
+    setHighlightedLocalityIndex(-1);
+  }
+
+  function selectLocality(nextLocality: string) {
+    updateLocality(nextLocality);
+
+    if (searchOnly) return;
+
+    const href = buildLocalitySrpHref(city, nextLocality, {
+      pathname,
+      srpSlug,
+    });
+    if (href) router.push(href);
   }
 
   function handleSearch() {
     onSearch?.({ city, locality: localityQuery.trim() || locality });
     setActivePanel(null);
+
+    if (searchOnly) return;
+
+    const href = buildCitySrpHref(city, { pathname, srpSlug });
+    if (href) router.push(href);
   }
+
+  useEffect(() => {
+    if (cityProp !== undefined) return;
+    setInternalCity(readStoredCity());
+  }, [cityProp]);
 
   useEffect(() => {
     const query = debouncedLocalityQuery.trim();
@@ -219,6 +283,7 @@ export function LocationSearch({
       setLocalitySuggestions([]);
       setIsLoadingSuggestions(false);
       setHasFetchedSuggestions(false);
+      setHighlightedLocalityIndex(-1);
       return;
     }
 
@@ -240,6 +305,7 @@ export function LocationSearch({
 
         setLocalitySuggestions(success ? data.locality : []);
         setHasFetchedSuggestions(true);
+        setHighlightedLocalityIndex(-1);
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
           return;
@@ -247,6 +313,7 @@ export function LocationSearch({
 
         setLocalitySuggestions([]);
         setHasFetchedSuggestions(true);
+        setHighlightedLocalityIndex(-1);
       } finally {
         if (!abortController.signal.aborted) {
           setIsLoadingSuggestions(false);
@@ -260,6 +327,13 @@ export function LocationSearch({
       abortController.abort();
     };
   }, [city, debouncedLocalityQuery, strictLocality]);
+
+  useEffect(() => {
+    if (highlightedLocalityIndex < 0) return;
+    localityOptionRefs.current
+      .get(highlightedLocalityIndex)
+      ?.scrollIntoView({ block: "nearest" });
+  }, [highlightedLocalityIndex, localitySuggestions]);
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
@@ -363,12 +437,17 @@ export function LocationSearch({
             <input
               id={localityInputId}
               type="search"
+              role="combobox"
+              aria-expanded={showLocalityDropdown}
+              aria-controls={localityListboxId}
+              aria-autocomplete="list"
+              aria-activedescendant={activeLocalityOptionId}
               value={localityQuery}
               placeholder={localityPlaceholder}
               onChange={(event) => {
                 setLocalityQuery(event.target.value);
                 setActivePanel("locality");
-                setHighlightedLocality(null);
+                setHighlightedLocalityIndex(-1);
                 if (event.target.value.trim().length < LOCALITY_SUGGEST_MIN_LENGTH) {
                   setLocalitySuggestions([]);
                   setHasFetchedSuggestions(false);
@@ -376,14 +455,24 @@ export function LocationSearch({
               }}
               onFocus={() => setActivePanel("locality")}
               onKeyDown={(event) => {
+                if (
+                  showLocalityDropdown &&
+                  localitySuggestions.length > 0 &&
+                  (event.key === "ArrowDown" || event.key === "ArrowUp")
+                ) {
+                  event.preventDefault();
+                  moveHighlightedLocality(event.key === "ArrowDown" ? 1 : -1);
+                  return;
+                }
+
                 if (event.key === "Enter") {
                   event.preventDefault();
-                  if (highlightedLocality) {
-                    updateLocality(highlightedLocality);
-                    return;
-                  }
-                  if (localitySuggestions[0]) {
-                    updateLocality(localitySuggestions[0]);
+                  const selected =
+                    highlightedLocalityIndex >= 0
+                      ? localitySuggestions[highlightedLocalityIndex]
+                      : localitySuggestions[0];
+                  if (selected) {
+                    selectLocality(selected);
                     return;
                   }
                   handleSearch();
@@ -394,30 +483,36 @@ export function LocationSearch({
 
             <SearchDropdown
               open={showLocalityDropdown}
+              id={localityListboxId}
+              labelledBy={localityInputId}
               className="left-0 right-0"
             >
               {isLoadingSuggestions || isDebouncingSuggestions ? (
                 <p className="px-4 py-3.5 text-sm text-gray-500">Searching…</p>
               ) : localitySuggestions.length > 0 ? (
                 localitySuggestions.map((option, index) => {
-                  const isHighlighted =
-                    highlightedLocality === option ||
-                    (highlightedLocality === null &&
-                      index === 0 &&
-                      trimmedLocalityQuery);
+                  const isHighlighted = highlightedLocalityIndex === index;
 
                   return (
                     <button
                       key={option}
+                      id={localityOptionId(index)}
+                      ref={(element) => {
+                        if (element) {
+                          localityOptionRefs.current.set(index, element);
+                        } else {
+                          localityOptionRefs.current.delete(index);
+                        }
+                      }}
                       type="button"
                       role="option"
-                      aria-selected={locality === option}
-                      onMouseEnter={() => setHighlightedLocality(option)}
-                      onMouseLeave={() => setHighlightedLocality(null)}
-                      onClick={() => updateLocality(option)}
+                      aria-selected={isHighlighted || locality === option}
+                      onMouseEnter={() => setHighlightedLocalityIndex(index)}
+                      onMouseLeave={() => setHighlightedLocalityIndex(-1)}
+                      onClick={() => selectLocality(option)}
                       className={cn(
                         "w-full border-b border-gray-100 px-4 py-3.5 text-left text-sm text-gray-900 transition-colors last:border-b-0",
-                        isHighlighted ? "bg-gray-25" : "hover:bg-gray-25",
+                        isHighlighted ? "bg-gray-100" : "hover:bg-gray-25",
                       )}
                     >
                       {option}
@@ -425,9 +520,18 @@ export function LocationSearch({
                   );
                 })
               ) : (
-                <p className="px-4 py-3.5 text-sm text-gray-500">
-                  No locality found
-                </p>
+                <div className="px-4 py-3.5">
+                  <p className="text-sm text-gray-500">No locality found</p>
+                  {citySrpHref ? (
+                    <Link
+                      href={citySrpHref}
+                      onClick={() => setActivePanel(null)}
+                      className="mt-2 inline-block text-sm font-semibold text-hello-lime-700 transition-colors hover:text-hello-lime-800 hover:underline"
+                    >
+                      Explore properties in {getCityLabel(city)}
+                    </Link>
+                  ) : null}
+                </div>
               )}
             </SearchDropdown>
           </div>

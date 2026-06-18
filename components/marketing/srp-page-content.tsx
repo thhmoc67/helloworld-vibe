@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeaderSearch } from "@/components/layout/site-header-search";
 import { LocalityContactCard } from "@/components/marketing/locality-contact-card";
@@ -19,8 +19,33 @@ import { PropertyActionsProvider } from "@/components/booking/property-actions-p
 import { JsonLd } from "@/components/seo/json-ld";
 import { mapPropertiesToSrpCards } from "@/src/lib/map-property";
 import type { SrpPageConfig } from "@/src/lib/srp/resolve-srp-page";
+import { resolveSrpHeroImageSrc } from "@/src/lib/srp/srp-hero-image";
+import { useSrpPagination } from "@/src/lib/srp/use-srp-pagination";
 import { cn } from "@/src/lib/cn";
 import { pageLayout } from "@/src/tokens/layout";
+import { srpHeroPlaceholderImage } from "@/src/tokens/srp";
+
+function SrpHeroImage({ src, alt }: { src: string; alt: string }) {
+  const [currentSrc, setCurrentSrc] = useState(src);
+
+  useEffect(() => {
+    setCurrentSrc(src);
+  }, [src]);
+
+  return (
+    <div className="relative mt-6 aspect-[4/3] overflow-hidden rounded-2xl bg-gray-200 md:aspect-[1281/398]">
+      <Image
+        src={currentSrc}
+        alt={alt}
+        fill
+        priority
+        className="object-cover"
+        sizes="(max-width: 1280px) 100vw, 1280px"
+        onError={() => setCurrentSrc(srpHeroPlaceholderImage)}
+      />
+    </div>
+  );
+}
 
 function SrpHero({
   config,
@@ -29,10 +54,7 @@ function SrpHero({
   config: SrpPageConfig;
   heroImageSrc?: string;
 }) {
-  const imageSrc =
-    heroImageSrc ??
-    config.properties[0]?.property_image?.[0] ??
-    config.properties[0]?.image;
+  const resolvedSrc = resolveSrpHeroImageSrc(config, heroImageSrc);
 
   return (
     <section aria-label="Search results overview">
@@ -45,18 +67,7 @@ function SrpHero({
         </p>
       </div>
 
-      {config.kind === "landmark" && imageSrc ? (
-        <div className="relative mt-6 aspect-[1281/398] overflow-hidden rounded-2xl bg-gray-200">
-          <Image
-            src={imageSrc.startsWith("http") ? imageSrc : "/assets/community/hero/hero-1.png"}
-            alt={config.pageTitle}
-            fill
-            priority
-            className="object-cover"
-            sizes="(max-width: 1280px) 100vw, 1280px"
-          />
-        </div>
-      ) : null}
+      <SrpHeroImage src={resolvedSrc} alt={config.pageTitle} />
     </section>
   );
 }
@@ -104,7 +115,31 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
   const [mobileTab, setMobileTab] = useState<LocalityMobileTab>("properties");
   const detailsRef = useRef<HTMLDivElement>(null);
 
-  const subtitleBuilder = (property: (typeof config.properties)[number]) => {
+  const paginationContext = useMemo(
+    () => ({
+      kind: config.kind,
+      city: config.city,
+      localitySlug: config.localitySlug,
+      landmarkSlug: config.landmarkSlug,
+      slugGender: config.slugGender,
+    }),
+    [
+      config.kind,
+      config.city,
+      config.localitySlug,
+      config.landmarkSlug,
+      config.slugGender,
+    ],
+  );
+
+  const { properties, isLoading, sentinelRef } = useSrpPagination(
+    config.properties,
+    config.total,
+    paginationContext,
+    config.canonicalPath,
+  );
+
+  const subtitleBuilder = (property: (typeof properties)[number]) => {
     if (config.kind === "landmark") {
       return `Coliving PG near ${config.localityName ?? config.city}`;
     }
@@ -114,14 +149,10 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
     return `Coliving PG in ${config.city}`;
   };
 
-  const cardProperties = mapPropertiesToSrpCards(
-    config.properties,
-    subtitleBuilder,
-    {
-      city: config.city,
-      locality: config.localityName ?? config.city,
-    },
-  );
+  const cardProperties = mapPropertiesToSrpCards(properties, subtitleBuilder, {
+    city: config.city,
+    locality: config.localityName ?? config.city,
+  });
 
   function showDetails() {
     setMobileTab("details");
@@ -155,6 +186,8 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
             <SrpListingsSection
               heading={config.propertiesHeading}
               properties={cardProperties}
+              isLoadingMore={isLoading}
+              loadMoreRef={sentinelRef}
             />
           </div>
 

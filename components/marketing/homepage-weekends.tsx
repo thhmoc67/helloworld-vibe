@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { HomepageAsset } from "@/components/marketing/homepage-asset";
 import { cn } from "@/src/lib/cn";
+import { pageShell } from "@/src/tokens/layout";
 import { homepageStats, homepageVideo } from "@/src/tokens/homepage";
 
 function StatDivider() {
@@ -44,7 +45,7 @@ function WeekendsHeading() {
 export function HomepageWeekends() {
   return (
     <section className="bg-white py-12 sm:py-16 lg:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+      <div className={pageShell.homepage}>
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="overflow-hidden rounded-tl-[2rem] bg-gray-900 shadow-[11px_9px_0_0_#0baaec]">
             <video

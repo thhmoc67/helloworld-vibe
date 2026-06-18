@@ -6,6 +6,8 @@ import {
   srpCardSampleImages,
   type SrpCardStatusLabel,
 } from "@/src/tokens/srp-card";
+import { buildNestedHdpHref } from "@/src/lib/sitemap-slug";
+import { vibeChips, type VibeChip } from "@/src/tokens/vibes";
 
 export type LocalityBentoTile = {
   id: string;
@@ -39,14 +41,11 @@ export type LocalityProperty = {
   genderLabel?: string;
   city?: string;
   location?: string;
+  href?: string;
   propertyUrl?: string;
 };
 
-export type LocalityVibeChip = {
-  id: string;
-  label: string;
-  emoji: string;
-};
+export type LocalityVibeChip = VibeChip;
 
 export const localityPage = {
   name: "Indiranagar",
@@ -61,6 +60,12 @@ export const localityPage = {
   aboutText:
     "Indiranagar is one of Bengaluru's most connected neighbourhoods — metro lines, cafés, offices, and nightlife all within walking distance. HelloWorld homes here are fully furnished with community events, biometric access, and zero brokerage so you can move in and start living from day one.",
 } as const;
+
+const localitySlug = localityPage.name.toLowerCase().replace(/\s+/g, "-");
+
+function localityPropertyHref(name: string) {
+  return buildNestedHdpHref(localityPage.citySlug, localitySlug, name);
+}
 
 export const localityHeroSubtitle = formatLocalityDetails(
   localityPage.startingRent,
@@ -211,28 +216,9 @@ export const localityAmenities: readonly LocalityAmenity[] = [
   },
 ] as const;
 
-export const localityVibeChips: readonly LocalityVibeChip[] = [
-  { id: "chill", label: "Chill", emoji: "😎" },
-  { id: "creative", label: "Creative", emoji: "🎨" },
-  { id: "fitness", label: "Fitness", emoji: "🏋" },
-  { id: "gamer", label: "Gamer", emoji: "🎮" },
-  { id: "football", label: "Football", emoji: "⚽️" },
-  { id: "hustle", label: "Hustle", emoji: "🚀" },
-  { id: "foodie", label: "Foodie", emoji: "🍔" },
-  { id: "night-owl", label: "Night Owl", emoji: "🌚" },
-  { id: "party", label: "Party", emoji: "🎉" },
-  { id: "coders", label: "Coders", emoji: "👩🏼‍💻" },
-  { id: "cricket", label: "Cricket", emoji: "🏏" },
-  { id: "biryani", label: "Biryani Lovers", emoji: "🍛" },
-  { id: "explorer", label: "Explorer", emoji: "✈️" },
-  { id: "movie", label: "Movie Buff", emoji: "🎬" },
-  { id: "cooking", label: "Cooking", emoji: "🍳" },
-  { id: "swimming", label: "Swimming", emoji: "🏊" },
-  { id: "pet", label: "Pet Lover", emoji: "🐱" },
-  { id: "reader", label: "Reader", emoji: "📚" },
-] as const;
+export const localityVibeChips: readonly LocalityVibeChip[] = vibeChips;
 
-export const localityProperties: readonly LocalityProperty[] = [
+export const localityProperties: LocalityProperty[] = [
   {
     id: "park-square",
     propertyId: 1001,
@@ -304,7 +290,10 @@ export const localityProperties: readonly LocalityProperty[] = [
     rent: 10500,
     genderLabel: "Women Only",
   },
-] as const;
+].map((property) => ({
+  ...property,
+  href: localityPropertyHref(property.name),
+})) as LocalityProperty[];
 
 export const localitySimilarProperties = localityProperties.slice(0, 3);
 

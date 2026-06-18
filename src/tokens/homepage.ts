@@ -1,4 +1,5 @@
 import { getAssetById } from "@/src/tokens/assets";
+import { buildNestedHdpHref } from "@/src/lib/sitemap-slug";
 import { srpCardSampleImages, type SrpCardStatusLabel } from "@/src/tokens/srp-card";
 
 function asset(id: string) {
@@ -20,6 +21,7 @@ export type HomepageFeaturedProperty = {
   statusLabel?: SrpCardStatusLabel;
   visitsToday?: number;
   genderLabel?: string;
+  href?: string;
 };
 
 export const homepageHeroDesktop = asset("hero-desktop");
@@ -90,14 +92,7 @@ export const homepagePressLogos = [
   asset("et-realty"),
 ] as const;
 
-export const homepageVibeChips = [
-  { id: "chill", label: "Chill", emoji: "😎" },
-  { id: "creative", label: "Creative", emoji: "🎨" },
-  { id: "fitness", label: "Fitness", emoji: "🏋️" },
-  { id: "gamer", label: "Gamer", emoji: "🎮" },
-] as const;
-
-export const homepageVibeMoreCount = 8;
+export { vibeChips as homepageVibeChips } from "@/src/tokens/vibes";
 
 export const homepageFeaturedProperties: HomepageFeaturedProperty[] = [
   {
@@ -110,6 +105,7 @@ export const homepageFeaturedProperties: HomepageFeaturedProperty[] = [
     rent: 12500,
     statusLabel: "filling-fast",
     genderLabel: "Women Only",
+    href: buildNestedHdpHref("bangalore", "hsr-layout", "HelloWorld Mahaveer"),
   },
   {
     id: "suncity",
@@ -121,6 +117,7 @@ export const homepageFeaturedProperties: HomepageFeaturedProperty[] = [
     rent: 12500,
     visitsToday: 7,
     genderLabel: "Women Only",
+    href: buildNestedHdpHref("bangalore", "hsr-layout", "HelloWorld Mahaveer"),
   },
   {
     id: "iti",
@@ -132,6 +129,7 @@ export const homepageFeaturedProperties: HomepageFeaturedProperty[] = [
     rent: 12500,
     statusLabel: "trending",
     genderLabel: "Women Only",
+    href: buildNestedHdpHref("bangalore", "hsr-layout", "HelloWorld Mahaveer"),
   },
 ];
 

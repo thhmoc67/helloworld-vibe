@@ -5,6 +5,7 @@ import { BlogPostCard } from "@/components/blog/blog-post-card";
 import { getApiOriginHeader } from "@/src/lib/api";
 import { getAllBlogPostsMeta } from "@/src/lib/blog.server";
 import { BLOG_PAGE_SIZE, paginate } from "@/src/lib/pagination";
+import { pageShell } from "@/src/tokens/layout";
 
 export const revalidate = 86400;
 
@@ -44,7 +45,7 @@ export default async function BlogsPaginatedPage({ params }: PageProps) {
   if (pageNum > pageCount) notFound();
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8 md:py-10">
+    <div className={pageShell.blogIndex}>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold tracking-tight md:text-2xl">

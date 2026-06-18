@@ -1,0 +1,112 @@
+import { cn } from "@/src/lib/cn";
+
+function CarouselArrowButton({
+  direction,
+  label,
+  onClick,
+  disabled,
+}: {
+  direction: "prev" | "next";
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      disabled={disabled}
+      onClick={onClick}
+      className="flex size-10 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-900 shadow-xs transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+    >
+      <svg aria-hidden viewBox="0 0 24 24" fill="none" className="size-5">
+        <path
+          d={direction === "prev" ? "M15 6l-6 6 6 6" : "M9 6l6 6-6 6"}
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  );
+}
+
+export function HomepageCarouselPagination({
+  pageCount,
+  activeIndex,
+  onPrev,
+  onNext,
+  onSelectPage,
+  prevDisabled,
+  nextDisabled,
+  className,
+  placeholder = false,
+}: {
+  pageCount: number;
+  activeIndex: number;
+  onPrev: () => void;
+  onNext: () => void;
+  onSelectPage?: (index: number) => void;
+  prevDisabled?: boolean;
+  nextDisabled?: boolean;
+  className?: string;
+  /** Renders non-interactive dots for loading states. */
+  placeholder?: boolean;
+}) {
+  const dotCount = placeholder ? 6 : pageCount;
+
+  return (
+    <div className={cn("flex items-center justify-center gap-6", className)}>
+      <CarouselArrowButton
+        direction="prev"
+        label="Previous"
+        disabled={prevDisabled}
+        onClick={onPrev}
+      />
+
+      <div className="flex items-center gap-2">
+        {Array.from({ length: dotCount }, (_, index) => {
+          const isActive = index === activeIndex;
+
+          if (placeholder) {
+            return (
+              <span
+                key={index}
+                aria-hidden
+                className={cn(
+                  "rounded-full bg-gray-300",
+                  isActive ? "h-2 w-8 bg-hello-lime-400" : "size-2 opacity-60",
+                )}
+              />
+            );
+          }
+
+          return (
+            <button
+              key={index}
+              type="button"
+              aria-label={`Go to slide ${index + 1}`}
+              aria-current={isActive}
+              disabled={!onSelectPage}
+              onClick={() => onSelectPage?.(index)}
+              className={cn(
+                "rounded-full transition-all",
+                isActive
+                  ? "h-2 w-8 bg-hello-lime-400"
+                  : "size-2 bg-gray-300 hover:bg-gray-400",
+              )}
+            />
+          );
+        })}
+      </div>
+
+      <CarouselArrowButton
+        direction="next"
+        label="Next"
+        disabled={nextDisabled}
+        onClick={onNext}
+      />
+    </div>
+  );
+}

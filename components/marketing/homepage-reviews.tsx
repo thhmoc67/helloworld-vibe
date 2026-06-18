@@ -58,7 +58,7 @@ function ReviewCard({
       <div style={{ transform: `rotate(${review.rotation}deg)` }}>
         <article
           className={cn(
-            "relative h-72 w-[min(18rem,calc(100vw-3rem))] shadow-[0_10px_28px_rgba(0,0,0,0.22)] sm:h-80 sm:w-80",
+            "relative h-72 w-[min(18rem,calc(100vw-3rem))] shadow-[0_1px_12px_rgba(0,0,0,0.22)] sm:h-80 sm:w-80",
             "transition-[transform,box-shadow] duration-300 ease-out",
             "hover:-translate-y-1 hover:shadow-[0_14px_32px_rgba(0,0,0,0.26)]",
             "motion-reduce:transition-none motion-reduce:hover:translate-y-0",

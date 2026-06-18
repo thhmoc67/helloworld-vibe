@@ -51,6 +51,7 @@ export function HdpSimilarProperties({
         {cards.map((property) => (
           <SrpCard
             key={property.id}
+            href={property.href}
             name={property.name}
             subtitle={property.subtitle}
             images={property.images}
@@ -92,6 +93,7 @@ export function HdpSimilarProperties({
           <SrpCard
             key={property.id}
             className="w-[min(342px,85vw)] shrink-0"
+            href={property.href}
             name={property.name}
             subtitle={property.subtitle}
             images={property.images}
