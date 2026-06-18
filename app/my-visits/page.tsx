@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
-import { WishlistPageContent } from "@/components/wishlist/wishlist-page-content";
+import { MyVisitsAppDownload } from "@/components/visits/my-visits-app-download";
 
 export const metadata: Metadata = {
-  title: "My Wishlist | HelloWorld",
-  description: "View and manage your saved coliving properties.",
+  title: "My Visits | HelloWorld",
+  description:
+    "Download the HelloWorld app to manage your property tours and visits.",
 };
 
-export default function WishlistPage() {
+export default function MyVisitsPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <SiteHeader />
       <main className="flex flex-1 flex-col">
-        <WishlistPageContent />
+        <MyVisitsAppDownload />
       </main>
       <SiteFooter />
     </div>

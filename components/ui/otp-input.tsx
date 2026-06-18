@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, type KeyboardEvent } from "react";
+import { useEffect, useId, useRef, type KeyboardEvent } from "react";
 import { cn } from "@/src/lib/cn";
 
 export interface OtpInputProps {
@@ -9,6 +9,7 @@ export interface OtpInputProps {
   length?: number;
   error?: boolean;
   disabled?: boolean;
+  autoFocus?: boolean;
   onComplete?: (value: string) => void;
 }
 
@@ -18,11 +19,22 @@ export function OtpInput({
   length = 6,
   error = false,
   disabled = false,
+  autoFocus = false,
   onComplete,
 }: OtpInputProps) {
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const groupId = useId();
   const digits = value.padEnd(length, " ").slice(0, length).split("");
+
+  useEffect(() => {
+    if (!autoFocus) return;
+
+    const timer = window.setTimeout(() => {
+      inputRefs.current[0]?.focus();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [autoFocus]);
 
   function updateDigit(index: number, digit: string) {
     const sanitized = digit.replace(/\D/g, "").slice(-1);

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchAllProperty } from "@/src/apis/srp";
-import { SrpCard } from "@/components/marketing/srp-card";
+import { WishlistSrpCard } from "@/components/marketing/wishlist-srp-card";
 import { HomepageSectionHeading } from "@/components/marketing/homepage-section-heading";
 import { PaginatedCarousel } from "@/components/ui/paginated-carousel";
 import { mapPropertiesToSrpCards } from "@/src/lib/map-property";
@@ -42,7 +42,8 @@ function PropertyCard({
   className?: string;
 }) {
   return (
-    <SrpCard
+    <WishlistSrpCard
+      propertyId={property.propertyId}
       href={property.href}
       name={property.name}
       subtitle={property.subtitle}

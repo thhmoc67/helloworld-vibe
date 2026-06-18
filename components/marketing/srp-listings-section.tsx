@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type RefObject } from "react";
-import { SrpCard } from "@/components/marketing/srp-card";
+import { WishlistSrpCard } from "@/components/marketing/wishlist-srp-card";
 import { SrpFiltersBar } from "@/components/marketing/srp-filters-bar";
 import { useOptionalPropertyActions } from "@/components/booking/property-actions-provider";
 import type { SrpQuery } from "@/src/models/srp-query";
@@ -37,6 +37,7 @@ export function SrpListingsSection({
   filterQuery,
   onFilterChange,
   slugGender,
+  showFilters = true,
 }: {
   heading: string;
   properties: readonly LocalityProperty[];
@@ -47,6 +48,7 @@ export function SrpListingsSection({
   filterQuery: SrpQuery;
   onFilterChange: (updates: Partial<SrpQuery>) => void;
   slugGender?: "male only" | "female only";
+  showFilters?: boolean;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { selectedVibes, toggleVibe, clearSelectedVibes } = useSelectedVibes();
@@ -66,11 +68,13 @@ export function SrpListingsSection({
           {heading}
         </h2>
 
-        <SrpFiltersBar
-          query={filterQuery}
-          setQuery={onFilterChange}
-          slugGender={slugGender}
-        />
+        {showFilters ? (
+          <SrpFiltersBar
+            query={filterQuery}
+            setQuery={onFilterChange}
+            slugGender={slugGender}
+          />
+        ) : null}
 
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-4">
@@ -139,8 +143,9 @@ export function SrpListingsSection({
         )}
       >
         {properties.map((property) => (
-          <SrpCard
+          <WishlistSrpCard
             key={property.id}
+            propertyId={property.propertyId}
             href={property.href}
             name={property.name}
             subtitle={property.subtitle}

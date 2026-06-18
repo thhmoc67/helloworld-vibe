@@ -42,6 +42,8 @@ export interface LocationSearchProps {
   searchOnly?: boolean;
   /** Override SRP slug used when building locality URLs (defaults from route + city). */
   srpSlug?: string;
+  /** When true, changing city navigates to that city's SRP (city pages only). */
+  navigateOnCityChange?: boolean;
   onCityChange?: (city: CitySlug) => void;
   onLocalityChange?: (locality: string) => void;
   onSearch?: (value: LocationSearchValue) => void;
@@ -149,6 +151,7 @@ export function LocationSearch({
   strictLocality = true,
   searchOnly = false,
   srpSlug,
+  navigateOnCityChange = false,
   onCityChange,
   onLocalityChange,
   onSearch,
@@ -233,6 +236,11 @@ export function LocationSearch({
     onCityChange?.(nextCity);
     setActivePanel(null);
     setHighlightedCity(null);
+
+    if (navigateOnCityChange) {
+      const href = buildCitySrpHref(nextCity, { pathname, srpSlug });
+      if (href) router.push(href);
+    }
   }
 
   function updateLocality(nextLocality: string) {

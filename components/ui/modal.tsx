@@ -133,7 +133,7 @@ export function Modal({
           type="button"
           aria-label={closeLabel}
           onClick={onClose}
-          className="absolute -right-1 -top-1 z-10 flex size-10 items-center justify-center rounded-full bg-gray-900 text-white shadow-lg transition-colors hover:bg-gray-800 sm:-right-2 sm:-top-2"
+          className="absolute -right-1 -top-1 z-10 flex size-10 items-center justify-center rounded-full bg-gray-900 text-white shadow-lg transition-colors hover:bg-gray-800 sm:-right-4 sm:-top-12"
         >
           <CloseIcon className="size-5" />
         </button>

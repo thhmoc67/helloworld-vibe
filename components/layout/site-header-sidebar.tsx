@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { SidebarLoginFlow } from "@/components/auth/sidebar-login-flow";
 import { Logo } from "@/components/brand/logo";
 import { cn } from "@/src/lib/cn";
 import {
@@ -186,20 +187,41 @@ function SidebarMenuRow({
   );
 }
 
+function ChevronLeftIcon({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden viewBox="0 0 6 10" fill="none" className={className}>
+      <path
+        d="M5 1 1 5l4 4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function SiteHeaderSidebar({
   open,
   onClose,
   userPhone,
-  onLogin,
+  onLoginSuccess,
   onLogout,
 }: {
   open: boolean;
   onClose: () => void;
   userPhone?: string | null;
-  onLogin?: () => void;
+  onLoginSuccess?: (phone: string) => void;
   onLogout?: () => void;
 }) {
   const menuItems = getHeaderMenuItems(Boolean(userPhone));
+  const [view, setView] = useState<"menu" | "login">("menu");
+
+  useEffect(() => {
+    if (!open) {
+      setView("menu");
+    }
+  }, [open]);
   useEffect(() => {
     if (!open) return;
 
@@ -248,51 +270,71 @@ export function SiteHeaderSidebar({
         </button>
 
         <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden px-10 pb-10 pt-[5.25rem]">
-          {userPhone ? (
-            <div className="mb-8 flex items-center gap-4">
-              <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-light-100 to-blue-light-300 text-blue-light-700">
-                <UserAvatarIcon className="size-8" />
-              </div>
-              <p className="text-lg font-bold leading-7 text-gray-900">{userPhone}</p>
-            </div>
-          ) : null}
-
-          <nav className="flex flex-col gap-8">
-            {menuItems.map((item) => (
-              <SidebarMenuRow
-                key={item.id}
-                label={item.label}
-                icon={item.id}
-                href={item.href}
-                onNavigate={onClose}
-                onAction={
-                  item.action === "logout"
-                    ? () => {
-                        onLogout?.();
-                        onClose();
-                      }
-                    : item.action === "login"
-                      ? () => {
-                          onLogin?.();
-                          onClose();
-                        }
-                      : undefined
-                }
+          {view === "login" ? (
+            <>
+              <button
+                type="button"
+                onClick={() => setView("menu")}
+                className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-gray-900"
+              >
+                <ChevronLeftIcon className="size-2.5" />
+                Back
+              </button>
+              <SidebarLoginFlow
+                onSuccess={(phone) => {
+                  onLoginSuccess?.(phone);
+                  setView("menu");
+                }}
               />
-            ))}
-          </nav>
+            </>
+          ) : (
+            <>
+              {userPhone ? (
+                <div className="mb-8 flex items-center gap-4">
+                  <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-light-100 to-blue-light-300 text-blue-light-700">
+                    <UserAvatarIcon className="size-8" />
+                  </div>
+                  <p className="text-lg font-bold leading-7 text-gray-900">
+                    +91-{userPhone}
+                  </p>
+                </div>
+              ) : null}
 
-          <div
-            aria-hidden
-            className="pointer-events-none absolute bottom-0 left-14 select-none"
-          >
-            <Logo
-              variant={blackWordmark}
-              width={250}
-              height={143}
-              className="h-auto w-[17.5rem] max-w-none opacity-[0.12]"
-            />
-          </div>
+              <nav className="flex flex-col gap-8">
+                {menuItems.map((item) => (
+                  <SidebarMenuRow
+                    key={item.id}
+                    label={item.label}
+                    icon={item.id}
+                    href={item.href}
+                    onNavigate={onClose}
+                    onAction={
+                      item.action === "logout"
+                        ? () => {
+                            onLogout?.();
+                            onClose();
+                          }
+                        : item.action === "login"
+                          ? () => setView("login")
+                          : undefined
+                    }
+                  />
+                ))}
+              </nav>
+
+              <div
+                aria-hidden
+                className="pointer-events-none absolute bottom-0 left-14 select-none"
+              >
+                <Logo
+                  variant={blackWordmark}
+                  width={250}
+                  height={143}
+                  className="h-auto w-[17.5rem] max-w-none opacity-[0.12]"
+                />
+              </div>
+            </>
+          )}
         </div>
       </aside>
     </>

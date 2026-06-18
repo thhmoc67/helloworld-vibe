@@ -15,6 +15,40 @@ import {
   parseMarketingSrpSlug,
 } from "@/src/lib/srp-slug-parse";
 import { localityNameToSlug } from "@/src/lib/string-utils";
+import type { ParsedMarketingSrpSlug } from "@/src/lib/srp-slug-parse";
+
+function buildCityMarketingSlug(
+  segment: string,
+  targetCity: string,
+): string {
+  const city = targetCity.trim().toLowerCase();
+  if (!city) return segment;
+
+  if (segment.startsWith("pg-for-boys-in-")) return `pg-for-boys-in-${city}`;
+  if (segment.startsWith("pg-for-girls-in-")) return `pg-for-girls-in-${city}`;
+  if (segment.startsWith("gents-pg-in-")) return `gents-pg-in-${city}`;
+  if (segment.startsWith("ladies-pg-in-")) return `ladies-pg-in-${city}`;
+  if (segment.startsWith("boys-hostels-in-")) {
+    return isKotaCity(city) ? "boys-hostels-in-kota" : `boys-hostels-in-${city}`;
+  }
+  if (segment.startsWith("girls-hostels-in-")) {
+    return isKotaCity(city) ? "girls-hostels-in-kota" : `girls-hostels-in-${city}`;
+  }
+  if (segment.startsWith("hostels-in-")) {
+    return isKotaCity(city) ? "hostels-in-kota" : `hostels-in-${city}`;
+  }
+  if (segment.startsWith("pg-in-")) {
+    return isKotaCity(city) ? "hostels-in-kota" : `pg-in-${city}`;
+  }
+  if (segment.startsWith("coliving-in-")) return `coliving-in-${city}`;
+
+  const marketing = parseMarketingSrpSlug(segment) as ParsedMarketingSrpSlug | null;
+  if (marketing?.livingType === "hostels") {
+    return isKotaCity(city) ? "hostels-in-kota" : `hostels-in-${city}`;
+  }
+
+  return srpSlug(city);
+}
 
 export function resolveEffectiveSrpSlug(
   pathname: string | null | undefined,
@@ -27,13 +61,15 @@ export function resolveEffectiveSrpSlug(
   if (!segment) return srpSlug(city);
 
   const marketing = parseMarketingSrpSlug(segment);
-  if (marketing && !marketing.localityOnly) return segment;
+  if (marketing && !marketing.localityOnly) {
+    return buildCityMarketingSlug(segment, city);
+  }
 
   const genderFlat = parseFlatGenderLocalitySlug(segment, PRESENT_CITIES);
   if (genderFlat) {
     return genderFlat.slugGender === "male only"
-      ? `pg-for-boys-in-${genderFlat.city}`
-      : `pg-for-girls-in-${genderFlat.city}`;
+      ? `pg-for-boys-in-${city}`
+      : `pg-for-girls-in-${city}`;
   }
 
   const kotaGenderFlat = parseFlatKotaGenderHostelSlug(segment);
@@ -47,11 +83,11 @@ export function resolveEffectiveSrpSlug(
   if (kotaHostelFlat) return "hostels-in-kota";
 
   const colivingFlat = parseFlatColivingLocalitySlug(segment, PRESENT_CITIES);
-  if (colivingFlat) return `coliving-in-${colivingFlat.city}`;
+  if (colivingFlat) return `coliving-in-${city}`;
 
   const pgFlat = parseFlatPgLocalitySlug(segment, PRESENT_CITIES);
   if (pgFlat) {
-    return isKotaCity(pgFlat.city) ? "hostels-in-kota" : `pg-in-${pgFlat.city}`;
+    return isKotaCity(city) ? "hostels-in-kota" : `pg-in-${city}`;
   }
 
   return srpSlug(city);

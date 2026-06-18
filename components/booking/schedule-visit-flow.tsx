@@ -7,6 +7,7 @@ import {
   type FormEvent,
 } from "react";
 import { VisitScheduler } from "@/components/booking/visit-scheduler";
+import { VisitScheduledSuccess } from "@/components/booking/visit-scheduled-success";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { OtpInput } from "@/components/ui/otp-input";
@@ -17,6 +18,7 @@ import { validateField } from "@/src/lib/form-validation";
 import { cn } from "@/src/lib/cn";
 import {
   formatVisitDate,
+  formatScheduledVisitLabel,
   mapVisitSlots,
   type MappedTimeSlot,
 } from "@/src/lib/visit-slots";
@@ -25,12 +27,16 @@ import type { VisitDate, VisitTimeSlot } from "@/src/tokens/visit-scheduler";
 
 type FlowStep = "schedule" | "details" | "otp" | "success";
 
+export type ScheduleVisitFlowStep = FlowStep;
+
 export interface ScheduleVisitFlowProps {
   propertyId: number;
   propertyName: string;
   propertyUrl?: string;
   layout?: "modal" | "embedded";
   onSuccess?: () => void;
+  onClose?: () => void;
+  onStepChange?: (step: FlowStep) => void;
 }
 
 export function ScheduleVisitFlow({
@@ -39,6 +45,8 @@ export function ScheduleVisitFlow({
   propertyUrl = "",
   layout = "modal",
   onSuccess,
+  onClose,
+  onStepChange,
 }: ScheduleVisitFlowProps) {
   const embedded = layout === "embedded";
   const formId = useId();
@@ -63,10 +71,22 @@ export function ScheduleVisitFlow({
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [scheduledAt, setScheduledAt] = useState("");
+
+  useEffect(() => {
+    onStepChange?.(step);
+  }, [onStepChange, step]);
 
   useEffect(() => {
     setLoggedIn(isLoggedIn());
   }, []);
+
+  function buildScheduledAtLabel() {
+    const slot = getSelectedSlot();
+    const rawDate = rawDateBySlotId[selectedDateId];
+    if (!slot || !rawDate) return "your selected slot";
+    return formatScheduledVisitLabel(rawDate, slot.label);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -165,6 +185,7 @@ export function ScheduleVisitFlow({
     setLoading(false);
 
     if (response.success) {
+      setScheduledAt(buildScheduledAtLabel());
       setStep("success");
       onSuccess?.();
       return;
@@ -229,15 +250,17 @@ export function ScheduleVisitFlow({
 
   if (step === "success") {
     return (
-      <div className={cn("space-y-4 text-center", embedded ? "py-2" : "")}>
-        <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-hello-lime-100 text-2xl">
-          ✓
-        </div>
-        <h3 className="text-xl font-bold text-gray-900">Visit scheduled</h3>
-        <p className="text-sm text-gray-600">
-          Your tour for {propertyName} is confirmed. We&apos;ll see you soon!
-        </p>
-      </div>
+      <VisitScheduledSuccess
+        scheduledAt={scheduledAt}
+        onGotIt={() => {
+          if (onClose) {
+            onClose();
+            return;
+          }
+          setStep("schedule");
+        }}
+        className={embedded ? "py-2" : undefined}
+      />
     );
   }
 

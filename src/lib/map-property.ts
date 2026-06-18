@@ -1,6 +1,7 @@
 import { imageUrlFormatter } from "@/src/lib/images";
 import { getPropertyHref } from "@/src/lib/sitemap-slug";
 import { getPublicSiteUrl } from "@/src/lib/schema";
+import type { WishlistPropertyCard } from "@/src/models/wishlist";
 import type { Property } from "@/src/models/property";
 import { srpCardDefaultImage, type SrpCardStatusLabel } from "@/src/tokens/srp-card";
 import type { LocalityProperty } from "@/src/tokens/locality";
@@ -88,4 +89,34 @@ export function mapPropertiesToSrpCards(
       locality: context?.locality ?? subtitleBuilder(property),
     }),
   );
+}
+
+export function mapWishlistCardToSrpCard(
+  card: WishlistPropertyCard,
+): LocalityProperty {
+  const localityLabel =
+    card.locality || card.address?.line2 || card.city || "your city";
+  const property = {
+    id: card.id,
+    name: card.name,
+    display_name: card.display_name,
+    image: card.image,
+    hdp_image: card.image,
+    srp_image: null,
+    property_image: card.image ? [card.image] : [],
+    address: card.address,
+    city: card.city,
+    locality: card.locality,
+    gender: card.gender,
+    min_rent: card.min_rent,
+    available_beds: card.available_beds,
+    lightning_deal: card.lightning_deal,
+    free_rent: card.free_rent,
+    sold_out: card.sold_out,
+  } as Property;
+
+  return mapPropertyToSrpCard(property, `Coliving PG in ${localityLabel}`, {
+    city: card.city,
+    locality: localityLabel,
+  });
 }

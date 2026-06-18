@@ -24,3 +24,22 @@ export function setStoredToken(token: string) {
 export function isLoggedIn(): boolean {
   return Boolean(getStoredMobile() && getStoredToken());
 }
+
+export function clearAuth() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(MOBILE_KEY);
+  window.localStorage.removeItem(TOKEN_KEY);
+}
+
+export function logout() {
+  clearAuth();
+  if (typeof window !== "undefined") {
+    window.location.reload();
+  }
+}
+
+export function refreshAfterLogin() {
+  if (typeof window !== "undefined") {
+    window.location.reload();
+  }
+}

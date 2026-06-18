@@ -75,3 +75,13 @@ export function formatVisitDate(isoDate: string): string {
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
+
+export function formatScheduledVisitLabel(
+  rawDate: string,
+  timeLabel: string,
+): string {
+  const date = new Date(rawDate);
+  const weekday = date.toLocaleDateString("en-IN", { weekday: "short" });
+  const month = date.toLocaleDateString("en-IN", { month: "short" });
+  return `${weekday}, ${date.getDate()} ${month} at ${timeLabel}`;
+}

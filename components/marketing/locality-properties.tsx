@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { SrpCard } from "@/components/marketing/srp-card";
+import { WishlistSrpCard } from "@/components/marketing/wishlist-srp-card";
 import { VibeChips } from "@/components/ui/vibe-chips";
 import { useSelectedVibes } from "@/src/lib/use-selected-vibes";
 import {
@@ -20,7 +20,8 @@ function PropertyCard({
   className?: string;
 }) {
   return (
-    <SrpCard
+    <WishlistSrpCard
+      propertyId={property.propertyId}
       href={property.href}
       name={property.name}
       subtitle={property.subtitle}

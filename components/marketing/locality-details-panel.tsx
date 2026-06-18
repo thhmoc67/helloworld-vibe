@@ -1,14 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import { useRef, useState } from "react";
-import { NeighborhoodTimeline } from "@/components/marketing/neighborhood-card";
 import {
   LocalityCard,
   LocalityCarouselButton,
 } from "@/components/marketing/locality-card";
+import { LocalityAmenitiesSection } from "@/components/marketing/locality-amenities-section";
+import { LocalityDayFromHereSection } from "@/components/marketing/locality-day-from-here";
 import { HomepageCarouselNav } from "@/components/marketing/homepage-carousel-nav";
-import { SrpCard } from "@/components/marketing/srp-card";
+import { WishlistSrpCard } from "@/components/marketing/wishlist-srp-card";
 import {
   localityAmenities,
   localityDayFromHereItems,
@@ -19,27 +19,6 @@ import {
   localitySimilarProperties,
 } from "@/src/tokens/locality";
 import { cn } from "@/src/lib/cn";
-
-function MapLinkButton() {
-  return (
-    <button
-      type="button"
-      className="inline-flex items-center gap-2 text-sm font-semibold text-hello-lime-600 hover:text-hello-lime-700"
-    >
-      <svg aria-hidden viewBox="0 0 16 16" fill="none" className="size-4">
-        <path
-          d="M8 1.5a4 4 0 0 0-4 4c0 3 4 8.5 4 8.5s4-5.5 4-8.5a4 4 0 0 0-4-4Z"
-          stroke="currentColor"
-          strokeWidth="1.33"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <circle cx="8" cy="5.5" r="1.25" fill="currentColor" />
-      </svg>
-      Show on Maps
-    </button>
-  );
-}
 
 export function LocalityDetailsPanel({ className }: { className?: string }) {
   const similarScrollRef = useRef<HTMLDivElement>(null);
@@ -79,45 +58,13 @@ export function LocalityDetailsPanel({ className }: { className?: string }) {
 
   return (
     <div className={cn("space-y-10 md:space-y-12", className)}>
-      <section aria-label="A day from here">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-1">
-            <h2 className="text-2xl font-bold tracking-tight text-gray-900 md:text-[1.875rem] md:leading-[2.375rem]">
-              {localityDayFromHereTitle}
-            </h2>
-            <p className="text-base text-gray-600">
-              {localityDayFromHereSubtitle}
-            </p>
-          </div>
-          <MapLinkButton />
-        </div>
-        <div className="mt-6">
-          <NeighborhoodTimeline items={localityDayFromHereItems} />
-        </div>
-      </section>
+      <LocalityDayFromHereSection
+        title={localityDayFromHereTitle}
+        subtitle={localityDayFromHereSubtitle}
+        items={localityDayFromHereItems}
+      />
 
-      <section aria-label="Included amenities">
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900 md:text-[1.875rem] md:leading-[2.375rem]">
-          Included Across Our Homes
-        </h2>
-        <div className="mt-6 flex flex-wrap gap-x-8 gap-y-6">
-          {localityAmenities.map((amenity) => (
-            <div
-              key={amenity.id}
-              className="flex w-[6.125rem] flex-col items-center gap-3 text-center"
-            >
-              <Image
-                src={amenity.iconSrc}
-                alt=""
-                width={45}
-                height={40}
-                className="h-10 w-auto object-contain"
-              />
-              <p className="text-sm font-medium text-gray-800">{amenity.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <LocalityAmenitiesSection amenities={localityAmenities} />
 
       <section aria-label="About locality">
         <h2 className="text-2xl font-bold tracking-tight text-gray-900 md:text-[1.875rem] md:leading-[2.375rem]">
@@ -134,8 +81,9 @@ export function LocalityDetailsPanel({ className }: { className?: string }) {
         </h2>
         <div className="mt-6 hidden gap-6 lg:flex">
           {visibleSimilar.map((property) => (
-            <SrpCard
+            <WishlistSrpCard
               key={property.id}
+              propertyId={property.propertyId}
               href={property.href}
               name={property.name}
               subtitle={property.subtitle}
@@ -158,8 +106,9 @@ export function LocalityDetailsPanel({ className }: { className?: string }) {
             className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-none"
           >
             {localitySimilarProperties.map((property) => (
-              <SrpCard
+              <WishlistSrpCard
                 key={property.id}
+                propertyId={property.propertyId}
                 href={property.href}
                 name={property.name}
                 subtitle={property.subtitle}

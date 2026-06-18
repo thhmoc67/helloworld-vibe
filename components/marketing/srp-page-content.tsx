@@ -5,7 +5,9 @@ import { useMemo, useRef, useState } from "react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeaderSearch } from "@/components/layout/site-header-search";
 import { LocalityBentoHero } from "@/components/marketing/locality-bento-hero";
+import { LocalityAmenitiesSection } from "@/components/marketing/locality-amenities-section";
 import { LocalityContactCard } from "@/components/marketing/locality-contact-card";
+import { LocalityDayFromHereSection } from "@/components/marketing/locality-day-from-here";
 import {
   LocalityMobileActions,
 } from "@/components/marketing/locality-mobile-actions";
@@ -24,6 +26,12 @@ import { useSrpFilters } from "@/src/lib/srp/use-srp-filters";
 import { useSrpPagination } from "@/src/lib/srp/use-srp-pagination";
 import { cn } from "@/src/lib/cn";
 import { pageLayout } from "@/src/tokens/layout";
+import type { CitySlug } from "@/src/tokens/cities";
+import {
+  localityAmenities,
+  localityDayFromHereItems,
+  localityDayFromHereTitle,
+} from "@/src/tokens/locality";
 
 function SrpHero({
   config,
@@ -105,6 +113,8 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
   );
 
   const { query, setQuery } = useSrpFilters();
+  const isCityPage = config.kind === "city";
+  const activeQuery = isCityPage ? query : {};
 
   const {
     properties,
@@ -117,7 +127,7 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
     config.total,
     paginationContext,
     config.canonicalPath,
-    query,
+    activeQuery,
   );
 
   const listingsHeading = useMemo(
@@ -140,6 +150,14 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
     locality: config.localityName ?? config.city,
   });
 
+  const contactLocation = config.localityName ?? config.city;
+  const dayFromHereSubtitle = `What living at ${contactLocation} actually looks like.`;
+  const contactCardProps = {
+    city: config.city,
+    location: contactLocation,
+    locationEditable: config.kind === "city",
+  };
+
   function showDetails() {
     setMobileTab("details");
     detailsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -152,7 +170,10 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
     >
     <div className={cn("bg-white", pageLayout.mobileStickyBottomPadding)}>
       <JsonLd schema={config.schema} />
-      <SiteHeaderSearch />
+      <SiteHeaderSearch
+        city={config.city as CitySlug}
+        navigateOnCityChange
+      />
 
       <main className={cn(pageLayout.container, "pt-0 lg:pt-8")}>
         <SrpHero config={config} />
@@ -178,6 +199,7 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
               filterQuery={query}
               onFilterChange={setQuery}
               slugGender={config.slugGender}
+              showFilters={isCityPage}
             />
           </div>
 
@@ -190,17 +212,23 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
           >
             <div className={pageLayout.twoColumn}>
               <div className={cn(pageLayout.mainColumn, "space-y-10 md:space-y-12")}>
+                <LocalityDayFromHereSection
+                  title={localityDayFromHereTitle}
+                  subtitle={dayFromHereSubtitle}
+                  items={localityDayFromHereItems}
+                />
+                <LocalityAmenitiesSection amenities={localityAmenities} />
                 <SrpAboutSection config={config} />
                 <RelatedLandmarkLinks links={config.relatedLandmarkLinks} />
               </div>
               <div className={pageLayout.sidebarColumn}>
-                <LocalityContactCard sticky />
+                <LocalityContactCard sticky {...contactCardProps} />
               </div>
             </div>
           </div>
 
           <div className="mt-12 md:hidden">
-            <LocalityContactCard />
+            <LocalityContactCard {...contactCardProps} />
           </div>
 
           {!config.hideFaqSection ? (

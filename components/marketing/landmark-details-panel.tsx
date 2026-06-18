@@ -8,7 +8,7 @@ import {
   LocalityCarouselButton,
 } from "@/components/marketing/locality-card";
 import { HomepageCarouselNav } from "@/components/marketing/homepage-carousel-nav";
-import { SrpCard } from "@/components/marketing/srp-card";
+import { WishlistSrpCard } from "@/components/marketing/wishlist-srp-card";
 import {
   landmarkAmenities,
   landmarkDayFromHereItems,
@@ -134,8 +134,9 @@ export function LandmarkDetailsPanel({ className }: { className?: string }) {
         </h2>
         <div className="mt-6 hidden gap-6 lg:flex">
           {visibleSimilar.map((property) => (
-            <SrpCard
+            <WishlistSrpCard
               key={property.id}
+              propertyId={property.propertyId}
               href={property.href}
               name={property.name}
               subtitle={property.subtitle}
@@ -158,8 +159,9 @@ export function LandmarkDetailsPanel({ className }: { className?: string }) {
             className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-none"
           >
             {landmarkSimilarProperties.map((property) => (
-              <SrpCard
+              <WishlistSrpCard
                 key={property.id}
+                propertyId={property.propertyId}
                 href={property.href}
                 name={property.name}
                 subtitle={property.subtitle}

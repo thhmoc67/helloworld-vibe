@@ -1,7 +1,10 @@
 "use client";
 
-import { useId } from "react";
-import { ScheduleVisitFlow } from "@/components/booking/schedule-visit-flow";
+import { useEffect, useId, useState } from "react";
+import {
+  ScheduleVisitFlow,
+  type ScheduleVisitFlowStep,
+} from "@/components/booking/schedule-visit-flow";
 import {
   Modal,
   ModalDescription,
@@ -25,6 +28,14 @@ export function ScheduleVisitModal({
 }: ScheduleVisitModalProps) {
   const titleId = useId();
   const descriptionId = useId();
+  const [flowStep, setFlowStep] = useState<ScheduleVisitFlowStep>("schedule");
+  const isSuccess = flowStep === "success";
+
+  useEffect(() => {
+    if (!open) {
+      setFlowStep("schedule");
+    }
+  }, [open]);
 
   if (!propertyId) return null;
 
@@ -32,17 +43,21 @@ export function ScheduleVisitModal({
     <Modal
       open={open}
       onClose={onClose}
-      labelledBy={titleId}
-      describedBy={descriptionId}
+      labelledBy={isSuccess ? undefined : titleId}
+      describedBy={isSuccess ? undefined : descriptionId}
       closeLabel="Close schedule visit dialog"
-      maxWidthClassName="max-w-xl"
+      maxWidthClassName={isSuccess ? "max-w-lg" : "max-w-xl"}
     >
-      <ModalTitle id={titleId}>Schedule a visit</ModalTitle>
-      <ModalDescription id={descriptionId}>
-        Pick a date and time to tour {propertyName}.
-      </ModalDescription>
+      {!isSuccess ? (
+        <>
+          <ModalTitle id={titleId}>Schedule a visit</ModalTitle>
+          <ModalDescription id={descriptionId}>
+            Pick a date and time to tour {propertyName}.
+          </ModalDescription>
+        </>
+      ) : null}
 
-      <div className="mt-6">
+      <div className={isSuccess ? undefined : "mt-6"}>
         {open ? (
           <ScheduleVisitFlow
             key={`${propertyId}-${open}`}
@@ -50,6 +65,8 @@ export function ScheduleVisitModal({
             propertyName={propertyName}
             propertyUrl={propertyUrl}
             layout="modal"
+            onClose={onClose}
+            onStepChange={setFlowStep}
           />
         ) : null}
       </div>

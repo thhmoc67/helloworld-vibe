@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type { HdpPageView } from "@/src/lib/hdp/hdp-page-view";
+import { useOptionalWishlist } from "@/components/wishlist/wishlist-provider";
 import { hdpProperty } from "@/src/tokens/hdp";
 import { cn } from "@/src/lib/cn";
 
@@ -33,6 +34,25 @@ function MapPinIcon({ className }: { className?: string }) {
   );
 }
 
+function HeartIcon({ filled }: { filled?: boolean }) {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 20 20"
+      fill={filled ? "currentColor" : "none"}
+      className="size-4"
+    >
+      <path
+        d="M10 17.5s-6.667-4.167-6.667-8.333A3.333 3.333 0 0 1 10 6.25a3.333 3.333 0 0 1 6.667 2.917c0 4.166-6.667 8.333-6.667 8.333Z"
+        stroke="currentColor"
+        strokeWidth="1.67"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function HdpHeader({
   view,
   className,
@@ -45,6 +65,9 @@ export function HdpHeader({
   const locality = view?.locality ?? hdpProperty.locality;
   const startingRent = view?.startingRent ?? hdpProperty.startingRent;
   const mapUrl = view?.mapUrl;
+  const propertyId = view?.propertyId ?? hdpProperty.propertyId;
+  const wishlist = useOptionalWishlist();
+  const saved = wishlist?.isWishlisted(propertyId) ?? false;
 
   async function handleShare() {
     if (typeof window === "undefined") return;
@@ -99,6 +122,22 @@ export function HdpHeader({
               Show on Maps
             </button>
           )}
+          <button
+            type="button"
+            onClick={() => {
+              void wishlist?.toggleWishlist(propertyId, pageTitle);
+            }}
+            aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
+            aria-pressed={saved}
+            className={cn(
+              "inline-flex size-9 items-center justify-center rounded-full border transition-colors",
+              saved
+                ? "border-error-200 bg-error-50 text-error-500 hover:border-error-300"
+                : "border-gray-900 text-gray-900 hover:border-gray-700 hover:text-gray-700",
+            )}
+          >
+            <HeartIcon filled={saved} />
+          </button>
           <button
             type="button"
             onClick={handleShare}

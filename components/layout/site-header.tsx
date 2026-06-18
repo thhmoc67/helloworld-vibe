@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Logo } from "@/components/brand/logo";
 import { SiteHeaderSidebar } from "@/components/layout/site-header-sidebar";
+import { getStoredMobile, logout } from "@/src/lib/auth-storage";
 import { cn } from "@/src/lib/cn";
 import { pageShell } from "@/src/tokens/layout";
 
@@ -22,17 +23,30 @@ function MenuIcon({ className }: { className?: string }) {
 
 export function SiteHeader({
   variant = "default",
-  userPhone = null,
-  onLogin,
-  onLogout,
+  userPhone: userPhoneProp = null,
+  onLogout: onLogoutProp,
 }: {
   variant?: "default" | "banner";
   userPhone?: string | null;
-  onLogin?: () => void;
   onLogout?: () => void;
-}) {
+} = {}) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userPhone, setUserPhone] = useState<string | null>(userPhoneProp);
   const isBanner = variant === "banner";
+
+  useEffect(() => {
+    setUserPhone(userPhoneProp ?? getStoredMobile());
+  }, [userPhoneProp]);
+
+  function handleLoginSuccess(phone: string) {
+    setUserPhone(phone);
+  }
+
+  function handleLogout() {
+    setUserPhone(null);
+    onLogoutProp?.();
+    logout();
+  }
 
   return (
     <>
@@ -94,8 +108,8 @@ export function SiteHeader({
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
         userPhone={userPhone}
-        onLogin={onLogin}
-        onLogout={onLogout}
+        onLoginSuccess={handleLoginSuccess}
+        onLogout={handleLogout}
       />
     </>
   );

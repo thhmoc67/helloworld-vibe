@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Logo } from "@/components/brand/logo";
 import { SiteHeaderSidebar } from "@/components/layout/site-header-sidebar";
 import { LocationSearch } from "@/components/search/location-search";
+import { getStoredMobile, logout } from "@/src/lib/auth-storage";
 import { cn } from "@/src/lib/cn";
+import type { CitySlug } from "@/src/tokens/cities";
 
 function MenuIcon({ className }: { className?: string }) {
   return (
@@ -21,15 +23,41 @@ function MenuIcon({ className }: { className?: string }) {
 }
 
 export function SiteHeaderSearch({
-  userPhone = null,
-  onLogin,
-  onLogout,
+  userPhone: userPhoneProp = null,
+  onLogout: onLogoutProp,
+  city,
+  srpSlug,
+  navigateOnCityChange = false,
 }: {
   userPhone?: string | null;
-  onLogin?: () => void;
   onLogout?: () => void;
-}) {
+  city?: CitySlug;
+  srpSlug?: string;
+  navigateOnCityChange?: boolean;
+} = {}) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userPhone, setUserPhone] = useState<string | null>(userPhoneProp);
+
+  useEffect(() => {
+    setUserPhone(userPhoneProp ?? getStoredMobile());
+  }, [userPhoneProp]);
+
+  function handleLoginSuccess(phone: string) {
+    setUserPhone(phone);
+  }
+
+  function handleLogout() {
+    setUserPhone(null);
+    onLogoutProp?.();
+    logout();
+  }
+
+  const locationSearchProps = {
+    localityPlaceholder: "Search for Localities" as const,
+    city,
+    srpSlug,
+    navigateOnCityChange,
+  };
 
   return (
     <>
@@ -40,7 +68,7 @@ export function SiteHeaderSearch({
           </Link>
 
           <div className="hidden min-w-0 flex-1 lg:block max-w-lg mx-auto">
-            <LocationSearch localityPlaceholder="Search for Localities" />
+            <LocationSearch {...locationSearchProps} />
           </div>
 
           <div className="ml-auto flex items-center gap-3 sm:gap-4">
@@ -64,7 +92,7 @@ export function SiteHeaderSearch({
         </div>
 
         <div className="border-t border-gray-100 px-4 pb-3 pt-2 lg:hidden">
-          <LocationSearch localityPlaceholder="Search for Localities" />
+          <LocationSearch {...locationSearchProps} />
         </div>
       </header>
 
@@ -72,8 +100,8 @@ export function SiteHeaderSearch({
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
         userPhone={userPhone}
-        onLogin={onLogin}
-        onLogout={onLogout}
+        onLoginSuccess={handleLoginSuccess}
+        onLogout={handleLogout}
       />
     </>
   );

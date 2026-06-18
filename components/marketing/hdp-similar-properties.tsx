@@ -1,6 +1,6 @@
 "use client";
 
-import { SrpCard } from "@/components/marketing/srp-card";
+import { WishlistSrpCard } from "@/components/marketing/wishlist-srp-card";
 import { useOptionalPropertyActions } from "@/components/booking/property-actions-provider";
 import { mapPropertyToSrpCard } from "@/src/lib/map-property";
 import type { SimilarProperty } from "@/src/models/property";
@@ -49,8 +49,13 @@ export function HdpSimilarProperties({
 
       <div className="hidden gap-6 lg:grid lg:grid-cols-3">
         {cards.map((property) => (
-          <SrpCard
+          <WishlistSrpCard
             key={property.id}
+            propertyId={
+              usingApiCards
+                ? (property as LocalityProperty).propertyId
+                : undefined
+            }
             href={property.href}
             name={property.name}
             subtitle={property.subtitle}
@@ -90,8 +95,13 @@ export function HdpSimilarProperties({
 
       <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 scrollbar-none lg:hidden">
         {cards.map((property) => (
-          <SrpCard
+          <WishlistSrpCard
             key={property.id}
+            propertyId={
+              usingApiCards
+                ? (property as LocalityProperty).propertyId
+                : undefined
+            }
             className="w-[min(342px,85vw)] shrink-0"
             href={property.href}
             name={property.name}

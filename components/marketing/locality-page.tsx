@@ -15,6 +15,7 @@ import {
   type LocalityMobileTab,
 } from "@/components/marketing/locality-mobile-tabs";
 import { LocalityProperties } from "@/components/marketing/locality-properties";
+import { localityPage } from "@/src/tokens/locality";
 import { cn } from "@/src/lib/cn";
 import { pageLayout } from "@/src/tokens/layout";
 
@@ -61,13 +62,20 @@ export function LocalityPageContent() {
                 <LocalityDetailsPanel />
               </div>
               <div className={pageLayout.sidebarColumn}>
-                <LocalityContactCard sticky />
+                <LocalityContactCard
+                  sticky
+                  city={localityPage.city}
+                  location={localityPage.name}
+                />
               </div>
             </div>
           </div>
 
           <div className="mt-12 md:hidden">
-            <LocalityContactCard />
+            <LocalityContactCard
+              city={localityPage.city}
+              location={localityPage.name}
+            />
           </div>
 
           <div className="mt-12 md:mt-16">
