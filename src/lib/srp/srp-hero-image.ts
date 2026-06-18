@@ -2,6 +2,12 @@ import { imageUrlFormatter } from "@/src/lib/images";
 import type { SrpPageConfig } from "@/src/lib/srp/resolve-srp-page";
 import { srpHeroPlaceholderImage } from "@/src/tokens/srp";
 
+function normalizeImageSource(value: unknown): string {
+  const trimmed = String(value ?? "").trim();
+  if (!trimmed || trimmed === "null" || trimmed === "undefined") return "";
+  return trimmed;
+}
+
 function formatHeroImageUrl(url: string): string {
   const trimmed = url.trim();
   if (!trimmed) return "";
@@ -25,15 +31,15 @@ export function resolveSrpHeroImageSrc(
   const property = config.properties[0];
   const raw =
     override?.trim() ||
-    property?.property_image?.[0] ||
-    property?.image ||
-    property?.srp_image ||
-    property?.hdp_image ||
+    normalizeImageSource(property?.image) ||
+    normalizeImageSource(property?.srp_image) ||
+    normalizeImageSource(property?.hdp_image) ||
+    normalizeImageSource(property?.property_image?.[0]) ||
     "";
 
-  if (typeof raw !== "string" || !raw.trim()) {
+  if (!raw) {
     return srpHeroPlaceholderImage;
   }
 
-  return formatHeroImageUrl(raw) || srpHeroPlaceholderImage;
+  return formatHeroImageUrl(raw);
 }

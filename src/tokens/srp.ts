@@ -1,1 +1,3 @@
-export const srpHeroPlaceholderImage = "/assets/community/hero/hero-1.png";
+import { srpCardComingSoonImage } from "@/src/tokens/srp-card";
+
+export const srpHeroPlaceholderImage = srpCardComingSoonImage;

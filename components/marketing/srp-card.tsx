@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/src/lib/cn";
 import {
   formatRent,
+  isSrpComingSoonImage,
   srpCardDefaultImage,
   type SrpCardStatusLabel,
 } from "@/src/tokens/srp-card";
@@ -195,13 +196,12 @@ function SrpCardCarousel({
   const slides = images.length > 0 ? images : [srpCardDefaultImage];
   const [activeIndex, setActiveIndex] = useState(0);
   const slideCount = slides.length;
-  const [imageSrc, setImageSrc] = useState(
-    () => slides[activeIndex] ?? srpCardDefaultImage,
-  );
+  const imageSrc = slides[activeIndex] ?? srpCardDefaultImage;
+  const isComingSoon = isSrpComingSoonImage(imageSrc);
 
   useEffect(() => {
-    setImageSrc(slides[activeIndex] ?? srpCardDefaultImage);
-  }, [activeIndex, slides]);
+    setActiveIndex(0);
+  }, [slides]);
 
   function goTo(direction: -1 | 1) {
     setActiveIndex((current) => (current + direction + slideCount) % slideCount);
@@ -213,18 +213,17 @@ function SrpCardCarousel({
         <Image
           src={imageSrc}
           alt={
-            imageSrc === srpCardDefaultImage
+            isComingSoon
               ? `${alt} coming soon`
               : `${alt} — photo ${activeIndex + 1} of ${slideCount}`
           }
           fill
-          className="object-cover"
+          className={cn(isComingSoon ? "object-cover" : "object-cover")}
           sizes="411px"
-          onError={() => setImageSrc(srpCardDefaultImage)}
         />
       </div>
 
-      {slideCount > 1 ? (
+      {slideCount > 1 && !isComingSoon ? (
         <>
           <button
             type="button"

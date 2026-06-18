@@ -92,7 +92,7 @@ export const localityBentoTiles: readonly LocalityBentoTile[] = [
     emoji: "🌙",
     imageSrc: "/assets/locality/nightlife-bento-desktop.png",
     gradientClassName: "bg-gradient-locality-night-life",
-    illustrationClassName: "bottom-0 right-0 h-[72%] w-[58%]",
+    illustrationClassName: "-bottom-6 -right-6 h-[72%] w-[58%]",
   },
   {
     id: "dining",
@@ -101,7 +101,7 @@ export const localityBentoTiles: readonly LocalityBentoTile[] = [
     emoji: "🍽️",
     imageSrc: "/assets/locality/dinning-bento-desktop.png",
     gradientClassName: "bg-gradient-locality-dining",
-    illustrationClassName: "right-0 top-0 h-[100%] w-[52%] translate-y-[-8%]",
+    illustrationClassName: "-right-2 -bottom-4 h-[100%] w-[52%] ",
   },
   {
     id: "health",
@@ -110,7 +110,7 @@ export const localityBentoTiles: readonly LocalityBentoTile[] = [
     emoji: "🏥",
     imageSrc: "/assets/locality/health-bento-desktop.png",
     gradientClassName: "bg-gradient-locality-health",
-    illustrationClassName: "bottom-0 right-0 h-[68%] w-[84%]",
+    illustrationClassName: "-bottom-4 -right-4 h-[68%] w-[84%]",
   },
 ] as const;
 

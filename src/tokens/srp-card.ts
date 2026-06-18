@@ -11,6 +11,10 @@ export const srpCardComingSoonImage =
 
 export const srpCardDefaultImage = srpCardComingSoonImage;
 
+export function isSrpComingSoonImage(src: string): boolean {
+  return src === srpCardDefaultImage || src.includes("coming-soon");
+}
+
 export type SrpCardStatusLabel = "filling-fast" | "trending";
 
 export const srpCardVariants = {

@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeaderSearch } from "@/components/layout/site-header-search";
+import { LocalityBentoHero } from "@/components/marketing/locality-bento-hero";
 import { LocalityContactCard } from "@/components/marketing/locality-contact-card";
 import {
   LocalityMobileActions,
@@ -20,32 +20,10 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { mapPropertiesToSrpCards } from "@/src/lib/map-property";
 import type { SrpPageConfig } from "@/src/lib/srp/resolve-srp-page";
 import { resolveSrpHeroImageSrc } from "@/src/lib/srp/srp-hero-image";
+import { useSrpFilters } from "@/src/lib/srp/use-srp-filters";
 import { useSrpPagination } from "@/src/lib/srp/use-srp-pagination";
 import { cn } from "@/src/lib/cn";
 import { pageLayout } from "@/src/tokens/layout";
-import { srpHeroPlaceholderImage } from "@/src/tokens/srp";
-
-function SrpHeroImage({ src, alt }: { src: string; alt: string }) {
-  const [currentSrc, setCurrentSrc] = useState(src);
-
-  useEffect(() => {
-    setCurrentSrc(src);
-  }, [src]);
-
-  return (
-    <div className="relative mt-6 aspect-[4/3] overflow-hidden rounded-2xl bg-gray-200 md:aspect-[1281/398]">
-      <Image
-        src={currentSrc}
-        alt={alt}
-        fill
-        priority
-        className="object-cover"
-        sizes="(max-width: 1280px) 100vw, 1280px"
-        onError={() => setCurrentSrc(srpHeroPlaceholderImage)}
-      />
-    </div>
-  );
-}
 
 function SrpHero({
   config,
@@ -57,18 +35,12 @@ function SrpHero({
   const resolvedSrc = resolveSrpHeroImageSrc(config, heroImageSrc);
 
   return (
-    <section aria-label="Search results overview">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 md:text-[1.875rem] md:leading-[2.375rem]">
-          {config.pageTitle}
-        </h1>
-        <p className="text-base font-medium text-gray-600">
-          {config.heroSubtitle}
-        </p>
-      </div>
-
-      <SrpHeroImage src={resolvedSrc} alt={config.pageTitle} />
-    </section>
+    <LocalityBentoHero
+      title={config.pageTitle}
+      subtitle={config.heroSubtitle}
+      heroImageSrc={resolvedSrc}
+      heroImageAlt={config.pageTitle}
+    />
   );
 }
 
@@ -132,11 +104,25 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
     ],
   );
 
-  const { properties, isLoading, sentinelRef } = useSrpPagination(
+  const { query, setQuery } = useSrpFilters();
+
+  const {
+    properties,
+    total,
+    isLoading,
+    isRefreshing,
+    sentinelRef,
+  } = useSrpPagination(
     config.properties,
     config.total,
     paginationContext,
     config.canonicalPath,
+    query,
+  );
+
+  const listingsHeading = useMemo(
+    () => config.propertiesHeading.replace(/^\d+/, String(total)),
+    [config.propertiesHeading, total],
   );
 
   const subtitleBuilder = (property: (typeof properties)[number]) => {
@@ -168,7 +154,7 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
       <JsonLd schema={config.schema} />
       <SiteHeaderSearch />
 
-      <main className={cn(pageLayout.container, "pt-6 md:pt-8")}>
+      <main className={cn(pageLayout.container, "pt-0 lg:pt-8")}>
         <SrpHero config={config} />
 
         <div className="mt-8 md:mt-12">
@@ -184,10 +170,14 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
             )}
           >
             <SrpListingsSection
-              heading={config.propertiesHeading}
+              heading={listingsHeading}
               properties={cardProperties}
               isLoadingMore={isLoading}
+              isRefreshing={isRefreshing}
               loadMoreRef={sentinelRef}
+              filterQuery={query}
+              onFilterChange={setQuery}
+              slugGender={config.slugGender}
             />
           </div>
 

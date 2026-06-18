@@ -6,8 +6,14 @@ import {
   fetchPropertiesBySlug,
   SRP_LIST_PAGE_SIZE,
 } from "@/src/apis/srp";
-import { genderFilterApiValue } from "@/src/lib/srp-slug-parse";
+import {
+  buildSrpApiFilter,
+  buildSrpApiSorting,
+  hasActiveSrpQueryFilters,
+  serializeSrpQuery,
+} from "@/src/lib/srp/build-srp-api-payload";
 import type { SrpPageKind } from "@/src/lib/srp/resolve-srp-page";
+import type { SrpQuery } from "@/src/models/srp-query";
 import type { Property } from "@/src/models/property";
 
 export type SrpPaginationContext = {
@@ -34,39 +40,120 @@ function mergeUniqueProperties(previous: Property[], incoming: Property[]) {
   return [...previous, ...uniqueIncoming];
 }
 
+async function fetchSrpPage(
+  context: SrpPaginationContext,
+  query: SrpQuery,
+  page: number,
+) {
+  const filter = buildSrpApiFilter(query, context.slugGender);
+  const sorting = buildSrpApiSorting(query.sort);
+  const params = { page, page_size: SRP_LIST_PAGE_SIZE };
+
+  if (context.kind === "landmark" && context.landmarkSlug) {
+    return fetchPropertiesBySlug(
+      { slug: context.landmarkSlug, filter, sorting },
+      params,
+    );
+  }
+
+  return fetchAllProperty(
+    {
+      city: context.city,
+      localityName: context.localitySlug?.replace(/-/g, " "),
+      filter,
+      sorting,
+    },
+    params,
+  );
+}
+
 export function useSrpPagination(
   initialProperties: Property[],
-  total: number,
+  initialTotal: number,
   context: SrpPaginationContext,
   resetKey: string,
+  query: SrpQuery,
 ) {
   const [properties, setProperties] = useState(initialProperties);
+  const [total, setTotal] = useState(initialTotal);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(
-    () => total > initialProperties.length,
+    () => initialTotal > initialProperties.length,
   );
 
   const pageRef = useRef(1);
-  const hasMoreRef = useRef(total > initialProperties.length);
-  const totalRef = useRef(total);
+  const hasMoreRef = useRef(initialTotal > initialProperties.length);
+  const totalRef = useRef(initialTotal);
   const loadingRef = useRef(false);
   const contextRef = useRef(context);
+  const queryRef = useRef(query);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   contextRef.current = context;
+  queryRef.current = query;
   totalRef.current = total;
 
-  const resetSnapshot = `${resetKey}:${total}:${initialProperties.length}`;
+  const queryKey = serializeSrpQuery(query);
+  const resetSnapshot = `${resetKey}:${initialTotal}:${initialProperties.length}:${queryKey}`;
 
   useEffect(() => {
-    setProperties(initialProperties);
-    pageRef.current = 1;
-    const more = total > initialProperties.length;
-    hasMoreRef.current = more;
-    setHasMore(more);
-    loadingRef.current = false;
-    setIsLoading(false);
-  }, [resetSnapshot, initialProperties, total]);
+    let cancelled = false;
+
+    async function syncListings() {
+      if (!hasActiveSrpQueryFilters(query)) {
+        setProperties(initialProperties);
+        setTotal(initialTotal);
+        pageRef.current = 1;
+        const more = initialTotal > initialProperties.length;
+        hasMoreRef.current = more;
+        setHasMore(more);
+        loadingRef.current = false;
+        setIsLoading(false);
+        setIsRefreshing(false);
+        return;
+      }
+
+      setIsRefreshing(true);
+      loadingRef.current = true;
+
+      try {
+        const response = await fetchSrpPage(contextRef.current, query, 1);
+        if (cancelled) return;
+
+        const nextData = response.success && Array.isArray(response.data)
+          ? response.data
+          : [];
+        const nextTotal = response.pageInfo?.total ?? nextData.length;
+
+        setProperties(nextData);
+        setTotal(nextTotal);
+        pageRef.current = 1;
+        const more = nextData.length > 0 && nextData.length < nextTotal;
+        hasMoreRef.current = more;
+        setHasMore(more);
+      } catch {
+        if (!cancelled) {
+          setProperties([]);
+          setTotal(0);
+          pageRef.current = 1;
+          hasMoreRef.current = false;
+          setHasMore(false);
+        }
+      } finally {
+        if (!cancelled) {
+          loadingRef.current = false;
+          setIsRefreshing(false);
+        }
+      }
+    }
+
+    void syncListings();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [resetSnapshot, initialProperties, initialTotal, query, queryKey]);
 
   const loadMore = useCallback(async () => {
     if (loadingRef.current || !hasMoreRef.current) return;
@@ -77,33 +164,19 @@ export function useSrpPagination(
     setIsLoading(true);
 
     try {
-      const ctx = contextRef.current;
-      const apiGender = genderFilterApiValue(undefined, ctx.slugGender);
-      const filter = apiGender
-        ? { gender: apiGender, amenities: [] as string[] }
-        : undefined;
-      const params = { page: nextPage, page_size: SRP_LIST_PAGE_SIZE };
-
-      const response =
-        ctx.kind === "landmark" && ctx.landmarkSlug
-          ? await fetchPropertiesBySlug(
-              { slug: ctx.landmarkSlug, filter },
-              params,
-            )
-          : await fetchAllProperty(
-              {
-                city: ctx.city,
-                localityName: ctx.localitySlug?.replace(/-/g, " "),
-                filter,
-              },
-              params,
-            );
+      const response = await fetchSrpPage(
+        contextRef.current,
+        queryRef.current,
+        nextPage,
+      );
 
       if (response.success && Array.isArray(response.data) && response.data.length > 0) {
         setProperties((prev) => {
           const merged = mergeUniqueProperties(prev, response.data);
           const added = merged.length - prev.length;
           const nextTotal = response.pageInfo?.total ?? totalRef.current;
+          totalRef.current = nextTotal;
+          setTotal(nextTotal);
           const more = added > 0 && merged.length < nextTotal;
           hasMoreRef.current = more;
           setHasMore(more);
@@ -171,11 +244,18 @@ export function useSrpPagination(
   }, [hasMore, maybeLoadMore]);
 
   useEffect(() => {
-    if (!hasMore || isLoading) return;
+    if (!hasMore || isLoading || isRefreshing) return;
     requestAnimationFrame(() => {
       maybeLoadMore();
     });
-  }, [properties.length, hasMore, isLoading, maybeLoadMore]);
+  }, [properties.length, hasMore, isLoading, isRefreshing, maybeLoadMore]);
 
-  return { properties, isLoading, hasMore, sentinelRef };
+  return {
+    properties,
+    total,
+    isLoading,
+    isRefreshing,
+    hasMore,
+    sentinelRef,
+  };
 }

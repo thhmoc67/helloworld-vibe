@@ -39,7 +39,7 @@ export function SiteHeaderSearch({
             <Logo width={105} height={40} priority className="h-10 w-auto" />
           </Link>
 
-          <div className="hidden min-w-0 flex-1 lg:block">
+          <div className="hidden min-w-0 flex-1 lg:block max-w-lg mx-auto">
             <LocationSearch localityPlaceholder="Search for Localities" />
           </div>
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { SrpPageContent } from "@/components/marketing/srp-page-content";
 import { resolveSrpPage } from "@/src/lib/srp/resolve-srp-page";
 import { getPublicSiteUrl } from "@/src/lib/schema";
@@ -62,5 +63,9 @@ export default async function DynamicSrpPage({ params }: PageProps) {
   const { srp_slug } = await params;
   const config = await resolveSrpPage(srp_slug);
   if (!config) notFound();
-  return <SrpPageContent config={config} />;
+  return (
+    <Suspense fallback={null}>
+      <SrpPageContent config={config} />
+    </Suspense>
+  );
 }

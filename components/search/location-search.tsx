@@ -9,6 +9,7 @@ import {
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { fetchLocalitySuggest } from "@/src/apis/search";
 import { cn } from "@/src/lib/cn";
 import { persistCity, readStoredCity } from "@/src/lib/city-storage";
@@ -48,23 +49,18 @@ export interface LocationSearchProps {
 
 type Panel = "city" | "locality" | null;
 
+const locationIconSrc = "/assets/search/location-icon.png";
+
 function LocationIcon({ className }: { className?: string }) {
   return (
-    <svg
+    <Image
+      src={locationIconSrc}
+      alt=""
       aria-hidden
-      viewBox="0 0 20 20"
-      fill="none"
+      width={20}
+      height={20}
       className={className}
-    >
-      <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.5" />
-      <circle cx="10" cy="10" r="2" fill="currentColor" />
-      <path
-        d="M10 2.5V5M10 15V17.5M2.5 10H5M15 10H17.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
+    />
   );
 }
 

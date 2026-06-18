@@ -2,7 +2,9 @@
 
 import { useRef, type RefObject } from "react";
 import { SrpCard } from "@/components/marketing/srp-card";
+import { SrpFiltersBar } from "@/components/marketing/srp-filters-bar";
 import { useOptionalPropertyActions } from "@/components/booking/property-actions-provider";
+import type { SrpQuery } from "@/src/models/srp-query";
 import { VibeChips } from "@/components/ui/vibe-chips";
 import { useSelectedVibes } from "@/src/lib/use-selected-vibes";
 import { localityVibeChips } from "@/src/tokens/locality";
@@ -30,13 +32,21 @@ export function SrpListingsSection({
   properties,
   className,
   isLoadingMore = false,
+  isRefreshing = false,
   loadMoreRef,
+  filterQuery,
+  onFilterChange,
+  slugGender,
 }: {
   heading: string;
   properties: readonly LocalityProperty[];
   className?: string;
   isLoadingMore?: boolean;
+  isRefreshing?: boolean;
   loadMoreRef?: RefObject<HTMLDivElement | null>;
+  filterQuery: SrpQuery;
+  onFilterChange: (updates: Partial<SrpQuery>) => void;
+  slugGender?: "male only" | "female only";
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { selectedVibes, toggleVibe, clearSelectedVibes } = useSelectedVibes();
@@ -55,6 +65,12 @@ export function SrpListingsSection({
         <h2 className="text-2xl font-bold tracking-tight text-gray-900 md:text-[1.875rem] md:leading-[2.375rem]">
           {heading}
         </h2>
+
+        <SrpFiltersBar
+          query={filterQuery}
+          setQuery={onFilterChange}
+          slugGender={slugGender}
+        />
 
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-4">
@@ -116,7 +132,12 @@ export function SrpListingsSection({
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div
+        className={cn(
+          "grid gap-6 md:grid-cols-2 xl:grid-cols-3",
+          isRefreshing && "pointer-events-none opacity-60",
+        )}
+      >
         {properties.map((property) => (
           <SrpCard
             key={property.id}

@@ -5,6 +5,12 @@ import type { Property } from "@/src/models/property";
 import { srpCardDefaultImage, type SrpCardStatusLabel } from "@/src/tokens/srp-card";
 import type { LocalityProperty } from "@/src/tokens/locality";
 
+function normalizeImageSource(value: unknown): string {
+  const trimmed = String(value ?? "").trim();
+  if (!trimmed || trimmed === "null" || trimmed === "undefined") return "";
+  return trimmed;
+}
+
 function genderLabel(gender?: string): string | undefined {
   switch (gender) {
     case "MALE":
@@ -27,14 +33,21 @@ function statusLabel(property: Property): SrpCardStatusLabel | undefined {
 }
 
 function propertyImages(property: Property): readonly string[] {
-  const primary = property.image || property.srp_image || property.hdp_image;
-  const gallery = Array.isArray(property.property_image)
-    ? property.property_image
-    : [];
-  const urls = [primary, ...gallery]
-    .map((url) => imageUrlFormatter("srp", String(url ?? "").trim()))
+  const candidates = [
+    property.image,
+    property.srp_image,
+    property.hdp_image,
+    ...(Array.isArray(property.property_image) ? property.property_image : []),
+  ];
+
+  const urls = candidates
+    .map(normalizeImageSource)
+    .filter(Boolean)
+    .map((url) => imageUrlFormatter("srp", url))
     .filter((url) => url.length > 0);
-  return urls.length > 0 ? urls : [srpCardDefaultImage];
+
+  const unique = [...new Set(urls)];
+  return unique.length > 0 ? unique : [srpCardDefaultImage];
 }
 
 export function mapPropertyToSrpCard(
