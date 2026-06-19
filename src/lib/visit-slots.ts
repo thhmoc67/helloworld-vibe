@@ -45,15 +45,7 @@ export function mapVisitSlots(data: TimeSlotData[]): MappedVisitSlots {
 
   for (const entry of data) {
     const slotDate = new Date(entry.date);
-    rawDateBySlotId[entry.slotId] = entry.date;
-
-    dates.push({
-      id: entry.slotId,
-      label: formatDayLabel(slotDate),
-      day: slotDate.getDate(),
-    });
-
-    timeSlotsByDateId[entry.slotId] = entry.slots
+    const availableSlots = entry.slots
       .filter(
         (slot) =>
           slot.value && isSlotAvailableToday(slot.label, slotDate),
@@ -63,6 +55,20 @@ export function mapVisitSlots(data: TimeSlotData[]): MappedVisitSlots {
         label: formatTimeLabel(slot.label),
         timeValue: slot.label,
       }));
+
+    if (availableSlots.length === 0) {
+      continue;
+    }
+
+    rawDateBySlotId[entry.slotId] = entry.date;
+
+    dates.push({
+      id: entry.slotId,
+      label: formatDayLabel(slotDate),
+      day: slotDate.getDate(),
+    });
+
+    timeSlotsByDateId[entry.slotId] = availableSlots;
   }
 
   return { dates, rawDateBySlotId, timeSlotsByDateId };

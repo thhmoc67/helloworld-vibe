@@ -46,7 +46,7 @@ export function HdpSectionNav({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "sticky top-[4.5rem] z-30 -mx-4 bg-white/95 backdrop-blur-sm md:top-20",
+        "sticky top-[4.5rem] z-30 -mx-4 bg-white/95 backdrop-blur-sm md:top-18",
         className,
       )}
     >

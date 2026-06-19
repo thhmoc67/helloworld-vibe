@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { postSendOtp, postVerifyOtp } from "@/src/apis/user";
+import { sendLoginOtp, verifyLoginOtp } from "@/src/apis/login";
 import { refreshAfterLogin } from "@/src/lib/auth-storage";
 import { cn } from "@/src/lib/cn";
+import { validateField } from "@/src/lib/form-validation";
 
 const RESEND_SECONDS = 30;
 
@@ -64,7 +65,7 @@ export function SidebarLoginFlow({
   async function sendOtp() {
     setLoading(true);
     setErrorMessage(null);
-    const response = await postSendOtp({ mobile: phone });
+    const response = await sendLoginOtp({ mobile: phone });
     setLoading(false);
 
     if (response.Status === "Success") {
@@ -92,7 +93,7 @@ export function SidebarLoginFlow({
 
     setLoading(true);
     setErrorMessage(null);
-    const response = await postVerifyOtp({
+    const response = await verifyLoginOtp({
       mobile: phone,
       otp: Number.parseInt(otp, 10),
       session_id: "kyun-chahiye",

@@ -30,6 +30,8 @@ export type HdpPageView = {
   amenities: readonly string[];
   galleryImages: readonly string[];
   propertyUrl: string;
+  hdpPath: string;
+  bookingPath: string;
   soldOut: boolean;
   gstPercent?: number;
   roomTypes: readonly HdpRoomType[];

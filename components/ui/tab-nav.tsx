@@ -134,7 +134,7 @@ export function TabNav<T extends string>({
               aria-controls={`${tabListId}-${item.id}-panel`}
               onClick={() => onChange(item.id as T)}
               className={cn(
-                "relative z-10 shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-300",
+                "relative cursor-pointer z-10 shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-300",
                 "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-hello-lime-100",
                 "motion-reduce:transition-none",
                 isActive

@@ -5,11 +5,17 @@ import type { HdpPageView } from "@/src/lib/hdp/hdp-page-view";
 import { cn } from "@/src/lib/cn";
 
 export function HdpMobileActions({
+  view,
   className,
 }: {
   view?: HdpPageView;
   className?: string;
 }) {
+  function scrollToBookingCard() {
+    const card = document.getElementById("hdp-booking-card");
+    card?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   return (
     <footer
       className={cn(
@@ -23,11 +29,17 @@ export function HdpMobileActions({
           hierarchy="secondary-gray"
           size="sm"
           className="w-1/2"
+          onClick={scrollToBookingCard}
         >
           Book free visit
         </Button>
-        <Button size="sm" className="w-1/2 bg-hello-lime-400 text-gray-900 hover:bg-hello-lime-500">
-          Book now
+        <Button
+          size="sm"
+          className="w-1/2 bg-hello-lime-400 text-gray-900 hover:bg-hello-lime-500"
+          disabled={view?.soldOut}
+          onClick={scrollToBookingCard}
+        >
+          {view?.soldOut ? "Sold out" : "Book now"}
         </Button>
       </div>
     </footer>

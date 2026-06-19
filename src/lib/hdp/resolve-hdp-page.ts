@@ -188,6 +188,8 @@ function buildHdpView(options: {
     ].filter((item) => item && item !== "None"),
     galleryImages: propertyGalleryImages(property),
     propertyUrl: `${getPublicSiteUrl()}/${canonicalPath}`,
+    hdpPath: `/${canonicalPath}`,
+    bookingPath: `/${canonicalPath}/booking`,
     soldOut: Boolean(property.sold_out),
     gstPercent: property.gst_percent || undefined,
     roomTypes: mapCategoriesToRoomTypes(categories),

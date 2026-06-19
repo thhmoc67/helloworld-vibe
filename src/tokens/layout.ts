@@ -26,7 +26,7 @@ export const pageShell = {
  */
 export const pageLayout = {
   container: "mx-auto max-w-7xl px-4 sm:px-6",
-  containerWithTopPadding: "mx-auto max-w-7xl px-4 pt-4 sm:px-6 md:pt-6",
+  containerWithTopPadding: "mx-auto max-w-7xl px-4 pt-4 sm:px-6 md:py-6 ",
   twoColumn: "md:flex md:items-start md:justify-between md:gap-8",
   hdpTwoColumn:
     "mt-8 md:mt-10 md:flex md:items-stretch md:justify-between md:gap-2",
