@@ -1,3 +1,4 @@
+import { formatCityDisplayName } from "@/src/tokens/cities";
 import { imageUrlFormatter } from "@/src/lib/images";
 import { getPropertyHref } from "@/src/lib/sitemap-slug";
 import { getPublicSiteUrl } from "@/src/lib/schema";
@@ -71,7 +72,9 @@ export function mapPropertyToSrpCard(
     rent: property.min_rent ?? 0,
     statusLabel: statusLabel(property),
     genderLabel: genderLabel(property.gender),
-    city: context?.city ?? property.address?.city ?? property.city,
+    city: formatCityDisplayName(
+      context?.city ?? property.address?.city ?? property.city ?? "",
+    ),
     location: context?.locality ?? property.locality,
     href,
     propertyUrl,

@@ -24,7 +24,7 @@ export const hdpProperty = {
   name: "Helloworld Park Square",
   propertyId: 156,
   badge: "Women Only",
-  locality: "Neeladri Road, Electronic City Phase 1, Bengaluru",
+  locality: "Neeladri Road, Electronic City Phase 1, Bangalore",
   trendingLabel: "Trending",
   topChoiceCopy: "is the top choice in Electronic City.",
   rating: 4.8,

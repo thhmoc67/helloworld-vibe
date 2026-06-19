@@ -302,10 +302,14 @@ export function VisitScheduler({
                         "relative z-10 cursor-pointer rounded-full px-5 py-3 text-sm font-semibold",
                         "transition-[color,transform] duration-300 motion-reduce:transition-none",
                         "focus-within:outline-none focus-within:ring-4 focus-within:ring-blue-light-100",
+                        "animate-tab-panel-in motion-reduce:animate-none",
                         isSelected
                           ? "text-blue-light-900"
                           : "bg-gray-100 text-gray-900 hover:-translate-y-0.5 hover:bg-gray-200/80 motion-reduce:hover:translate-y-0",
                       )}
+                      style={{
+                        animationDelay: `${index * 60}ms`,
+                      }}
                     >
                       <input
                         type="radio"

@@ -45,7 +45,7 @@ export const footerCityColumns = [
 
 export const footerContact = {
   address:
-    "1184, 5th Main Rd, Rajiv Gandhinagar Sector 7, HSR Layout, Bengaluru, Karnataka 560102",
+    "1184, 5th Main Rd, Rajiv Gandhinagar Sector 7, HSR Layout, Bangalore, Karnataka 560102",
   phone: "888 000 88 88",
   phoneHref: "tel:8880008888",
   email: "care@thehelloworld.com",

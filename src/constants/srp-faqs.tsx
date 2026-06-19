@@ -314,37 +314,37 @@ export function getColivingFaqCategoryGroups(
 
   if (isBangalore) {
     groups.push({
-      title: "Bengaluru (Bangalore) city guide",
+      title: "Bangalore city guide",
       anchorId: "faq-bengaluru-guide",
       items: [
         {
           id: "locality-choice-blr",
           qstn:
-            "How do I choose a locality for coliving in Bengaluru or Bangalore?",
-          ans: `Bengaluru rewards commuters who anchor on office gates, campus turnstiles, or reliable metro/BMTC spines before they obsess over café culture. The Outer Ring Road tech ribbon from Bellandur through Kadubeesanahalli to Marathahalli hosts enormous IT employment; Manyata and HRBR clusters dominate north tech; Whitefield and Mahadevapura pull EPIP and Graphite-era parks; Electronic City Phase 1 and 2 hold firms that resist CBD relocations; Indiranagar, Koramangala, HSR, Domlur, and BTM blend nightlife with shorter hops to central startups. Rent arbitrage exists in outer wards, but long peak-hour rides erode salary gains—model petrol, surge pricing, and sleep loss, not just rupee rent. HelloWorld’s geo-distributed inventory lets you match micro-market to your actual calendar instead of chasing the cheapest pin on a map.`,
+            "How do I choose a locality for coliving in Bangalore?",
+          ans: `Bangalore rewards commuters who anchor on office gates, campus turnstiles, or reliable metro/BMTC spines before they obsess over café culture. The Outer Ring Road tech ribbon from Bellandur through Kadubeesanahalli to Marathahalli hosts enormous IT employment; Manyata and HRBR clusters dominate north tech; Whitefield and Mahadevapura pull EPIP and Graphite-era parks; Electronic City Phase 1 and 2 hold firms that resist CBD relocations; Indiranagar, Koramangala, HSR, Domlur, and BTM blend nightlife with shorter hops to central startups. Rent arbitrage exists in outer wards, but long peak-hour rides erode salary gains—model petrol, surge pricing, and sleep loss, not just rupee rent. HelloWorld’s geo-distributed inventory lets you match micro-market to your actual calendar instead of chasing the cheapest pin on a map.`,
         },
         {
           id: "blr-it-students",
           qstn:
-            "Which areas of Bengaluru are best for IT professionals or students?",
+            "Which areas of Bangalore are best for IT professionals or students?",
           ans: `IT professionals prioritise ORR adjacency, Manyata–Thanisandra belt access, or Whitefield–ITPL radii depending on badge campus; hybrid workers optimise quiet rooms and backup power inside the home since café hopping in Koramangala grows expensive. Students map to Christ, Jain, RV, Dayananda Sagar, Reva, or coaching alleys with late autos and safe street lamps—parents often screen girls’ housing with extra care. Intern cohorts cluster short leases near internship towers. Rather than declaring one “best” pin, evaluate time-to-desk at 09:00 and return after 21:00; HelloWorld listings across these hubs exist so you filter realistically.`,
         },
         {
           id: "cost-living-blr",
-          qstn: "What should I budget beyond rent for living in Bengaluru?",
+          qstn: "What should I budget beyond rent for living in Bangalore?",
           ans: `Beyond coliving rent, model electricity actuals—summer AC can rival a week’s groceries—plus personal transport (Namma Metro passes versus app cab spill when Purple Line clogs), weekend social spend in Indiranagar lanes, health emergencies, and flights home. Some HelloWorld plans bundle meals; if not, track food-delivery drift. Deposits tie up one-to-two months’ rent in escrow. Student laptops and bondable gadgets matter for insurance riders. Always tie budget back to commute: a cheaper room far from work can erase savings in cab fares.`,
         },
         {
           id: "safety-blr",
           qstn:
-            "Is HelloWorld coliving in Bengaluru safe for women and working professionals?",
-          ans: `Bengaluru remains a top migration magnet because talent demand outstrips supply, but women professionals still scrutinise lanes near liquor retail, auto behaviour late at night, and cab PIN sharing norms. HelloWorld stacks biometric or RFID access, CCTV in shared paths, visitor logs, and staff escalation playbooks; women-only inventory exists where demand justifies separate towers or floors. None of this replaces walking the neighbourhood after dark with headphones off, checking auto stands, and saving local police station maps. Align with colleagues on informal safety circles if you work similar shifts.`,
+            "Is HelloWorld coliving in Bangalore safe for women and working professionals?",
+          ans: `Bangalore remains a top migration magnet because talent demand outstrips supply, but women professionals still scrutinise lanes near liquor retail, auto behaviour late at night, and cab PIN sharing norms. HelloWorld stacks biometric or RFID access, CCTV in shared paths, visitor logs, and staff escalation playbooks; women-only inventory exists where demand justifies separate towers or floors. None of this replaces walking the neighbourhood after dark with headphones off, checking auto stands, and saving local police station maps. Align with colleagues on informal safety circles if you work similar shifts.`,
         },
         {
           id: "metro-commute-blr",
           qstn:
             "How does Namma Metro or BMTC factor into picking a HelloWorld home?",
-          ans: `Metro coverage expansion reshapes Bengaluru weekly—Green Line stitches eastern IT to CBD pockets; Purple Line feeds airport transfers; upcoming corridors may flip “too far” nodes overnight. Still, last-mile autorickshaw negotiation from station to gated coliving matters: one kilometre of mud road negates train reliability. BMTC Volvo routes from IT corridors to residential wards remain lifelines when ride-hail surges during rain. Test Tuesday morning reality, not Sunday map estimates. Ask HelloWorld teams which exits residents actually use and whether shuttle tie-ups exist.`,
+          ans: `Metro coverage expansion reshapes Bangalore weekly—Green Line stitches eastern IT to CBD pockets; Purple Line feeds airport transfers; upcoming corridors may flip “too far” nodes overnight. Still, last-mile autorickshaw negotiation from station to gated coliving matters: one kilometre of mud road negates train reliability. BMTC Volvo routes from IT corridors to residential wards remain lifelines when ride-hail surges during rain. Test Tuesday morning reality, not Sunday map estimates. Ask HelloWorld teams which exits residents actually use and whether shuttle tie-ups exist.`,
         },
       ],
     });

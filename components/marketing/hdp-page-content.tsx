@@ -23,13 +23,13 @@ import { JsonLd } from "@/components/seo/json-ld";
 import type { HdpPageConfig } from "@/src/lib/hdp/resolve-hdp-page";
 import { cn } from "@/src/lib/cn";
 import { pageLayout } from "@/src/tokens/layout";
+import { formatCityDisplayName } from "@/src/tokens/cities";
 
 export function HdpPageContent({ config }: { config: HdpPageConfig }) {
   const { view } = config;
-  const city =
-    config.property.address?.city?.replace(/_/g, " ") ||
-    config.property.city?.replace(/_/g, " ") ||
-    undefined;
+  const cityRaw =
+    config.property.address?.city || config.property.city || "";
+  const city = cityRaw ? formatCityDisplayName(cityRaw) : undefined;
   const locality =
     config.property.locality ||
     config.property.address?.line2 ||

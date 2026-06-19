@@ -58,7 +58,7 @@ export const localityPage = {
     "Fully Furnished Coliving in Indiranagar, Bangalore for Students & Working Professionals",
   aboutTitle: "About Indiranagar",
   aboutText:
-    "Indiranagar is one of Bengaluru's most connected neighbourhoods — metro lines, cafés, offices, and nightlife all within walking distance. HelloWorld homes here are fully furnished with community events, biometric access, and zero brokerage so you can move in and start living from day one.",
+    "Indiranagar is one of Bangalore's most connected neighbourhoods — metro lines, cafés, offices, and nightlife all within walking distance. HelloWorld homes here are fully furnished with community events, biometric access, and zero brokerage so you can move in and start living from day one.",
 } as const;
 
 const localitySlug = localityPage.name.toLowerCase().replace(/\s+/g, "-");

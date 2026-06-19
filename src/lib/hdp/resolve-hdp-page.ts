@@ -31,6 +31,7 @@ import {
   getWebPageSchema,
   type HdpPageSchema,
 } from "@/src/lib/schema";
+import { formatCityDisplayName } from "@/src/tokens/cities";
 import { capitalizeFirstLetter } from "@/src/lib/string-utils";
 import type { CategoryProps } from "@/src/models/category";
 import type {
@@ -177,7 +178,7 @@ function buildHdpView(options: {
     visitsToday: undefined,
     trendingLabel: property.lightning_deal ? "Trending" : undefined,
     topChoiceCopy: property.address?.city
-      ? `is the top choice in ${capitalizeFirstLetter(property.address.city.replace(/_/g, " "))}.`
+      ? `is the top choice in ${formatCityDisplayName(property.address.city)}.`
       : undefined,
     about: property.description || property.nearby_description || "",
     amenities: [

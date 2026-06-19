@@ -387,6 +387,38 @@
   animation: tab-panel-in 300ms ease-out both;
 }
 
+@keyframes booking-panel-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(0.75rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes booking-panel-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-0.75rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@utility animate-booking-panel-in-right {
+  animation: booking-panel-in-right 280ms ease-out both;
+}
+
+@utility animate-booking-panel-in-left {
+  animation: booking-panel-in-left 280ms ease-out both;
+}
+
 @keyframes carousel-panel-in {
   from {
     opacity: 0;

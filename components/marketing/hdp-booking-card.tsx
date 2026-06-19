@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ScheduleVisitFlow } from "@/components/booking/schedule-visit-flow";
 import { Button } from "@/components/ui/button";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import type { HdpPageView } from "@/src/lib/hdp/hdp-page-view";
 import {
   filterCategoriesByOccupancy,
@@ -23,6 +24,11 @@ import {
 import { cn } from "@/src/lib/cn";
 
 type BookingMode = "tour" | "book";
+
+const bookingModeOptions = [
+  { value: "tour" as const, label: "Take a Tour" },
+  { value: "book" as const, label: "Book Now" },
+];
 
 type BookingRoom = {
   id: string;
@@ -190,6 +196,8 @@ export function HdpBookingCard({
   }, [visibleCategories, fallbackRoomTypes]);
 
   const [mode, setMode] = useState<BookingMode>("tour");
+  const [panelDirection, setPanelDirection] = useState<"left" | "right">("right");
+  const skipPanelAnimation = useRef(true);
   const [occupancy, setOccupancy] = useState<HdpOccupancy>(
     () => availableOccupancies[0] ?? "private",
   );
@@ -225,6 +233,13 @@ export function HdpBookingCard({
     availableOccupancies.includes(item.id),
   );
 
+  function handleModeChange(next: BookingMode) {
+    if (next === mode) return;
+    skipPanelAnimation.current = false;
+    setPanelDirection(next === "book" ? "right" : "left");
+    setMode(next);
+  }
+
   return (
     <aside
       className={cn(
@@ -233,30 +248,24 @@ export function HdpBookingCard({
       )}
       aria-label="Booking actions"
     >
-      <div className="flex rounded-full bg-gray-200 p-1">
-        {(["tour", "book"] as const).map((value) => {
-          const isActive = mode === value;
-          return (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setMode(value)}
-              className={cn(
-                "min-w-0 flex-1 rounded-full px-3 py-2 text-sm font-bold transition-colors sm:px-4",
-                isActive
-                  ? "bg-white text-gray-800 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700",
-              )}
-            >
-              <span className="block truncate">
-                {value === "tour" ? "Take a Tour" : "Book Now"}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+      <SegmentedControl
+        aria-label="Booking mode"
+        options={bookingModeOptions}
+        value={mode}
+        onChange={handleModeChange}
+        className="bg-gray-200"
+      />
 
-      <div key={mode} className="animate-tab-panel-in motion-reduce:animate-none">
+      <div
+        key={mode}
+        className={cn(
+          "motion-reduce:animate-none",
+          !skipPanelAnimation.current &&
+            (panelDirection === "right"
+              ? "animate-booking-panel-in-right"
+              : "animate-booking-panel-in-left"),
+        )}
+      >
         {mode === "tour" ? (
           <>
             <HdpBookingTourPanel view={resolvedView} />

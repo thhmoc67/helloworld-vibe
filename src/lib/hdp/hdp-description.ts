@@ -1,3 +1,4 @@
+import { formatCityDisplayName } from "@/src/tokens/cities";
 import { getPublicSiteUrl } from "@/src/lib/schema";
 import type { GoogleData, Property } from "@/src/models/property";
 
@@ -46,7 +47,7 @@ export function buildHdpMetaDescription(
   googleData: GoogleData | null | undefined,
   canonicalPath: string,
 ): string {
-  const city = titleCaseLocation(property.address?.city || property.city || "");
+  const city = formatCityDisplayName(property.address?.city || property.city || "");
   const locality = titleCaseLocation(property.locality || "");
   const displayName = property.display_name || property.name || "HelloWorld";
   const gender = formatGenderResidents(property.gender || "");
