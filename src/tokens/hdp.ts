@@ -11,6 +11,7 @@ export type HdpRoomType = {
   name: string;
   rent: number;
   features: readonly string[];
+  occupancy: HdpOccupancy;
 };
 
 export type HdpVibeMatch = {
@@ -100,18 +101,21 @@ export const hdpRoomTypes: readonly HdpRoomType[] = [
     name: "Room Type 1",
     rent: 12500,
     features: ["Attached washroom", "Work desk", "Wardrobe"],
+    occupancy: "private",
   },
   {
     id: "room-2",
     name: "Room Type 2",
     rent: 10999,
     features: ["Shared washroom", "Work desk", "Balcony access"],
+    occupancy: "double",
   },
   {
     id: "room-3",
     name: "Room Type 3",
     rent: 9999,
     features: ["Shared washroom", "Compact layout", "AC ready"],
+    occupancy: "triple",
   },
 ];
 

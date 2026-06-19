@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type MouseEvent } from "react";
 import { Button } from "@/components/ui/button";
+import { WishlistButton } from "@/components/wishlist/wishlist-button";
 import { cn } from "@/src/lib/cn";
 import { formatSrpCardImageSrc } from "@/src/lib/images";
 import {
@@ -71,25 +72,6 @@ function BedIcon({ className }: { className?: string }) {
         d="M2 12.667V10a2.667 2.667 0 0 1 2.667-2.667h6.666A2.667 2.667 0 0 1 14 10v2.667M2 12.667h12M2 12.667v1.333M14 12.667v1.333M4.667 7.333V5.333a1.333 1.333 0 0 1 1.334-1.333h4a1.333 1.333 0 0 1 1.333 1.333v2"
         stroke="currentColor"
         strokeWidth="1.33"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function HeartIcon({ filled }: { filled?: boolean }) {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 20 20"
-      fill={filled ? "currentColor" : "none"}
-      className="size-5"
-    >
-      <path
-        d="M10 17.5s-6.667-4.167-6.667-8.333A3.333 3.333 0 0 1 10 6.25a3.333 3.333 0 0 1 6.667 2.917c0 4.166-6.667 8.333-6.667 8.333Z"
-        stroke="currentColor"
-        strokeWidth="1.67"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -367,21 +349,14 @@ export function SrpCard({
         <div className="flex items-center justify-between gap-3">
           <p className="min-w-0 truncate text-xs text-gray-600">{subtitle}</p>
           <div className="flex shrink-0 items-center gap-2">
-            <button
-              type="button"
+            <WishlistButton
+              saved={saved}
               aria-label={saved ? "Remove from saved" : "Save property"}
-              aria-pressed={saved}
               onClick={(event) => {
                 event.stopPropagation();
                 onSaveToggle?.();
               }}
-              className={cn(
-                "transition-colors",
-                saved ? "text-error-500" : "text-gray-500 hover:text-gray-700",
-              )}
-            >
-              <HeartIcon filled={saved} />
-            </button>
+            />
             <button
               type="button"
               aria-label="Share property"

@@ -15,7 +15,10 @@ import { HdpSectionNav } from "@/components/marketing/hdp-section-nav";
 import { HdpSimilarProperties } from "@/components/marketing/hdp-similar-properties";
 import { HdpVibeMatch } from "@/components/marketing/hdp-vibe-match";
 import { HdpReviews } from "@/components/marketing/hdp-reviews";
-import { PropertyGalleryFromImages } from "@/components/marketing/property-gallery-from-images";
+import {
+  PropertyGalleryDesktop,
+  PropertyGalleryMobile,
+} from "@/components/marketing/property-gallery";
 import { JsonLd } from "@/components/seo/json-ld";
 import type { HdpPageConfig } from "@/src/lib/hdp/resolve-hdp-page";
 import { cn } from "@/src/lib/cn";
@@ -42,13 +45,15 @@ export function HdpPageContent({ config }: { config: HdpPageConfig }) {
           <HdpHeader view={view} />
 
           <div className="mt-4 md:mt-6">
-            <PropertyGalleryFromImages
-              images={view.galleryImages}
-              alt={view.displayName}
-            />
+            <div className="hidden md:block">
+              <PropertyGalleryDesktop images={view.galleryImages} />
+            </div>
+            <div className="md:hidden">
+              <PropertyGalleryMobile images={view.galleryImages} />
+            </div>
           </div>
 
-          <div className={cn("mt-8 md:mt-10", pageLayout.twoColumn)}>
+          <div className={pageLayout.hdpTwoColumn}>
             <div className={pageLayout.mainColumn}>
               <div className="space-y-6">
                 <HdpRatingCard view={view} />
@@ -75,13 +80,10 @@ export function HdpPageContent({ config }: { config: HdpPageConfig }) {
               </div>
             </div>
 
-            <div
-              className={cn(
-                pageLayout.sidebarColumn,
-                "md:sticky md:top-18 md:z-20 md:max-h-[calc(100vh-4.5rem)] md:overflow-y-auto",
-              )}
-            >
-              <HdpBookingCard view={view} />
+            <div className={pageLayout.hdpSidebarColumn}>
+              <div className="sticky top-24 z-20 w-full">
+                <HdpBookingCard view={view} categories={config.categories} />
+              </div>
             </div>
           </div>
 

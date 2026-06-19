@@ -87,3 +87,40 @@ export function getGalleryItemsByCategory(category: GalleryCategory) {
 export function getGalleryCategoryIndex(category: GalleryCategory) {
   return propertyGalleryItems.findIndex((item) => item.category === category);
 }
+
+const desktopTileLabels = [
+  "Property Video",
+  "Moments",
+  "Living Room",
+  "Washroom",
+] as const;
+
+export function buildGalleryItemsFromImages(
+  images: readonly string[],
+): GalleryMediaItem[] {
+  return images.map((imageSrc, index) => {
+    const category: GalleryCategory =
+      index === 0 ? "property-video" : index === 1 ? "moments" : "photos";
+    return {
+      id: `gallery-${index}`,
+      category,
+      label: desktopTileLabels[index] ?? "Photos",
+      imageSrc,
+      kind: index === 0 ? "video" : "image",
+    };
+  });
+}
+
+export function buildGalleryDesktopFromImages(
+  images: readonly string[],
+): typeof propertyGalleryDesktop {
+  const items = buildGalleryItemsFromImages(images);
+  const pick = (index: number) => items[index] ?? items[0];
+
+  return {
+    video: pick(0),
+    moments: pick(1),
+    livingRoom: pick(2),
+    washroom: pick(3),
+  };
+}

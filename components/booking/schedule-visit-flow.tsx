@@ -5,6 +5,7 @@ import {
   useId,
   useState,
   type FormEvent,
+  type ReactNode,
 } from "react";
 import { VisitScheduler } from "@/components/booking/visit-scheduler";
 import { VisitScheduledSuccess } from "@/components/booking/visit-scheduled-success";
@@ -248,8 +249,10 @@ export function ScheduleVisitFlow({
     setErrors((current) => ({ ...current, otp: true }));
   }
 
+  let content: ReactNode;
+
   if (step === "success") {
-    return (
+    content = (
       <VisitScheduledSuccess
         scheduledAt={scheduledAt}
         onGotIt={() => {
@@ -262,10 +265,8 @@ export function ScheduleVisitFlow({
         className={embedded ? "py-2" : undefined}
       />
     );
-  }
-
-  if (step === "otp") {
-    return (
+  } else if (step === "otp") {
+    content = (
       <div className="space-y-6">
         <div>
           <h3 className="text-xl font-bold text-gray-900">Verify your number</h3>
@@ -303,10 +304,8 @@ export function ScheduleVisitFlow({
         </form>
       </div>
     );
-  }
-
-  if (step === "details") {
-    return (
+  } else if (step === "details") {
+    content = (
       <div className="space-y-6">
         <div>
           <h3 className="text-xl font-bold text-gray-900">Your details</h3>
@@ -373,37 +372,39 @@ export function ScheduleVisitFlow({
         </form>
       </div>
     );
+  } else {
+    content = (
+      <form className="space-y-6" onSubmit={handleScheduleContinue}>
+        {loadingSlots ? (
+          <p className="text-sm text-gray-500">Loading available slots...</p>
+        ) : noSlots ? (
+          <p className="rounded-xl bg-error-50 px-4 py-3 text-sm text-error-700">
+            No visit slots are available right now. Please try again later.
+          </p>
+        ) : (
+          <VisitScheduler
+            layout={embedded ? "embedded" : "default"}
+            animate={!embedded}
+            dates={dates}
+            timeSlots={timeSlots}
+            selectedDateId={selectedDateId}
+            selectedTimeSlotId={selectedTimeSlotId}
+            onDateChange={setSelectedDateId}
+            onTimeSlotChange={setSelectedTimeSlotId}
+          />
+        )}
+
+        <Button
+          type="submit"
+          className="w-full bg-hello-lime-400 text-gray-800 hover:bg-hello-lime-500"
+          size="lg"
+          disabled={loadingSlots || noSlots}
+        >
+          Continue
+        </Button>
+      </form>
+    );
   }
 
-  return (
-    <form className="space-y-6" onSubmit={handleScheduleContinue}>
-      {loadingSlots ? (
-        <p className="text-sm text-gray-500">Loading available slots...</p>
-      ) : noSlots ? (
-        <p className="rounded-xl bg-error-50 px-4 py-3 text-sm text-error-700">
-          No visit slots are available right now. Please try again later.
-        </p>
-      ) : (
-        <VisitScheduler
-          layout={embedded ? "embedded" : "default"}
-          animate={!embedded}
-          dates={dates}
-          timeSlots={timeSlots}
-          selectedDateId={selectedDateId}
-          selectedTimeSlotId={selectedTimeSlotId}
-          onDateChange={setSelectedDateId}
-          onTimeSlotChange={setSelectedTimeSlotId}
-        />
-      )}
-
-      <Button
-        type="submit"
-        className="w-full bg-hello-lime-400 text-gray-800 hover:bg-hello-lime-500"
-        size="lg"
-        disabled={loadingSlots || noSlots}
-      >
-        Continue
-      </Button>
-    </form>
-  );
+  return content;
 }

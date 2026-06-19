@@ -2,8 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { HomepageCarouselNav } from "@/components/marketing/homepage-carousel-nav";
+import { PaginatedCarousel } from "@/components/ui/paginated-carousel";
 import type { HdpReviewSummaryView } from "@/src/lib/hdp/map-hdp-api";
 import {
   hdpResidentReviews,
@@ -12,8 +11,7 @@ import {
 } from "@/src/tokens/hdp-reviews";
 import { cn } from "@/src/lib/cn";
 
-const CARD_WIDTH = 301;
-const CARD_GAP = 24;
+const VISIBLE_DESKTOP_COUNT = 3;
 
 function RecommendRing({ percent }: { percent: number }) {
   const radius = 24;
@@ -77,9 +75,20 @@ function CategoryBar({
   );
 }
 
-function ReviewCard({ review }: { review: HdpResidentReview }) {
+function ReviewCard({
+  review,
+  className,
+}: {
+  review: HdpResidentReview;
+  className?: string;
+}) {
   return (
-    <article className="flex h-[16.375rem] w-[18.8125rem] shrink-0 snap-start flex-col gap-4 rounded-[10px] border border-[#eee] bg-white p-4 shadow-[0_1px_5.5px_rgba(0,0,0,0.04)]">
+    <article
+      className={cn(
+        "flex h-[16.375rem] w-full shrink-0 flex-col gap-4 rounded-[10px] border border-[#eee] bg-white p-4 shadow-[0_1px_5.5px_rgba(0,0,0,0.04)]",
+        className,
+      )}
+    >
       <div className="flex items-center gap-3">
         <div className="relative size-9 shrink-0 overflow-hidden rounded-full bg-gray-100">
           <Image
@@ -117,39 +126,12 @@ export function HdpReviews({
   googleLink?: string;
   className?: string;
 }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(true);
-
   const summary = reviewSummary ?? hdpReviewSummary;
   const reviews =
     residentReviews && residentReviews.length > 0
       ? residentReviews
       : hdpResidentReviews;
   const allReviewsLink = googleLink;
-
-  function updateScrollState() {
-    const container = scrollRef.current;
-    if (!container) return;
-
-    const maxScroll = container.scrollWidth - container.clientWidth;
-    setCanScrollPrev(container.scrollLeft > 8);
-    setCanScrollNext(container.scrollLeft < maxScroll - 8);
-  }
-
-  useEffect(() => {
-    updateScrollState();
-    window.addEventListener("resize", updateScrollState);
-    return () => window.removeEventListener("resize", updateScrollState);
-  }, [reviews.length]);
-
-  function scrollByCards(direction: "prev" | "next") {
-    const container = scrollRef.current;
-    if (!container) return;
-
-    const delta = (CARD_WIDTH + CARD_GAP) * (direction === "next" ? 1 : -1);
-    container.scrollBy({ left: delta, behavior: "smooth" });
-  }
 
   if (reviews.length === 0) return null;
 
@@ -222,26 +204,19 @@ export function HdpReviews({
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div
-            ref={scrollRef}
-            onScroll={updateScrollState}
-            className="-mx-1 flex gap-6 overflow-x-auto px-1 pb-1 scrollbar-none snap-x snap-mandatory"
-          >
-            {reviews.map((review) => (
-              <ReviewCard key={review.id} review={review} />
-            ))}
-          </div>
-
-          {reviews.length > 1 ? (
-            <HomepageCarouselNav
-              onPrev={() => scrollByCards("prev")}
-              onNext={() => scrollByCards("next")}
-              prevDisabled={!canScrollPrev}
-              nextDisabled={!canScrollNext}
-            />
-          ) : null}
-        </div>
+        <PaginatedCarousel
+          items={reviews}
+          getItemKey={(review) => review.id}
+          visibleDesktopCount={VISIBLE_DESKTOP_COUNT}
+          mobileScrollGap={24}
+          desktopItemClassName="w-full"
+          mobileItemClassName="w-[18.8125rem]"
+          paginationClassName="mt-4"
+          mobilePaginationClassName="mt-4"
+          renderItem={(review, cardClassName) => (
+            <ReviewCard review={review} className={cardClassName} />
+          )}
+        />
       </div>
     </section>
   );

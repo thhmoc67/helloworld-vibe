@@ -12,6 +12,10 @@ import {
   mapNearByToNeighborhoodCards,
   mergeNearByAreas,
 } from "@/src/lib/hdp/map-hdp-api";
+import {
+  categorySharingOccupancy,
+  categorySupportsPrivate,
+} from "@/src/lib/hdp/category-occupancy";
 import type { HdpPageView } from "@/src/lib/hdp/hdp-page-view";
 import { imageUrlFormatter } from "@/src/lib/images";
 import {
@@ -104,6 +108,9 @@ function mapCategoriesToRoomTypes(categories: CategoryProps[]): HdpRoomType[] {
       features: category.key_feature?.length
         ? category.key_feature
         : category.amenities?.slice(0, 3) ?? [],
+      occupancy:
+        categorySharingOccupancy(category) ??
+        (categorySupportsPrivate(category) ? "private" : "double"),
     }));
 }
 

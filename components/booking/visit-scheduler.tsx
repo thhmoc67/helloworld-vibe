@@ -10,6 +10,7 @@ import {
 } from "react";
 import { cn } from "@/src/lib/cn";
 import { useAnimateOnView } from "@/src/lib/use-animate-on-view";
+import { AnimateHeight } from "@/components/ui/animate-height";
 import type { VisitDate, VisitTimeSlot } from "@/src/tokens/visit-scheduler";
 import {
   visitSchedulerTitle,
@@ -252,20 +253,89 @@ export function VisitScheduler({
         delayOffset={180}
       >
         <div className={embedded ? "mt-4" : "mt-6 sm:mt-8"}>
-          <div
-            className="overflow-y-auto scrollbar-none"
-            style={{ maxHeight: visitTimeSlotListMaxHeight }}
-          >
+          {embedded ? (
             <div
-              key={selectedDateId}
-              ref={timeListRef}
-              role="radiogroup"
-              aria-label="Visit time"
-              className={cn(
-                "relative flex flex-wrap gap-3 py-2",
-                embedded ? "justify-start px-0" : "justify-center px-2",
-              )}
+              className="overflow-y-auto scrollbar-none"
+              style={{ maxHeight: visitTimeSlotListMaxHeight }}
             >
+              <div
+                key={selectedDateId}
+                ref={timeListRef}
+                role="radiogroup"
+                aria-label="Visit time"
+                className={cn(
+                  "relative flex flex-wrap gap-3 py-2",
+                  "justify-start px-0",
+                )}
+              >
+                {timeIndicator ? (
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "pointer-events-none absolute rounded-full bg-blue-light-50",
+                      "transition-[left,width,top,height] duration-300 ease-in-out",
+                      "motion-reduce:transition-none",
+                    )}
+                    style={{
+                      left: timeIndicator.left,
+                      top: timeIndicator.top,
+                      width: timeIndicator.width,
+                      height: timeIndicator.height,
+                    }}
+                  />
+                ) : null}
+
+                {timeSlots.map((slot, index) => {
+                  const isSelected = slot.id === selectedTimeSlotId;
+
+                  return (
+                    <label
+                      key={slot.id}
+                      ref={(element) => {
+                        if (element) {
+                          timeItemRefs.current.set(slot.id, element);
+                        } else {
+                          timeItemRefs.current.delete(slot.id);
+                        }
+                      }}
+                      className={cn(
+                        "relative z-10 cursor-pointer rounded-full px-5 py-3 text-sm font-semibold",
+                        "transition-[color,transform] duration-300 motion-reduce:transition-none",
+                        "focus-within:outline-none focus-within:ring-4 focus-within:ring-blue-light-100",
+                        isSelected
+                          ? "text-blue-light-900"
+                          : "bg-gray-100 text-gray-900 hover:-translate-y-0.5 hover:bg-gray-200/80 motion-reduce:hover:translate-y-0",
+                      )}
+                    >
+                      <input
+                        type="radio"
+                        name={timeGroupId}
+                        value={slot.id}
+                        checked={isSelected}
+                        onChange={() => onTimeSlotChange(slot.id)}
+                        className="sr-only"
+                      />
+                      {slot.label}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <AnimateHeight
+              className="overflow-y-auto scrollbar-none"
+              style={{ maxHeight: visitTimeSlotListMaxHeight }}
+            >
+              <div
+                key={selectedDateId}
+                ref={timeListRef}
+                role="radiogroup"
+                aria-label="Visit time"
+                className={cn(
+                  "relative flex flex-wrap gap-3 py-2",
+                  "justify-center px-2",
+                )}
+              >
           {timeIndicator ? (
             <span
               aria-hidden
@@ -321,8 +391,9 @@ export function VisitScheduler({
               </label>
             );
           })}
-            </div>
-          </div>
+              </div>
+            </AnimateHeight>
+          )}
         </div>
       </StaggeredRow>
     </div>

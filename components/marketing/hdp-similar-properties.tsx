@@ -2,11 +2,23 @@
 
 import { WishlistSrpCard } from "@/components/marketing/wishlist-srp-card";
 import { useOptionalPropertyActions } from "@/components/booking/property-actions-provider";
+import { PaginatedCarousel } from "@/components/ui/paginated-carousel";
 import { mapPropertyToSrpCard } from "@/src/lib/map-property";
 import type { SimilarProperty } from "@/src/models/property";
+import type { HomepageFeaturedProperty } from "@/src/tokens/homepage";
 import type { LocalityProperty } from "@/src/tokens/locality";
 import { hdpSimilarProperties } from "@/src/tokens/hdp";
 import { cn } from "@/src/lib/cn";
+
+const VISIBLE_DESKTOP_COUNT = 3;
+
+type SimilarPropertyCard = LocalityProperty | HomepageFeaturedProperty;
+
+function isLocalityProperty(
+  property: SimilarPropertyCard,
+): property is LocalityProperty {
+  return "propertyId" in property;
+}
 
 export function HdpSimilarProperties({
   properties,
@@ -34,7 +46,53 @@ export function HdpSimilarProperties({
         )
       : [];
   const usingApiCards = apiCards.length > 0;
-  const cards = usingApiCards ? apiCards : hdpSimilarProperties;
+  const cards: SimilarPropertyCard[] = usingApiCards
+    ? apiCards
+    : hdpSimilarProperties;
+
+  function renderPropertyCard(property: SimilarPropertyCard, cardClassName: string) {
+    const localityProperty = isLocalityProperty(property) ? property : null;
+
+    return (
+      <WishlistSrpCard
+        propertyId={localityProperty?.propertyId}
+        className={cardClassName}
+        href={property.href}
+        name={property.name}
+        subtitle={property.subtitle}
+        images={property.images}
+        rating={property.rating}
+        roomTypes={property.roomTypes}
+        rent={property.rent}
+        originalRent={property.originalRent}
+        offerLabel={property.offerLabel}
+        statusLabel={property.statusLabel}
+        visitsToday={property.visitsToday}
+        genderLabel={property.genderLabel}
+        onRequestCallback={
+          usingApiCards && propertyActions && localityProperty
+            ? () =>
+                propertyActions.openRequestCallback({
+                  propertyId: localityProperty.propertyId,
+                  propertyName: property.name,
+                  location: localityProperty.location,
+                  city: localityProperty.city,
+                })
+            : undefined
+        }
+        onTakeTour={
+          usingApiCards && propertyActions && localityProperty
+            ? () =>
+                propertyActions.openScheduleVisit({
+                  propertyId: localityProperty.propertyId,
+                  propertyName: property.name,
+                  propertyUrl: localityProperty.propertyUrl,
+                })
+            : undefined
+        }
+      />
+    );
+  }
 
   return (
     <section
@@ -47,98 +105,20 @@ export function HdpSimilarProperties({
         </h2>
       </div>
 
-      <div className="hidden gap-6 lg:grid lg:grid-cols-3">
-        {cards.map((property) => (
-          <WishlistSrpCard
-            key={property.id}
-            propertyId={
-              usingApiCards
-                ? (property as LocalityProperty).propertyId
-                : undefined
-            }
-            href={property.href}
-            name={property.name}
-            subtitle={property.subtitle}
-            images={property.images}
-            rating={property.rating}
-            roomTypes={property.roomTypes}
-            rent={property.rent}
-            originalRent={property.originalRent}
-            offerLabel={property.offerLabel}
-            statusLabel={property.statusLabel}
-            visitsToday={property.visitsToday}
-            genderLabel={property.genderLabel}
-            onRequestCallback={
-              usingApiCards && propertyActions
-                ? () =>
-                    propertyActions.openRequestCallback({
-                      propertyId: (property as LocalityProperty).propertyId,
-                      propertyName: property.name,
-                      location: (property as LocalityProperty).location,
-                      city: (property as LocalityProperty).city,
-                    })
-                : undefined
-            }
-            onTakeTour={
-              usingApiCards && propertyActions
-                ? () =>
-                    propertyActions.openScheduleVisit({
-                      propertyId: (property as LocalityProperty).propertyId,
-                      propertyName: property.name,
-                      propertyUrl: (property as LocalityProperty).propertyUrl,
-                    })
-                : undefined
-            }
-          />
-        ))}
-      </div>
-
-      <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 scrollbar-none lg:hidden">
-        {cards.map((property) => (
-          <WishlistSrpCard
-            key={property.id}
-            propertyId={
-              usingApiCards
-                ? (property as LocalityProperty).propertyId
-                : undefined
-            }
-            className="w-[min(342px,85vw)] shrink-0"
-            href={property.href}
-            name={property.name}
-            subtitle={property.subtitle}
-            images={property.images}
-            rating={property.rating}
-            roomTypes={property.roomTypes}
-            rent={property.rent}
-            originalRent={property.originalRent}
-            offerLabel={property.offerLabel}
-            statusLabel={property.statusLabel}
-            visitsToday={property.visitsToday}
-            genderLabel={property.genderLabel}
-            onRequestCallback={
-              usingApiCards && propertyActions
-                ? () =>
-                    propertyActions.openRequestCallback({
-                      propertyId: (property as LocalityProperty).propertyId,
-                      propertyName: property.name,
-                      location: (property as LocalityProperty).location,
-                      city: (property as LocalityProperty).city,
-                    })
-                : undefined
-            }
-            onTakeTour={
-              usingApiCards && propertyActions
-                ? () =>
-                    propertyActions.openScheduleVisit({
-                      propertyId: (property as LocalityProperty).propertyId,
-                      propertyName: property.name,
-                      propertyUrl: (property as LocalityProperty).propertyUrl,
-                    })
-                : undefined
-            }
-          />
-        ))}
-      </div>
+      <PaginatedCarousel
+        items={cards}
+        getItemKey={(property) => property.id}
+        visibleDesktopCount={VISIBLE_DESKTOP_COUNT}
+        mobileScrollGap={16}
+        desktopItemClassName="w-full"
+        mobileItemClassName="w-[min(342px,85vw)]"
+        mobileTrackClassName="-mx-4 px-4"
+        paginationClassName="mt-6"
+        mobilePaginationClassName="mt-4"
+        renderItem={(property, cardClassName) =>
+          renderPropertyCard(property, cardClassName)
+        }
+      />
     </section>
   );
 }

@@ -1,5 +1,7 @@
 import { createHttpClient } from "@/src/apis/http";
 
+export const SIMILAR_PROPERTIES_LIMIT = 12;
+
 export async function fetchProperty(name: string) {
   try {
     const nameForApi = (name || "").replace(/-/g, " ");
@@ -26,9 +28,13 @@ export async function fetchPropertyCategories(propertyId: number) {
 export async function fetchSimilarProperties(propertyId: number) {
   try {
     const { data } = await createHttpClient().get("v2/property/similar", {
-      params: { id: propertyId },
+      params: { id: propertyId, limit: SIMILAR_PROPERTIES_LIMIT },
     });
-    return data;
+    if (!data?.success || !Array.isArray(data.data)) return data;
+    return {
+      ...data,
+      data: data.data.slice(0, SIMILAR_PROPERTIES_LIMIT),
+    };
   } catch {
     return { success: false };
   }

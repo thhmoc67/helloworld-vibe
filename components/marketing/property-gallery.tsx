@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useState } from "react";
 import { cn } from "@/src/lib/cn";
 import {
+  buildGalleryDesktopFromImages,
+  buildGalleryItemsFromImages,
   galleryCategoryTabs,
   propertyGalleryDesktop,
   propertyGalleryItems,
@@ -11,6 +13,11 @@ import {
   type GalleryCategory,
   type GalleryMediaItem,
 } from "@/src/tokens/property-gallery";
+
+type PropertyGalleryProps = {
+  images?: readonly string[];
+  className?: string;
+};
 
 function GalleryBadge({ children }: { children: React.ReactNode }) {
   return (
@@ -64,11 +71,13 @@ function GalleryImageTile({
   item,
   className,
   showViewAll,
+  totalCount,
   onViewAll,
 }: {
   item: GalleryMediaItem;
   className?: string;
   showViewAll?: boolean;
+  totalCount?: number;
   onViewAll?: () => void;
 }) {
   return (
@@ -87,7 +96,7 @@ function GalleryImageTile({
           onClick={onViewAll}
           className="absolute bottom-3 right-3 z-10 rounded-full bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm"
         >
-          View All {propertyGalleryTotal}+
+          View All {totalCount ?? propertyGalleryTotal}+
         </button>
       ) : null}
     </div>
@@ -127,8 +136,16 @@ function GalleryVideoTile({
   );
 }
 
-export function PropertyGalleryDesktop({ className }: { className?: string }) {
-  const { video, moments, livingRoom, washroom } = propertyGalleryDesktop;
+export function PropertyGalleryDesktop({
+  images,
+  className,
+}: PropertyGalleryProps) {
+  if (images?.length === 0) return null;
+
+  const totalCount = images?.length ?? propertyGalleryTotal;
+  const { video, moments, livingRoom, washroom } = images?.length
+    ? buildGalleryDesktopFromImages(images)
+    : propertyGalleryDesktop;
 
   return (
     <div
@@ -141,7 +158,12 @@ export function PropertyGalleryDesktop({ className }: { className?: string }) {
       <GalleryImageTile item={moments} className="h-full" />
       <div className="grid min-h-0 grid-rows-2 gap-3">
         <GalleryImageTile item={livingRoom} className="min-h-0" />
-        <GalleryImageTile item={washroom} className="min-h-0" showViewAll />
+        <GalleryImageTile
+          item={washroom}
+          className="min-h-0"
+          showViewAll={totalCount > 4}
+          totalCount={totalCount}
+        />
       </div>
     </div>
   );
@@ -172,27 +194,35 @@ function GalleryPaginationDots({
   );
 }
 
-export function PropertyGalleryMobile({ className }: { className?: string }) {
+export function PropertyGalleryMobile({
+  images,
+  className,
+}: PropertyGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const activeItem = propertyGalleryItems[activeIndex];
+  const galleryItems = images?.length
+    ? buildGalleryItemsFromImages(images)
+    : propertyGalleryItems;
+  const totalCount = images?.length ?? propertyGalleryTotal;
+
+  if (galleryItems.length === 0) return null;
+
+  const activeItem = galleryItems[activeIndex];
   const activeCategory = activeItem.category;
 
   function goToCategory(category: GalleryCategory) {
-    const index = propertyGalleryItems.findIndex(
-      (item) => item.category === category,
-    );
+    const index = galleryItems.findIndex((item) => item.category === category);
     if (index >= 0) setActiveIndex(index);
   }
 
   function goPrev() {
     setActiveIndex((index) =>
-      index === 0 ? propertyGalleryItems.length - 1 : index - 1,
+      index === 0 ? galleryItems.length - 1 : index - 1,
     );
   }
 
   function goNext() {
     setActiveIndex((index) =>
-      index === propertyGalleryItems.length - 1 ? 0 : index + 1,
+      index === galleryItems.length - 1 ? 0 : index + 1,
     );
   }
 
@@ -224,7 +254,7 @@ export function PropertyGalleryMobile({ className }: { className?: string }) {
         <GalleryChevron direction="next" label="Next" onClick={goNext} />
 
         <div className="absolute bottom-24 right-3 z-10 rounded-lg bg-white px-2.5 py-1 text-sm font-semibold text-gray-900">
-          {activeIndex + 1}/{propertyGalleryTotal}
+          {activeIndex + 1}/{totalCount}
         </div>
 
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent px-4 pb-5 pt-16">
@@ -250,7 +280,7 @@ export function PropertyGalleryMobile({ className }: { className?: string }) {
           </div>
           <div className="mt-4">
             <GalleryPaginationDots
-              count={propertyGalleryItems.length}
+              count={galleryItems.length}
               activeIndex={activeIndex}
             />
           </div>
