@@ -10,6 +10,7 @@ export const footerAboutLinks = [
   { label: "For home owners", href: "/for-homeowners" },
   { label: "Contact", href: "/contact" },
   { label: "Blog", href: "/blog" },
+  { label: "Sitemap", href: "/sitemap" },
 ] as const;
 
 export const footerAboutLinksMobile = footerAboutLinks.filter(

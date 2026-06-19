@@ -1,14 +1,11 @@
+"use client";
+
+import { useState } from "react";
+import { formatAmenityForDisplay } from "@/src/lib/amenity-display";
 import { hdpAmenities } from "@/src/tokens/hdp";
 import { cn } from "@/src/lib/cn";
 
-function humanizeAmenity(value: string): string {
-  return value
-    .replace(/[_-]+/g, " ")
-    .trim()
-    .split(/\s+/)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-}
+const VISIBLE_COUNT = 11;
 
 export function HdpAmenities({
   amenities,
@@ -17,18 +14,21 @@ export function HdpAmenities({
   amenities?: readonly string[];
   className?: string;
 }) {
+  const [showAll, setShowAll] = useState(false);
+
   const source =
-    amenities && amenities.length > 0
-      ? amenities.map((label, index) => ({
-          id: `${label}-${index}`,
-          label: label.includes(" ") ? label : humanizeAmenity(label),
-        }))
-      : hdpAmenities.map((label, index) => ({
-          id: `demo-${index}`,
-          label,
-        }));
-  const visible = source.slice(0, 11);
-  const hasMore = source.length > visible.length;
+    amenities && amenities.length > 0 ? amenities : hdpAmenities;
+
+  const items = source.map((raw, index) => {
+    const display = formatAmenityForDisplay(raw);
+    return {
+      id: `${display.label}-${index}`,
+      ...display,
+    };
+  });
+
+  const visible = showAll ? items : items.slice(0, VISIBLE_COUNT);
+  const hasMore = items.length > VISIBLE_COUNT;
 
   return (
     <section
@@ -37,21 +37,26 @@ export function HdpAmenities({
       aria-label="Amenities section"
     >
       <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">Amenities</h2>
-      <ul className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 md:grid-cols-4">
+      <div className="flex flex-wrap gap-2">
         {visible.map((item) => (
-          <li key={item.id} className="flex items-center gap-3">
-            <span className="flex size-10 items-center justify-center rounded-full bg-gray-100 text-lg">
-              ✓
-            </span>
-            <span className="text-sm font-medium text-gray-800">{item.label}</span>
-          </li>
+          <span
+            key={item.id}
+            className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-2 text-sm font-medium text-gray-800"
+          >
+            <span aria-hidden>{item.emoji}</span>
+            {item.label}
+          </span>
         ))}
-      </ul>
-      {hasMore ? (
-        <p className="text-sm font-medium text-gray-500">
-          +{source.length - visible.length} more amenities
-        </p>
-      ) : null}
+        {hasMore && !showAll ? (
+          <button
+            type="button"
+            onClick={() => setShowAll(true)}
+            className="rounded-full bg-hello-lime-400 px-4 py-2 text-sm font-semibold text-gray-900 transition-colors hover:bg-hello-lime-500"
+          >
+            View All
+          </button>
+        ) : null}
+      </div>
     </section>
   );
 }
