@@ -1,5 +1,5 @@
 import { capitalizeFirstLetter } from "@/src/lib/string-utils";
-import type { GoogleData, NearByArea, NearbyData } from "@/src/models/property";
+import type { GoogleData, NearByArea } from "@/src/models/property";
 import type { NeighborhoodCardData } from "@/src/tokens/neighborhood-card";
 import type {
   HdpResidentReview,
@@ -82,34 +82,41 @@ export function mapNearByToNeighborhoodCards(
 
   for (const [categoryKey, places] of Object.entries(nearBy)) {
     if (!Array.isArray(places)) continue;
-    for (const place of places.slice(0, 2)) {
-      if (!place?.name) continue;
-      items.push(mapNearbyPlace(categoryKey, place, imageIndex, mapUrl));
-      imageIndex += 1;
-    }
+
+    const options = places
+      .filter((place) => place?.name)
+      .map((place, placeIndex) => {
+        const imageSrc = NEARBY_IMAGES[imageIndex % NEARBY_IMAGES.length];
+        imageIndex += 1;
+        return {
+          id: `${categoryKey}-${placeIndex}`,
+          placeName: place.name,
+          walkTime: formatDistanceAway(place.distance) || "Nearby",
+          imageSrc,
+          imageAlt: place.name,
+        };
+      });
+
+    if (options.length === 0) continue;
+
+    const category = formatNearbyLabel(categoryKey);
+    const primary = options[0];
+
+    items.push({
+      id: categoryKey,
+      emoji: nearbyEmoji(categoryKey),
+      category,
+      placeName: primary.placeName,
+      imageSrc: primary.imageSrc,
+      imageAlt: primary.imageAlt,
+      walkTime: primary.walkTime,
+      linkLabel: `View ${category}`,
+      options,
+      ...(mapUrl && options.length === 1 ? { href: mapUrl } : {}),
+    });
   }
 
-  return items.slice(0, 12);
-}
-
-function mapNearbyPlace(
-  categoryKey: string,
-  place: NearbyData,
-  index: number,
-  mapUrl?: string,
-): NeighborhoodCardData {
-  const category = formatNearbyLabel(categoryKey);
-  return {
-    id: `${categoryKey}-${place.name}-${index}`,
-    emoji: nearbyEmoji(categoryKey),
-    category,
-    placeName: place.name,
-    imageSrc: NEARBY_IMAGES[index % NEARBY_IMAGES.length],
-    imageAlt: place.name,
-    walkTime: formatDistanceAway(place.distance) || "Nearby",
-    linkLabel: `View ${category}`,
-    href: mapUrl,
-  };
+  return items;
 }
 
 function ratingLabel(rating: number): string {

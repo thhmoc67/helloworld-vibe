@@ -1,3 +1,11 @@
+export interface NeighborhoodPlaceOption {
+  id: string;
+  placeName: string;
+  walkTime: string;
+  imageSrc?: string;
+  imageAlt?: string;
+}
+
 export interface NeighborhoodCardData {
   id: string;
   emoji: string;
@@ -8,6 +16,7 @@ export interface NeighborhoodCardData {
   walkTime: string;
   linkLabel: string;
   href?: string;
+  options?: readonly NeighborhoodPlaceOption[];
 }
 
 /** Sample daily-routine cards from the neighborhood timeline (HSR Layout). */
@@ -20,7 +29,26 @@ export const neighborhoodRoutineSamples: readonly NeighborhoodCardData[] = [
     imageSrc: "/assets/community/hero/hero-1.png",
     walkTime: "3 min walk",
     linkLabel: "View Cafes Nearby",
-    href: "#",
+    options: [
+      {
+        id: "morning-0",
+        placeName: "Blue Tokai Coffee",
+        walkTime: "3 min walk",
+        imageSrc: "/assets/community/hero/hero-1.png",
+      },
+      {
+        id: "morning-1",
+        placeName: "Third Wave Coffee",
+        walkTime: "5 min walk",
+        imageSrc: "/assets/community/hero/hero-2.png",
+      },
+      {
+        id: "morning-2",
+        placeName: "Starbucks HSR",
+        walkTime: "7 min walk",
+        imageSrc: "/assets/community/hero/hero-3.png",
+      },
+    ],
   },
   {
     id: "workout",
@@ -30,7 +58,20 @@ export const neighborhoodRoutineSamples: readonly NeighborhoodCardData[] = [
     imageSrc: "/assets/community/sports/rectangle-2363-3.png",
     walkTime: "6 min walk",
     linkLabel: "View Gyms Nearby",
-    href: "#",
+    options: [
+      {
+        id: "workout-0",
+        placeName: "Cult.fit HSR",
+        walkTime: "6 min walk",
+        imageSrc: "/assets/community/sports/rectangle-2363-3.png",
+      },
+      {
+        id: "workout-1",
+        placeName: "Gold's Gym",
+        walkTime: "8 min walk",
+        imageSrc: "/assets/community/hero/hero-4.png",
+      },
+    ],
   },
   {
     id: "commute",

@@ -6,6 +6,7 @@ import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { uploadContactLead } from "@/src/apis/contact";
 import { postSendOtpLeads } from "@/src/apis/user";
 import { validateField } from "@/src/lib/form-validation";
+import { CallbackRequestSuccess } from "@/components/booking/callback-request-success";
 import { Button } from "@/components/ui/button";
 import { OtpInput } from "@/components/ui/otp-input";
 import { localityContactIllustration } from "@/src/tokens/locality";
@@ -128,154 +129,147 @@ export function LocalityContactCard({
       aria-label="Contact us"
     >
       <div className="px-6 pb-8 pt-5">
-        <Image
-          src={localityContactIllustration}
-          alt=""
-          width={280}
-          height={200}
-          className="mx-auto h-auto w-full max-w-[15.5rem] object-contain"
-          priority
-        />
-
         {step === "success" ? (
-          <div className="mt-6 space-y-4 text-center">
-            <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-white text-2xl shadow-sm">
-              ✓
-            </div>
-            <h2 className="text-xl font-bold text-gray-900">Request received</h2>
-            <p className="text-sm text-gray-600">
-              We&apos;ll call you back as soon as possible.
-            </p>
-            <Button type="button" className="w-full" onClick={resetForm}>
-              Done
-            </Button>
-          </div>
-        ) : step === "otp" ? (
-          <div className="mt-6 space-y-5">
-            <div className="space-y-1 text-center">
-              <h2 className="text-xl font-bold text-gray-900">Verify your number</h2>
-              <p className="text-sm text-gray-600">
-                Enter the 6-digit code sent to +91-{phone}
-              </p>
-            </div>
-            <form className="space-y-4" onSubmit={handleOtpSubmit}>
-              <OtpInput
-                value={otp}
-                onChange={setOtp}
-                error={errors.otp}
-                disabled={loading}
-              />
-              {errors.otp ? (
-                <p className="text-sm text-error-600">Invalid OTP. Please try again.</p>
-              ) : null}
-              {errorMessage ? (
-                <p className="text-sm text-error-600">{errorMessage}</p>
-              ) : null}
-              <div className="flex gap-3">
-                <Button
-                  type="button"
-                  hierarchy="secondary-gray"
-                  className="flex-1 bg-white"
-                  onClick={() => setStep("form")}
-                  disabled={loading}
-                >
-                  Edit phone
-                </Button>
-                <Button
-                  type="submit"
-                  className="h-12 flex-1 rounded-2xl bg-hello-lime-400 text-base font-bold text-gray-900 hover:bg-hello-lime-500"
-                  disabled={loading || otp.length !== 6}
-                >
-                  {loading ? "Submitting..." : "Submit"}
-                </Button>
-              </div>
-            </form>
-          </div>
+          <CallbackRequestSuccess onDone={resetForm} />
         ) : (
           <>
-            <h2 className="mt-4 text-center text-xl font-bold text-gray-900">
-              Let us help you!
-            </h2>
+            <Image
+              src={localityContactIllustration}
+              alt=""
+              width={280}
+              height={200}
+              className="mx-auto h-auto w-full max-w-[15.5rem] object-contain"
+              priority
+            />
 
-            <form className="mt-6 space-y-4" onSubmit={handleFormSubmit}>
-              <label className="block space-y-2">
-                <FieldLabel>Full Name</FieldLabel>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  placeholder="Enter your name"
-                  className={cn(
-                    fieldInputClassName,
-                    errors.name && "ring-2 ring-error-300",
-                  )}
-                />
-              </label>
-
-              <label className="block space-y-2">
-                <FieldLabel>Phone Number</FieldLabel>
-                <div className="relative">
-                  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-900">
-                    +91-
-                  </span>
-                  <input
-                    type="tel"
-                    inputMode="numeric"
-                    maxLength={10}
-                    value={phone}
-                    onChange={(event) =>
-                      setPhone(event.target.value.replace(/\D/g, "").slice(0, 10))
-                    }
-                    placeholder="Enter your phone number"
-                    className={cn(
-                      fieldInputClassName,
-                      "pl-[3.25rem]",
-                      errors.phone && "ring-2 ring-error-300",
-                    )}
-                  />
+            {step === "otp" ? (
+              <div className="mt-6 space-y-5">
+                <div className="space-y-1 text-center">
+                  <h2 className="text-xl font-bold text-gray-900">Verify your number</h2>
+                  <p className="text-sm text-gray-600">
+                    Enter the 6-digit code sent to +91-{phone}
+                  </p>
                 </div>
-              </label>
+                <form className="space-y-4" onSubmit={handleOtpSubmit}>
+                  <OtpInput
+                    value={otp}
+                    onChange={setOtp}
+                    error={errors.otp}
+                    disabled={loading}
+                  />
+                  {errors.otp ? (
+                    <p className="text-sm text-error-600">Invalid OTP. Please try again.</p>
+                  ) : null}
+                  {errorMessage ? (
+                    <p className="text-sm text-error-600">{errorMessage}</p>
+                  ) : null}
+                  <div className="flex gap-3">
+                    <Button
+                      type="button"
+                      hierarchy="secondary-gray"
+                      className="flex-1 bg-white"
+                      onClick={() => setStep("form")}
+                      disabled={loading}
+                    >
+                      Edit phone
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="h-12 flex-1 rounded-2xl bg-hello-lime-400 text-base font-bold text-gray-900 hover:bg-hello-lime-500"
+                      disabled={loading || otp.length !== 6}
+                    >
+                      {loading ? "Submitting..." : "Submit"}
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            ) : (
+              <>
+                <h2 className="mt-4 text-center text-xl font-bold text-gray-900">
+                  Let us help you!
+                </h2>
 
-              <label className="block space-y-2">
-                <FieldLabel>Location</FieldLabel>
-                <input
-                  type="text"
-                  value={location}
-                  onChange={(event) => setLocation(event.target.value)}
-                  readOnly={!locationEditable}
-                  placeholder="Enter preferred location"
-                  className={cn(
-                    fieldInputClassName,
-                    errors.location && "ring-2 ring-error-300",
-                    !locationEditable && "text-gray-700",
-                  )}
-                />
-              </label>
+                <form className="mt-6 space-y-4" onSubmit={handleFormSubmit}>
+                  <label className="block space-y-2">
+                    <FieldLabel>Full Name</FieldLabel>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(event) => setName(event.target.value)}
+                      placeholder="Enter your name"
+                      className={cn(
+                        fieldInputClassName,
+                        errors.name && "ring-2 ring-error-300",
+                      )}
+                    />
+                  </label>
 
-              {errorMessage ? (
-                <p className="text-sm text-error-600">{errorMessage}</p>
-              ) : null}
+                  <label className="block space-y-2">
+                    <FieldLabel>Phone Number</FieldLabel>
+                    <div className="relative">
+                      <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-900">
+                        +91-
+                      </span>
+                      <input
+                        type="tel"
+                        inputMode="numeric"
+                        maxLength={10}
+                        value={phone}
+                        onChange={(event) =>
+                          setPhone(event.target.value.replace(/\D/g, "").slice(0, 10))
+                        }
+                        placeholder="Enter your phone number"
+                        className={cn(
+                          fieldInputClassName,
+                          "pl-[3.25rem]",
+                          errors.phone && "ring-2 ring-error-300",
+                        )}
+                      />
+                    </div>
+                  </label>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="h-14 w-full rounded-2xl bg-hello-lime-400 text-base font-bold text-gray-900 transition-colors hover:bg-hello-lime-500 disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {loading ? "Sending OTP..." : "Request Callback"}
-              </button>
-            </form>
+                  <label className="block space-y-2">
+                    <FieldLabel>Location</FieldLabel>
+                    <input
+                      type="text"
+                      value={location}
+                      onChange={(event) => setLocation(event.target.value)}
+                      readOnly={!locationEditable}
+                      placeholder="Enter preferred location"
+                      className={cn(
+                        fieldInputClassName,
+                        errors.location && "ring-2 ring-error-300",
+                        !locationEditable && "text-gray-700",
+                      )}
+                    />
+                  </label>
 
-            <div className="mt-6 border-t border-gray-200/80 pt-5 text-center">
-              <p className="text-sm text-gray-600">
-                or call{" "}
-                <Link
-                  href={footerContact.phoneHref}
-                  className="text-base font-bold text-gray-900 hover:underline"
-                >
-                  {footerContact.phone}
-                </Link>
-              </p>
-            </div>
+                  {errorMessage ? (
+                    <p className="text-sm text-error-600">{errorMessage}</p>
+                  ) : null}
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="h-14 w-full rounded-2xl bg-hello-lime-400 text-base font-bold text-gray-900 transition-colors hover:bg-hello-lime-500 disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {loading ? "Sending OTP..." : "Request Callback"}
+                  </button>
+                </form>
+
+                <div className="mt-6 border-t border-gray-200/80 pt-5 text-center">
+                  <p className="text-sm text-gray-600">
+                    or call{" "}
+                    <Link
+                      href={footerContact.phoneHref}
+                      className="text-base font-bold text-gray-900 hover:underline"
+                    >
+                      {footerContact.phone}
+                    </Link>
+                  </p>
+                </div>
+              </>
+            )}
           </>
         )}
       </div>

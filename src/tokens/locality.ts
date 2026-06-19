@@ -318,3 +318,6 @@ export const localityFaqs: readonly FaqAccordionItem[] = [
 
 export const localityContactIllustration =
   "/assets/locality/contact-us-form-3d-illustration.png";
+
+export const localityCallbackSuccessIllustration =
+  "/assets/locality/callback-success-illustration.png";

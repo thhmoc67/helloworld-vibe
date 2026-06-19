@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeaderSearch } from "@/components/layout/site-header-search";
+import { Breadcrumbs } from "@/components/navigation/breadcrumbs";
 import { LocalityBentoHero } from "@/components/marketing/locality-bento-hero";
 import { LocalityAmenitiesSection } from "@/components/marketing/locality-amenities-section";
 import { LocalityContactCard } from "@/components/marketing/locality-contact-card";
@@ -182,6 +183,10 @@ export function SrpPageContent({ config }: { config: SrpPageConfig }) {
       />
 
       <main className={cn(pageLayout.container, "pt-0 lg:pt-8 pb-10")}>
+        <Breadcrumbs
+          items={config.breadcrumbItems}
+          className="mb-4 md:mb-6"
+        />
         <SrpHero config={config} />
 
         <div className="mt-8 md:mt-12">

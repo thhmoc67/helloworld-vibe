@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { RefObject } from "react";
+import { useMemo, useState, type RefObject } from "react";
+import { NeighborhoodCategoryPickerModal } from "@/components/marketing/neighborhood-category-picker-modal";
 import { cn } from "@/src/lib/cn";
 import { useAnimateOnView } from "@/src/lib/use-animate-on-view";
 import type { NeighborhoodCardData } from "@/src/tokens/neighborhood-card";
@@ -12,9 +13,8 @@ const STAGGER_MS = 100;
 const CARD_DELAY_OFFSET_MS = 80;
 export const NEIGHBORHOOD_CARD_WIDTH_PX = 220;
 const CARD_WIDTH_PX = NEIGHBORHOOD_CARD_WIDTH_PX;
-const CARD_GAP_CLASS = "gap-4";
+const CARD_GAP_PX = 16;
 const TIMELINE_ROW_PADDING_X = "0.25rem";
-const TIMELINE_DOT_OFFSET_PX = CARD_WIDTH_PX / 2;
 const TIMELINE_ROW_HEIGHT_PX = 24;
 const TIMELINE_LINE_TOP_PX = TIMELINE_ROW_HEIGHT_PX / 2;
 
@@ -88,17 +88,33 @@ export function NeighborhoodCard({
       <p className="mt-3 text-sm font-bold text-gray-900">{placeName}</p>
       <p className="mt-1 text-sm font-medium text-blue-light-500">{walkTime}</p>
 
-      {href ? (
-        <Link href={href} className={linkClassName}>
-          {linkContent}
-        </Link>
-      ) : (
+      {onLinkClick ? (
         <button type="button" onClick={onLinkClick} className={linkClassName}>
           {linkContent}
         </button>
-      )}
+      ) : href ? (
+        <Link href={href} className={linkClassName}>
+          {linkContent}
+        </Link>
+      ) : null}
     </article>
   );
+}
+
+function resolveDisplayCard(
+  item: NeighborhoodCardData,
+  selectedIndex: number,
+): NeighborhoodCardData {
+  const option = item.options?.[selectedIndex];
+  if (!option) return item;
+
+  return {
+    ...item,
+    placeName: option.placeName,
+    walkTime: option.walkTime,
+    imageSrc: option.imageSrc ?? item.imageSrc,
+    imageAlt: option.imageAlt ?? item.imageAlt,
+  };
 }
 
 function TimelineDot({
@@ -113,7 +129,7 @@ function TimelineDot({
   return (
     <div
       className={cn(
-        "relative mb-3 flex h-6 w-full items-center justify-center",
+        "relative mb-3 flex h-6 w-full items-center justify-start",
         "transition-opacity ease-out motion-reduce:transition-none",
         !shouldAnimate || isActive ? "opacity-100" : "opacity-0",
       )}
@@ -164,6 +180,16 @@ export function NeighborhoodTimeline({
   const isActive = isActiveProp ?? internalActive;
   const shouldAnimate = shouldAnimateProp ?? internalAnimate;
   const useInternalRef = isActiveProp === undefined;
+  const timelineLineWidthPx =
+    items.length > 1 ? (items.length - 1) * (CARD_WIDTH_PX + CARD_GAP_PX) : 0;
+  const [selectedByCategory, setSelectedByCategory] = useState<
+    Record<string, number>
+  >({});
+  const [pickerCategoryId, setPickerCategoryId] = useState<string | null>(null);
+  const pickerItem = useMemo(
+    () => items.find((item) => item.id === pickerCategoryId) ?? null,
+    [items, pickerCategoryId],
+  );
 
   return (
     <div ref={useInternalRef ? ref : undefined} className={cn("min-w-0", className)}>
@@ -173,8 +199,7 @@ export function NeighborhoodTimeline({
       >
         <div
           className={cn(
-            "relative flex w-max min-w-full px-1 pb-2",
-            CARD_GAP_CLASS,
+            "relative flex w-max min-w-full px-1 pb-2 gap-4",
           )}
         >
           {showTimeline && items.length > 1 ? (
@@ -187,8 +212,8 @@ export function NeighborhoodTimeline({
               )}
               style={{
                 top: TIMELINE_LINE_TOP_PX,
-                left: `calc(${TIMELINE_ROW_PADDING_X} + ${TIMELINE_DOT_OFFSET_PX}px)`,
-                right: `calc(${TIMELINE_ROW_PADDING_X} + ${TIMELINE_DOT_OFFSET_PX}px)`,
+                left: TIMELINE_ROW_PADDING_X,
+                width: timelineLineWidthPx,
                 transitionDuration: `${CARD_ANIMATION_MS}ms`,
                 transitionDelay:
                   shouldAnimate && isActive ? `${STAGGER_MS}ms` : "0ms",
@@ -198,11 +223,14 @@ export function NeighborhoodTimeline({
 
           {items.map((item, index) => {
             const delay = index * STAGGER_MS + CARD_DELAY_OFFSET_MS;
+            const selectedIndex = selectedByCategory[item.id] ?? 0;
+            const displayItem = resolveDisplayCard(item, selectedIndex);
+            const hasPicker = Boolean(item.options && item.options.length > 0);
 
             return (
               <div
                 key={item.id}
-                className="flex w-[220px] shrink-0 snap-start flex-col items-center"
+                className="flex w-[220px] shrink-0 snap-start flex-col items-start"
               >
                 {showTimeline ? (
                   <TimelineDot
@@ -225,13 +253,37 @@ export function NeighborhoodTimeline({
                       shouldAnimate && isActive ? `${delay}ms` : "0ms",
                   }}
                 >
-                  <NeighborhoodCard {...item} className="group w-full" />
+                  <NeighborhoodCard
+                    {...displayItem}
+                    href={hasPicker ? undefined : item.href}
+                    onLinkClick={
+                      hasPicker ? () => setPickerCategoryId(item.id) : undefined
+                    }
+                    className="group w-full"
+                  />
                 </div>
               </div>
             );
           })}
         </div>
       </div>
+
+      <NeighborhoodCategoryPickerModal
+        open={pickerCategoryId !== null}
+        onClose={() => setPickerCategoryId(null)}
+        category={pickerItem?.category ?? ""}
+        options={pickerItem?.options ?? []}
+        selectedIndex={
+          pickerItem ? (selectedByCategory[pickerItem.id] ?? 0) : 0
+        }
+        onSelect={(index) => {
+          if (!pickerItem) return;
+          setSelectedByCategory((current) => ({
+            ...current,
+            [pickerItem.id]: index,
+          }));
+        }}
+      />
     </div>
   );
 }

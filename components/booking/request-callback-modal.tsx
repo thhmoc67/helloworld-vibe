@@ -4,6 +4,7 @@ import { useId, useState, type FormEvent } from "react";
 import { uploadContactLead } from "@/src/apis/contact";
 import { postSendOtpLeads } from "@/src/apis/user";
 import { validateField } from "@/src/lib/form-validation";
+import { CallbackRequestSuccess } from "@/components/booking/callback-request-success";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -120,17 +121,12 @@ export function RequestCallbackModal({
       closeLabel="Close callback request dialog"
     >
       {step === "success" ? (
-        <div className="space-y-4 text-center">
-          <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-hello-lime-100 text-2xl">
-            ✓
-          </div>
-          <ModalTitle id={titleId}>Request received</ModalTitle>
-          <ModalDescription id={descriptionId}>
-            We&apos;ll call you back about {propertyName} as soon as possible.
-          </ModalDescription>
-          <Button className="w-full" onClick={handleClose}>
-            Done
-          </Button>
+        <div className="-m-1 rounded-2xl bg-gradient-contact-card px-2 py-4 sm:px-4">
+          <CallbackRequestSuccess
+            onDone={handleClose}
+            titleId={titleId}
+            descriptionId={descriptionId}
+          />
         </div>
       ) : step === "otp" ? (
         <div className="space-y-6">

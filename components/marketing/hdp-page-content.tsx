@@ -2,6 +2,7 @@
 
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { Breadcrumbs } from "@/components/navigation/breadcrumbs";
 import { PropertyActionsProvider } from "@/components/booking/property-actions-provider";
 import { HdpAbout } from "@/components/marketing/hdp-about";
 import { HdpAmenities } from "@/components/marketing/hdp-amenities";
@@ -42,6 +43,10 @@ export function HdpPageContent({ config }: { config: HdpPageConfig }) {
         <SiteHeader />
 
         <main className={pageLayout.containerWithTopPadding}>
+          <Breadcrumbs
+            items={config.breadcrumbItems}
+            className="mb-4 md:mb-6"
+          />
           <HdpHeader view={view} />
 
           <div className="mt-4 md:mt-6">
