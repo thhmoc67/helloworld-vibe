@@ -125,7 +125,6 @@ export const landmarkProperties: LocalityProperty[] = [
     roomTypes: ["Private", "Double", "Triple"],
     rent: 9000,
     statusLabel: "filling-fast" satisfies SrpCardStatusLabel,
-    genderLabel: "Unisex",
   },
   {
     id: "campus-view",
@@ -162,7 +161,6 @@ export const landmarkProperties: LocalityProperty[] = [
     rating: 4.4,
     roomTypes: ["Private", "Double"],
     rent: 11000,
-    genderLabel: "Unisex",
   },
   {
     id: "student-hub",
@@ -173,7 +171,6 @@ export const landmarkProperties: LocalityProperty[] = [
     rating: 4.5,
     roomTypes: ["Triple", "Quadruple"],
     rent: 8000,
-    genderLabel: "Unisex",
   },
   {
     id: "banashankari-central",

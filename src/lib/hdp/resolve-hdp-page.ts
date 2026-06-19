@@ -66,7 +66,7 @@ function genderBadge(gender?: string): string | undefined {
     case "FEMALE":
       return "Women Only";
     case "ALL":
-      return "Unisex";
+      return undefined;
     default:
       return undefined;
   }

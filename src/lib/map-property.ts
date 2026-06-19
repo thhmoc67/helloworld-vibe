@@ -19,7 +19,7 @@ function genderLabel(gender?: string): string | undefined {
     case "FEMALE":
       return "Women Only";
     case "ALL":
-      return "Unisex";
+      return undefined;
     default:
       return undefined;
   }
@@ -36,8 +36,6 @@ function statusLabel(property: Property): SrpCardStatusLabel | undefined {
 function propertyImages(property: Property): readonly string[] {
   const candidates = [
     property.image,
-    property.srp_image,
-    property.hdp_image,
     ...(Array.isArray(property.property_image) ? property.property_image : []),
   ];
 

@@ -229,7 +229,6 @@ export const localityProperties: LocalityProperty[] = [
     roomTypes: ["Private", "Double", "Triple"],
     rent: 9000,
     statusLabel: "filling-fast",
-    genderLabel: "Unisex",
   },
   {
     id: "mahaveer",
@@ -266,7 +265,6 @@ export const localityProperties: LocalityProperty[] = [
     rating: 4.4,
     roomTypes: ["Private", "Double"],
     rent: 11000,
-    genderLabel: "Unisex",
   },
   {
     id: "metro-hub",
@@ -277,7 +275,6 @@ export const localityProperties: LocalityProperty[] = [
     rating: 4.5,
     roomTypes: ["Triple", "Quadruple"],
     rent: 8000,
-    genderLabel: "Unisex",
   },
   {
     id: "central",

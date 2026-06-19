@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type MouseEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/src/lib/cn";
+import { formatSrpCardImageSrc } from "@/src/lib/images";
 import {
   formatRent,
   isSrpComingSoonImage,
@@ -193,11 +194,10 @@ function SrpCardCarousel({
 }: {
   images: readonly string[];
   alt: string;
-}) {
-  const slides = (images.length > 0 ? images : [srpCardDefaultImage]).slice(
-    0,
-    SRP_CARD_MAX_IMAGES,
-  );
+  }) {
+  const slides = (images.length > 0 ? images : [srpCardDefaultImage])
+    .slice(0, SRP_CARD_MAX_IMAGES)
+    .map((src) => formatSrpCardImageSrc(src) || srpCardDefaultImage);
   const [activeIndex, setActiveIndex] = useState(0);
   const slideCount = slides.length;
   const imageSrc = slides[activeIndex] ?? srpCardDefaultImage;
