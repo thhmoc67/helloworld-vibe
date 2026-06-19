@@ -6,6 +6,7 @@ import type {
 
 const RAZORPAY_SCRIPT_URL = "https://checkout.razorpay.com/v1/checkout.js";
 const RAZORPAY_LOGO_URL = "https://images.thehelloworld.com/icons/logo.png";
+const RAZORPAY_OPEN_DELAY_MS = 1000;
 
 let cashfreePromise: Promise<CashfreeInstance> | null = null;
 let razorpayScriptPromise: Promise<void> | null = null;
@@ -41,6 +42,10 @@ export function loadRazorpayScript() {
         `script[src="${RAZORPAY_SCRIPT_URL}"]`,
       );
       if (existing) {
+        if (window.Razorpay) {
+          resolve();
+          return;
+        }
         existing.addEventListener("load", () => resolve(), { once: true });
         existing.addEventListener("error", () => reject(), { once: true });
         return;
@@ -58,12 +63,38 @@ export function loadRazorpayScript() {
   return razorpayScriptPromise;
 }
 
-export async function openCashfreeCheckout(initResponse: InitBookingResponse) {
+export type CashfreeCheckoutCallbacks = {
+  onComplete: () => void;
+  onError?: (message: string) => void;
+};
+
+export async function openCashfreeCheckout(
+  initResponse: InitBookingResponse,
+  callbacks: CashfreeCheckoutCallbacks,
+) {
   const cashfree = await loadCashfree();
-  cashfree.checkout({
+  const result = await cashfree.checkout({
     paymentSessionId: initResponse.paymentObj.paymentSessionId,
     redirectTarget: "_modal",
   });
+
+  if (result.error) {
+    callbacks.onError?.(
+      result.error.message ?? "Payment was cancelled or could not be completed.",
+    );
+    return;
+  }
+
+  if (result.paymentDetails) {
+    callbacks.onComplete();
+    return;
+  }
+
+  if (result.redirect) {
+    return;
+  }
+
+  callbacks.onError?.("Payment status could not be confirmed. Please try again.");
 }
 
 export type RazorpayPrefill = {
@@ -81,7 +112,7 @@ export async function openRazorpayCheckout({
   initResponse: InitBookingResponse;
   prefill: RazorpayPrefill;
   onSuccess: (response: RazorpayPaymentResponse) => void;
-  onFailure?: () => void;
+  onFailure?: (message?: string) => void;
 }) {
   await loadRazorpayScript();
 
@@ -90,6 +121,11 @@ export async function openRazorpayCheckout({
   }
 
   const { paymentObj } = initResponse;
+
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, RAZORPAY_OPEN_DELAY_MS);
+  });
+
   const razorpay = new window.Razorpay({
     key: paymentObj.razaorpayKey,
     order_id: paymentObj.orderId,
@@ -105,7 +141,7 @@ export async function openRazorpayCheckout({
   });
 
   razorpay.on("payment.failed", () => {
-    onFailure?.();
+    onFailure?.("Payment failed. Please try again.");
   });
 
   razorpay.open();
@@ -113,4 +149,10 @@ export async function openRazorpayCheckout({
 
 export function usesCashfree(initResponse: InitBookingResponse) {
   return Boolean(initResponse.paymentObj.paymentSessionId);
+}
+
+export function markBookingSuccess(bookingId: string) {
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem("booking_successfull", bookingId);
+  }
 }

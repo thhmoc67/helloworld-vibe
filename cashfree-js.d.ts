@@ -8,8 +8,14 @@ declare module "@cashfreepayments/cashfree-js" {
     redirectTarget?: "_self" | "_blank" | "_modal";
   }
 
+  export interface CashfreeCheckoutResult {
+    error?: { message?: string };
+    redirect?: boolean;
+    paymentDetails?: { paymentMessage?: string };
+  }
+
   export interface CashfreeInstance {
-    checkout(options: CheckoutOptions): void;
+    checkout(options: CheckoutOptions): Promise<CashfreeCheckoutResult>;
   }
 
   export function load(options: CashfreeOptions): Promise<CashfreeInstance>;

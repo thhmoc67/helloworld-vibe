@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { BookingPaymentCheckout } from "@/components/booking/booking-payment-checkout";
 import { BookingPaymentOption } from "@/components/booking/booking-payment-option";
 import { PromoCodeInput } from "@/components/ui/promo-code-input";
+import { Snackbar } from "@/components/ui/snackbar";
 import {
   getPaymentDetails,
   postValidateReferral,
@@ -66,6 +67,7 @@ export function BookingPaymentPanel({
   const [referralCode, setReferralCode] = useState("");
   const [loadingPricing, setLoadingPricing] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [paymentSnackbar, setPaymentSnackbar] = useState<string | null>(null);
 
   const fetchPricing = useCallback(
     async (options?: { couponCode?: string; clearCoupon?: boolean }) => {
@@ -363,13 +365,16 @@ export function BookingPaymentPanel({
               utilitySelected: paymentDetails.utilityCharges,
             },
           }}
-          onError={(message) => setErrorMessage(message || null)}
+          onInitError={(message) => setPaymentSnackbar(message)}
         />
       </div>
 
-      {errorMessage ? (
-        <p className="text-sm text-error-600">{errorMessage}</p>
-      ) : null}
+      <Snackbar
+        open={paymentSnackbar != null}
+        message={paymentSnackbar ?? ""}
+        variant="error"
+        onClose={() => setPaymentSnackbar(null)}
+      />
 
       <section aria-labelledby="booking-terms-heading" className="space-y-3">
         <h2

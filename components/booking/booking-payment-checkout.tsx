@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { postInitBooking, postVerifyBooking } from "@/src/apis/booking";
 import type { BookingOccupantInfo } from "@/src/lib/booking/url";
 import {
+  markBookingSuccess,
   openCashfreeCheckout,
   openRazorpayCheckout,
   preloadPaymentGateways,
@@ -27,7 +28,7 @@ export interface BookingPaymentCheckoutProps {
   propertyAddress: string;
   mapUrl?: string;
   disabled?: boolean;
-  onError?: (message: string) => void;
+  onInitError?: (message: string) => void;
   className?: string;
 }
 
@@ -37,17 +38,20 @@ function buildSuccessHref({
   occupantInfo,
   propertyAddress,
   mapUrl,
+  bookingId,
 }: {
   propertyPath: string;
   moveInDate: string;
   occupantInfo: BookingOccupantInfo;
   propertyAddress: string;
   mapUrl?: string;
+  bookingId: string;
 }) {
   const params = new URLSearchParams({
     moveInDate,
     name: `${occupantInfo.firstName} ${occupantInfo.lastName}`.trim(),
     address: propertyAddress,
+    bookingId,
   });
   if (mapUrl) params.set("mapURL", mapUrl);
   return `${propertyPath}/booking/success?${params.toString()}`;
@@ -77,7 +81,7 @@ export function BookingPaymentCheckout({
   propertyAddress,
   mapUrl,
   disabled = false,
-  onError,
+  onInitError,
   className,
 }: BookingPaymentCheckoutProps) {
   const router = useRouter();
@@ -86,6 +90,24 @@ export function BookingPaymentCheckout({
   useEffect(() => {
     preloadPaymentGateways();
   }, []);
+
+  function redirectToSuccess(bookingId: string) {
+    markBookingSuccess(bookingId);
+    router.push(
+      buildSuccessHref({
+        propertyPath,
+        moveInDate,
+        occupantInfo,
+        propertyAddress,
+        mapUrl,
+        bookingId,
+      }),
+    );
+  }
+
+  function redirectToFailed(message: string) {
+    router.push(buildFailedHref({ propertyPath, message }));
+  }
 
   async function verifyRazorpayPayment(
     razorpayResponse: RazorpayPaymentResponse,
@@ -104,27 +126,25 @@ export function BookingPaymentCheckout({
     setLoading(false);
 
     if (verifyResponse?.success) {
-      router.push(
-        buildSuccessHref({
-          propertyPath,
-          moveInDate,
-          occupantInfo,
-          propertyAddress,
-          mapUrl,
-        }),
-      );
+      redirectToSuccess(initResponse.id);
       return;
     }
 
-    const message =
-      verifyResponse?.message ?? "Payment verification failed. Please try again.";
-    onError?.(message);
-    router.push(buildFailedHref({ propertyPath, message }));
+    redirectToFailed(
+      verifyResponse?.message ?? "Payment verification failed. Please try again.",
+    );
   }
 
   async function openGateway(initResponse: InitBookingResponse) {
     if (usesCashfree(initResponse)) {
-      await openCashfreeCheckout(initResponse);
+      await openCashfreeCheckout(initResponse, {
+        onComplete: () => redirectToSuccess(initResponse.id),
+        onError: (message) => {
+          setLoading(false);
+          onInitError?.(message);
+        },
+      });
+      setLoading(false);
       return;
     }
 
@@ -138,32 +158,33 @@ export function BookingPaymentCheckout({
       onSuccess: (response) => {
         void verifyRazorpayPayment(response, initResponse);
       },
-      onFailure: () => {
+      onFailure: (message) => {
         setLoading(false);
-        onError?.("Payment failed. Please try again.");
+        onInitError?.(message ?? "Payment failed. Please try again.");
       },
     });
+
+    setLoading(false);
   }
 
   async function handlePayNow() {
     setLoading(true);
-    onError?.("");
 
     try {
       const response = await postInitBooking(initPayload);
 
       if (!response?.success || !response?.data) {
         const message = response?.message ?? "Payment could not be initiated.";
-        onError?.(message);
+        onInitError?.(message);
         setLoading(false);
         return;
       }
 
-      const initResponse = response.data as InitBookingResponse;
-      await openGateway(initResponse);
+      await openGateway(response.data as InitBookingResponse);
     } catch {
-      onError?.("Something went wrong while starting payment. Please try again.");
-    } finally {
+      onInitError?.(
+        "Something went wrong while starting payment. Please try again.",
+      );
       setLoading(false);
     }
   }
@@ -172,14 +193,14 @@ export function BookingPaymentCheckout({
     <Button
       size="xl"
       className={cn(
-        "w-full bg-hello-lime-400 text-gray-900 hover:bg-hello-lime-500 sm:w-auto sm:min-w-[10rem]",
+        "w-full bg-hello-lime-400 text-gray-900 hover:bg-hello-lime-500 sm:w-auto sm:min-w-40",
         className,
       )}
       disabled={disabled || loading}
       onClick={() => void handlePayNow()}
       aria-busy={loading}
     >
-      {loading ? "Processing..." : `Pay Now`}
+      {loading ? "Processing..." : "Pay Now"}
     </Button>
   );
 }
