@@ -21,7 +21,7 @@ function formatHeroImageUrl(url: string): string {
       .replace(/ /g, "%20");
   }
 
-  return imageUrlFormatter("srp", trimmed);
+  return imageUrlFormatter("hdp", trimmed);
 }
 
 export function resolveSrpHeroImageSrc(
